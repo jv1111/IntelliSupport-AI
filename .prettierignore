@@ -9,3 +9,6 @@ public/
 package-lock.json
 next-env.d.ts
 tsconfig.tsbuildinfo
+
+# Generated Prisma client
+src/generated/prisma/
