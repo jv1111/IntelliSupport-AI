@@ -1,5 +1,7 @@
 import { BookOpen, Headset, MessageCircle, Ticket } from "lucide-react";
+import { redirect } from "next/navigation";
 import { AuthSwitcher } from "@/components/auth/auth-switcher";
+import { getCurrentUser } from "@/server/auth/current-user";
 
 const featureHighlights = [
   {
@@ -16,7 +18,14 @@ const featureHighlights = [
   },
 ] as const;
 
-export default function AuthPage() {
+export const instant = false;
+
+export default async function AuthPage() {
+  const user = await getCurrentUser();
+
+  if (user) {
+    redirect("/");
+  }
   return (
     <div className="grid min-h-dvh grid-cols-1 bg-background lg:grid-cols-2">
       <section className="relative hidden flex-col justify-between overflow-hidden bg-linear-to-br from-slate-950 via-blue-950 to-cyan-950 px-14 py-14 text-white lg:flex xl:px-20">
