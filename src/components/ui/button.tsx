@@ -7,7 +7,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const baseStyles =
-  "inline-flex items-center justify-center font-bold tracking-wider transition-all duration-150 ease-out cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/15 hover:scale-[1.01] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100 disabled:active:scale-100";
+  "inline-flex items-center justify-center font-bold tracking-wider transition-all duration-150 ease-out focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/15 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 disabled:hover:scale-100 disabled:active:scale-100";
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:

@@ -28,6 +28,18 @@ export async function createSession(userId: string) {
   };
 }
 
+export async function revokeSession(token: string | null): Promise<void> {
+  if (!token || !/^[a-f0-9]{64}$/.test(token)) {
+    return;
+  }
+
+  const tokenHash = createHash("sha256").update(token).digest("hex");
+
+  await prisma.session.deleteMany({
+    where: { tokenHash },
+  });
+}
+
 export interface AuthenticatedUser {
   id: string;
   username: string;

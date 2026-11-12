@@ -1,7 +1,5 @@
-export default function Home() {
-  return (
-    <main className="flex min-h-screen items-center justify-center">
-      <h1>intellisupport - ai</h1>
-    </main>
-  );
+import { PagePlaceholder } from "@/components/layout/page-placeholder";
+
+export default function DashboardPage() {
+  return <PagePlaceholder title="Dashboard" />;
 }

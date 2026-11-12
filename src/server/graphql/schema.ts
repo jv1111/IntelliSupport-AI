@@ -6,7 +6,7 @@ import {
   registerUser,
 } from "@/server/services/register-user";
 import { LoginError, loginUser } from "@/server/services/login-user";
-import { createSession } from "@/server/auth/session";
+import { createSession, revokeSession } from "@/server/auth/session";
 import type { GraphQLContext } from "@/server/graphql/context";
 
 interface RegisterInput {
@@ -48,6 +48,7 @@ export const typeDefs = `#graphql
   type Mutation {
     register(input: RegisterInput!): User!
     login(input: LoginInput!): User!
+    logout: Boolean!
   }
 `;
 
@@ -106,6 +107,27 @@ export const resolvers = {
         }
 
         throw new GraphQLError("Unable to log in.", {
+          extensions: {
+            code: "INTERNAL_SERVER_ERROR",
+          },
+        });
+      }
+    },
+    logout: async (
+      _parent: unknown,
+      _args: unknown,
+      context: GraphQLContext,
+    ): Promise<boolean> => {
+      try {
+        await revokeSession(context.sessionToken);
+
+        context.sessionCookieChange = {
+          type: "clear",
+        };
+
+        return true;
+      } catch {
+        throw new GraphQLError("Unable to log out.", {
           extensions: {
             code: "INTERNAL_SERVER_ERROR",
           },

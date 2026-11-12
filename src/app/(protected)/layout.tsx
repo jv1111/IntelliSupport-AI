@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
+import { AppShell } from "@/components/layout/app-shell";
 import { getCurrentUser } from "@/server/auth/current-user";
 
 export const instant = false;
@@ -15,5 +16,5 @@ export default async function ProtectedLayout({
     redirect("/auth");
   }
 
-  return children;
+  return <AppShell username={user.username}>{children}</AppShell>;
 }

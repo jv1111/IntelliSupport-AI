@@ -19,16 +19,26 @@ const sessionCookiePlugin: ApolloServerPlugin<GraphQLContext> = {
         }
 
         const cookieParts = [
-          `${SESSION_COOKIE_NAME}=${change.token}`,
+          `${SESSION_COOKIE_NAME}=${change.type === "set" ? change.token : ""}`,
           "Path=/",
           "HttpOnly",
           "SameSite=Lax",
-          `Expires=${change.expiresAt.toUTCString()}`,
-          `Max-Age=${Math.max(
-            0,
-            Math.floor((change.expiresAt.getTime() - Date.now()) / 1000),
-          )}`,
         ];
+
+        if (change.type === "set") {
+          cookieParts.push(
+            `Expires=${change.expiresAt.toUTCString()}`,
+            `Max-Age=${Math.max(
+              0,
+              Math.floor((change.expiresAt.getTime() - Date.now()) / 1000),
+            )}`,
+          );
+        } else {
+          cookieParts.push(
+            "Expires=Thu, 01 Jan 1970 00:00:00 GMT",
+            "Max-Age=0",
+          );
+        }
 
         if (process.env.NODE_ENV === "production") {
           cookieParts.push("Secure");

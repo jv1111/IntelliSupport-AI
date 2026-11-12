@@ -9,14 +9,19 @@ import {
 
 export { SESSION_COOKIE_NAME };
 
-export interface SessionCookieChange {
-  type: "set";
-  token: string;
-  expiresAt: Date;
-}
+export type SessionCookieChange =
+  | {
+      type: "set";
+      token: string;
+      expiresAt: Date;
+    }
+  | {
+      type: "clear";
+    };
 
 export interface GraphQLContext {
   sessionUser: AuthenticatedUser | null;
+  sessionToken: string | null;
   sessionCookieChange: SessionCookieChange | null;
 }
 
@@ -27,6 +32,7 @@ export async function createGraphQLContext(
 
   return {
     sessionUser: await getSessionUser(token),
+    sessionToken: token,
     sessionCookieChange: null,
   };
 }
