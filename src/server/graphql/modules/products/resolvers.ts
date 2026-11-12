@@ -5,6 +5,7 @@ import { GraphQLError } from "graphql";
 import {
   ProductError,
   createProduct,
+  getProduct,
   updateProduct,
   deleteProduct,
   getProducts,
@@ -51,9 +52,28 @@ function throwProductGraphQLError(
 
 export const productResolvers = {
   Query: {
+    product: async (
+      _parent: unknown,
+      args: { id: string },
+      context: GraphQLContext,
+    ): Promise<ProductResult> => {
+      const user = requireAuthenticatedUser(context);
+
+      try {
+        return await getProduct(user.id, args.id);
+      } catch (error) {
+        throwProductGraphQLError(error, "Unable to retrieve product.");
+      }
+    },
+
     products: async (
       _parent: unknown,
-      args: { page?: number; limit?: number; search?: string | null },
+      args: {
+        page?: number;
+        limit?: number;
+        search?: string | null;
+        status?: ProductStatusValue | null;
+      },
       context: GraphQLContext,
     ): Promise<Awaited<ReturnType<typeof getProducts>>> => {
       const user = requireAuthenticatedUser(context);

@@ -22,17 +22,17 @@ export function AppShell({ children, username }: AppShellProps) {
   }
 
   return (
-    <div className="min-h-dvh bg-background md:flex">
+    <div className="h-dvh overflow-hidden bg-background md:flex">
       <AppSidebar
         username={username}
         isOpen={isSidebarOpen}
         onClose={closeSidebar}
       />
 
-      <div className="flex min-h-dvh min-w-0 flex-1 flex-col md:pl-64">
+      <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col md:pl-64">
         <AppHeader onMenuClick={openSidebar} />
 
-        <div className="min-h-0 flex-1">{children}</div>
+        <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
         <AppFooter />
       </div>
     </div>

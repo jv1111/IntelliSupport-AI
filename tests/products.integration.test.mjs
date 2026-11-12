@@ -61,6 +61,19 @@ test("unauthenticated users cannot read or mutate products", async () => {
 
   assertError(products, "UNAUTHENTICATED");
 
+  const product = await graphql(
+    `
+      query Product($id: ID!) {
+        product(id: $id) {
+          id
+        }
+      }
+    `,
+    { id: "unauthorized-product-id" },
+  );
+
+  assertError(product, "UNAUTHENTICATED");
+
   const create = await graphql(
     `
       mutation CreateProduct($input: CreateProductInput!) {
@@ -237,6 +250,51 @@ test("authenticated users can create, update, and delete products", async (t) =>
   assert.ok(product.createdAt);
   assert.ok(product.updatedAt);
 
+  const draftArchiveAttempt = await graphql(
+    `
+      mutation UpdateProduct($id: ID!, $input: UpdateProductInput!) {
+        updateProduct(id: $id, input: $input) {
+          id
+          status
+        }
+      }
+    `,
+    {
+      id: productId,
+      input: { status: "archived" },
+    },
+    cookie,
+  );
+
+  assertError(draftArchiveAttempt, "INVALID_STATUS_TRANSITION");
+
+  const fetchedProduct = await graphql(
+    `
+      query Product($id: ID!) {
+        product(id: $id) {
+          id
+          name
+          sku
+          status
+          imageUrl
+          description
+        }
+      }
+    `,
+    { id: productId },
+    cookie,
+  );
+
+  assertSuccess(fetchedProduct);
+  assert.deepEqual(fetchedProduct.payload.data.product, {
+    id: product.id,
+    name: product.name,
+    sku: product.sku,
+    status: product.status,
+    imageUrl: product.imageUrl,
+    description: product.description,
+  });
+
   const emptyUpdate = await graphql(
     `
       mutation UpdateProduct($id: ID!, $input: UpdateProductInput!) {
@@ -289,6 +347,25 @@ test("authenticated users can create, update, and delete products", async (t) =>
   assert.equal(updatedProduct.status, "published");
   assert.equal(updatedProduct.description, "Integration test update.");
 
+  const archived = await graphql(
+    `
+      mutation UpdateProduct($id: ID!, $input: UpdateProductInput!) {
+        updateProduct(id: $id, input: $input) {
+          id
+          status
+        }
+      }
+    `,
+    {
+      id: productId,
+      input: { status: "archived" },
+    },
+    cookie,
+  );
+
+  assertSuccess(archived);
+  assert.equal(archived.payload.data.updateProduct.status, "archived");
+
   const deleted = await graphql(
     `
       mutation DeleteProduct($id: ID!) {
@@ -303,6 +380,20 @@ test("authenticated users can create, update, and delete products", async (t) =>
 
   assertSuccess(deleted);
   assert.equal(deleted.payload.data.deleteProduct, true);
+
+  const fetchedDeletedProduct = await graphql(
+    `
+      query Product($id: ID!) {
+        product(id: $id) {
+          id
+        }
+      }
+    `,
+    { id: productId },
+    cookie,
+  );
+
+  assertError(fetchedDeletedProduct, "NOT_FOUND");
 
   productId = null;
 
@@ -428,4 +519,16 @@ test("authenticated users can create, update, and delete products", async (t) =>
   );
 
   assertError(invalidPage, "INVALID_INPUT");
+
+  const invalidLimit = await graphql(
+    productsQuery,
+    {
+      page: 1,
+      limit: 11,
+      search,
+    },
+    cookie,
+  );
+
+  assertError(invalidLimit, "INVALID_INPUT");
 });

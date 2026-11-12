@@ -15,6 +15,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { AccountMenu } from "@/components/layout/account-menu";
+import { Button } from "@/components/ui/button";
 
 interface NavigationItem {
   label: string;
@@ -97,14 +98,14 @@ export function AppSidebar({ username, isOpen, onClose }: AppSidebarProps) {
             </div>
           </div>
 
-          <button
-            type="button"
+          <Button
+            variant="icon-surface"
             aria-label="Close navigation"
             onClick={onClose}
-            className="flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-surface-muted hover:text-foreground md:hidden"
+            className="md:hidden"
           >
             <X className="size-5" aria-hidden="true" />
-          </button>
+          </Button>
         </div>
 
         <nav

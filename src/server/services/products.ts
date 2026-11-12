@@ -25,7 +25,8 @@ const productSelect = {
 
 export class ProductError extends Error {
   constructor(
-    public readonly code: "INVALID_INPUT" | "NOT_FOUND",
+    public readonly code:
+      "INVALID_INPUT" | "NOT_FOUND" | "INVALID_STATUS_TRANSITION",
     message: string,
   ) {
     super(message);
@@ -56,10 +57,11 @@ export async function getProducts(userId: string, input: unknown) {
     );
   }
 
-  const { page, limit, search } = validationResult.data;
+  const { page, limit, search, status } = validationResult.data;
 
   const where = {
     userId,
+    ...(status ? { status } : {}),
     ...(search
       ? {
           name: {
@@ -91,6 +93,24 @@ export async function getProducts(userId: string, input: unknown) {
     hasNextPage: page < totalPages,
     hasPreviousPage: page > 1,
   };
+}
+
+export async function getProduct(userId: string, productId: string) {
+  const id = validateProductId(productId);
+
+  const product = await prisma.product.findFirst({
+    where: {
+      id,
+      userId,
+    },
+    select: productSelect,
+  });
+
+  if (!product) {
+    throw new ProductError("NOT_FOUND", "Product not found.");
+  }
+
+  return product;
 }
 
 export async function createProduct(userId: string, input: unknown) {
@@ -135,10 +155,27 @@ export async function updateProduct(
     where: {
       id,
       userId,
+      ...(validationResult.data.status === "archived"
+        ? { status: "published" as const }
+        : {}),
     },
     data: validationResult.data,
     select: productSelect,
   });
+
+  if (!product && validationResult.data.status === "archived") {
+    const existingProduct = await prisma.product.findFirst({
+      where: { id, userId },
+      select: { status: true },
+    });
+
+    if (existingProduct) {
+      throw new ProductError(
+        "INVALID_STATUS_TRANSITION",
+        "Only published products can be archived.",
+      );
+    }
+  }
 
   if (!product) {
     throw new ProductError("NOT_FOUND", "Product not found.");

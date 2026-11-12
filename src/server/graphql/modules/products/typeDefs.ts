@@ -42,7 +42,14 @@ export const productTypeDefs = `#graphql
   }
 
   extend type Query {
-    products(page: Int = 1, limit: Int = 10, search: String): ProductPage!
+    product(id: ID!): Product!
+
+    products(
+      page: Int = 1
+      limit: Int = 10
+      search: String
+      status: ProductStatus
+    ): ProductPage!
   }
 
   extend type Mutation {

@@ -134,7 +134,7 @@ export function SignInForm({ onSignUp }: SignInFormProps) {
               <Button variant="secondary" type="button">
                 <span
                   aria-hidden="true"
-                  className="mr-2 bg-linear-to-br from-blue-500 via-green-500 to-amber-500 bg-clip-text text-sm font-extrabold text-transparent"
+                  className="mr-2 bg-linear-to-br from-blue-500 via-green-500 to-amber-500 bg-clip-text text-sm leading-none font-extrabold text-transparent"
                 >
                   G
                 </span>

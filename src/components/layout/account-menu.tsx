@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
+import { Button } from "@/components/ui/button";
 import { logoutUser } from "@/lib/auth/logout-user";
 import {
   EllipsisVertical,
@@ -127,16 +128,15 @@ export function AccountMenu({ username, onNavigate }: AccountMenuProps) {
   return (
     <>
       <div ref={accountMenuRef} className="relative shrink-0">
-        <button
-          type="button"
+        <Button
+          variant="icon-surface"
           aria-label="Account options"
           aria-expanded={isOpen}
           aria-controls={isOpen ? "account-options-panel" : undefined}
           onClick={() => setIsOpen((open) => !open)}
-          className="flex size-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-surface hover:text-foreground"
         >
           <EllipsisVertical className="size-5" aria-hidden="true" />
-        </button>
+        </Button>
 
         {isOpen ? (
           <div
@@ -194,9 +194,9 @@ export function AccountMenu({ username, onNavigate }: AccountMenuProps) {
 
       <ConfirmationDialog
         open={isLogoutDialogOpen}
-        title="Log out?"
+        title="Logout?"
         description="You will be signed out of your IntelliSupport account. You will need to log in again to access your workspace."
-        confirmLabel="Log Out"
+        confirmLabel="Logout"
         pendingLabel="Logging out..."
         variant="danger"
         icon={LogOut}

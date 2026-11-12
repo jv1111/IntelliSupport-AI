@@ -3,6 +3,7 @@
 import { useField } from "formik";
 import type { InputHTMLAttributes, ReactNode } from "react";
 import { Input } from "@/components/ui/input";
+import { FieldLabel } from "@/components/ui/field";
 import type { LucideIcon } from "lucide-react";
 
 interface FormikInputProps extends Omit<
@@ -30,12 +31,7 @@ export function FormikInput({
 
   return (
     <div>
-      <label
-        htmlFor={id}
-        className="mb-1.5 block text-xs font-bold text-foreground"
-      >
-        {label}
-      </label>
+      <FieldLabel htmlFor={id}>{label}</FieldLabel>
 
       <div className="group relative">
         {LeadingIcon && (

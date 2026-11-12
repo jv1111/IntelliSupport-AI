@@ -1,36 +1,75 @@
 import type { ButtonHTMLAttributes } from "react";
 
-type ButtonVariant = "primary" | "secondary" | "text" | "icon";
+type ButtonVariant =
+  | "primary"
+  | "secondary"
+  | "danger"
+  | "danger-subtle"
+  | "icon-surface"
+  | "text"
+  | "icon"
+  | "tab";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
+  fullWidth?: boolean;
+  active?: boolean;
 }
 
 const baseStyles =
-  "inline-flex items-center justify-center font-bold tracking-wider transition-all duration-150 ease-out focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/15 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 disabled:hover:scale-100 disabled:active:scale-100";
+  "inline-flex items-center justify-center font-bold tracking-wider focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/15 disabled:opacity-60 p-3";
+
+const animatedStyles =
+  "transition-all duration-150 ease-out hover:scale-[1.01] active:scale-[0.99] disabled:hover:scale-100 disabled:active:scale-100";
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    "w-full rounded-xl bg-linear-to-r from-primary to-secondary py-3.5 text-xs text-primary-foreground shadow-lg shadow-primary/20 hover:from-primary-hover hover:to-secondary",
+    "rounded-xl bg-linear-to-r from-primary to-secondary text-xs text-primary-foreground   hover:from-primary-hover hover:to-secondary",
 
   secondary:
-    "w-full rounded-xl border border-border/70 bg-surface py-3 text-xs text-muted shadow-xs hover:bg-background hover:text-foreground",
+    "rounded-xl bg-surface text-xs text-foreground inset-ring-1 inset-ring-border hover:bg-surface-muted",
+
+  danger: "rounded-xl bg-danger text-xs text-white   hover:bg-danger/90",
+
+  "danger-subtle":
+    "rounded-xl bg-danger/5 text-xs text-danger inset-ring-1 inset-ring-danger/30 hover:bg-danger/10",
 
   text: "rounded-sm text-[11px] text-primary hover:text-primary-hover hover:underline",
 
   icon: "size-8 rounded-md text-muted-foreground hover:text-foreground",
+
+  "icon-surface":
+    "size-9 shrink-0 rounded-lg text-muted-foreground hover:bg-surface-muted hover:text-foreground",
+
+  tab: "text-xs",
 };
 
 export function Button({
   variant = "primary",
+  fullWidth = variant === "primary" || variant === "secondary",
+  active = false,
   type = "button",
   className = "",
   ...props
 }: ButtonProps) {
+  const stateStyles =
+    variant === "tab"
+      ? active
+        ? "text-primary"
+        : "text-muted-foreground hover:text-foreground"
+      : "";
+
+  const isIconVariant = variant === "icon" || variant === "icon-surface";
+  const widthStyles = isIconVariant ? "" : fullWidth ? "w-full" : "w-auto";
+  const transitionStyles =
+    variant === "tab" || variant === "icon-surface"
+      ? "transition-colors"
+      : animatedStyles;
+
   return (
     <button
       type={type}
-      className={`${baseStyles} ${variantStyles[variant]} ${className}`.trim()}
+      className={`${baseStyles} ${widthStyles} ${transitionStyles} ${variantStyles[variant]} ${stateStyles} ${className}`.trim()}
       {...props}
     />
   );

@@ -3,6 +3,8 @@
 import { createPortal } from "react-dom";
 import { useEffect, useId, useRef, useSyncExternalStore } from "react";
 import type { LucideIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 function subscribeToPortalContainer() {
   return () => {};
@@ -33,19 +35,9 @@ interface ConfirmationDialogProps {
   onCancel: () => void;
 }
 
-const variantStyles: Record<
-  ConfirmationDialogVariant,
-  { icon: string; confirmButton: string }
-> = {
-  primary: {
-    icon: "bg-primary/10 text-primary",
-    confirmButton:
-      "bg-primary text-primary-foreground shadow-primary/20 hover:bg-primary-hover",
-  },
-  danger: {
-    icon: "bg-danger/10 text-danger",
-    confirmButton: "bg-danger text-white shadow-danger/20 hover:bg-danger/90",
-  },
+const variantStyles: Record<ConfirmationDialogVariant, string> = {
+  primary: "bg-primary/10 text-primary",
+  danger: "bg-danger/10 text-danger",
 };
 
 const focusableSelector = [
@@ -77,7 +69,7 @@ export function ConfirmationDialog({
     getServerPortalContainer,
   );
   const dialogId = useId();
-  const dialogRef = useRef<HTMLElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open || !portalContainer) {
@@ -148,10 +140,10 @@ export function ConfirmationDialog({
     return null;
   }
 
-  const styles = variantStyles[variant];
+  const iconStyles = variantStyles[variant];
 
   return createPortal(
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
       <button
         type="button"
         aria-label="Close confirmation dialog"
@@ -160,19 +152,19 @@ export function ConfirmationDialog({
         className="absolute inset-0 bg-foreground/40 backdrop-blur-sm"
       />
 
-      <section
+      <Card
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby={`${dialogId}-title`}
         aria-describedby={`${dialogId}-description`}
         tabIndex={-1}
-        className="relative w-full max-w-sm space-y-5 rounded-2xl border border-border bg-surface p-6 shadow-2xl"
+        className="relative w-full max-w-sm space-y-5 p-6"
       >
         <div className="flex items-start gap-3.5">
           {Icon ? (
             <div
-              className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${styles.icon}`}
+              className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${iconStyles}`}
             >
               <Icon className="size-5" aria-hidden="true" />
             </div>
@@ -201,26 +193,26 @@ export function ConfirmationDialog({
         ) : null}
 
         <div className="flex items-center justify-end gap-2">
-          <button
-            type="button"
+          <Button
+            variant="secondary"
+            fullWidth={false}
             data-autofocus
             disabled={isPending}
             onClick={onCancel}
-            className="rounded-xl bg-surface-muted px-4 py-2 text-xs font-semibold text-foreground transition-colors hover:bg-border disabled:opacity-60"
           >
             {cancelLabel}
-          </button>
+          </Button>
 
-          <button
-            type="button"
+          <Button
+            variant={variant === "danger" ? "danger" : "primary"}
+            fullWidth={false}
             disabled={isPending}
             onClick={onConfirm}
-            className={`rounded-xl px-4 py-2 text-xs font-semibold shadow-md transition-colors disabled:opacity-60 ${styles.confirmButton}`}
           >
             {isPending ? pendingLabel : confirmLabel}
-          </button>
+          </Button>
         </div>
-      </section>
+      </Card>
     </div>,
     portalContainer,
   );
