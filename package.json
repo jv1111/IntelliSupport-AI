@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "test:products": "node --env-file=.env.test.local --test tests/products.integration.test.mjs",
+    "test:graphql-auth": "node --env-file=.env.test.local --test tests/graphql-auth.integration.test.mjs",
+    "test:graphql": "node --env-file=.env.test.local --test tests/products.integration.test.mjs tests/graphql-auth.integration.test.mjs"
   },
   "dependencies": {
     "@apollo/server": "5.5.1",

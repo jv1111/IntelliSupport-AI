@@ -1,0 +1,117 @@
+import "server-only";
+
+import { type ProductStatus as ProductStatusValue } from "@/generated/prisma/enums";
+import { GraphQLError } from "graphql";
+import {
+  ProductError,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  getProducts,
+} from "@/server/services/products";
+import { requireAuthenticatedUser } from "@/server/graphql/shared/require-authenticated-user";
+import type { GraphQLContext } from "@/server/graphql/context";
+
+interface CreateProductInput {
+  name: string;
+  sku?: string;
+  status?: ProductStatusValue;
+  imageUrl?: string | null;
+  description?: string;
+}
+
+interface UpdateProductInput {
+  name?: string;
+  sku?: string;
+  status?: ProductStatusValue;
+  imageUrl?: string | null;
+  description?: string;
+}
+
+type ProductResult = Awaited<ReturnType<typeof createProduct>>;
+
+function throwProductGraphQLError(
+  error: unknown,
+  fallbackMessage: string,
+): never {
+  if (error instanceof ProductError) {
+    throw new GraphQLError(error.message, {
+      extensions: {
+        code: error.code,
+      },
+    });
+  }
+
+  throw new GraphQLError(fallbackMessage, {
+    extensions: {
+      code: "INTERNAL_SERVER_ERROR",
+    },
+  });
+}
+
+export const productResolvers = {
+  Query: {
+    products: async (
+      _parent: unknown,
+      args: { page?: number; limit?: number; search?: string | null },
+      context: GraphQLContext,
+    ): Promise<Awaited<ReturnType<typeof getProducts>>> => {
+      const user = requireAuthenticatedUser(context);
+
+      try {
+        return await getProducts(user.id, args);
+      } catch (error) {
+        throwProductGraphQLError(error, "Unable to retrieve products.");
+      }
+    },
+  },
+
+  Mutation: {
+    createProduct: async (
+      _parent: unknown,
+      args: { input: CreateProductInput },
+      context: GraphQLContext,
+    ): Promise<ProductResult> => {
+      const user = requireAuthenticatedUser(context);
+
+      try {
+        return await createProduct(user.id, args.input);
+      } catch (error) {
+        throwProductGraphQLError(error, "Unable to create product.");
+      }
+    },
+
+    updateProduct: async (
+      _parent: unknown,
+      args: { id: string; input: UpdateProductInput },
+      context: GraphQLContext,
+    ): Promise<ProductResult> => {
+      const user = requireAuthenticatedUser(context);
+
+      try {
+        return await updateProduct(user.id, args.id, args.input);
+      } catch (error) {
+        throwProductGraphQLError(error, "Unable to update product.");
+      }
+    },
+
+    deleteProduct: async (
+      _parent: unknown,
+      args: { id: string },
+      context: GraphQLContext,
+    ): Promise<boolean> => {
+      const user = requireAuthenticatedUser(context);
+
+      try {
+        return await deleteProduct(user.id, args.id);
+      } catch (error) {
+        throwProductGraphQLError(error, "Unable to delete product.");
+      }
+    },
+  },
+
+  Product: {
+    createdAt: (parent: ProductResult) => parent.createdAt.toISOString(),
+    updatedAt: (parent: ProductResult) => parent.updatedAt.toISOString(),
+  },
+};

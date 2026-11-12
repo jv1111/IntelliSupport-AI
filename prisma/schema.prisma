@@ -7,6 +7,12 @@ datasource db {
   provider = "postgresql"
 }
 
+enum ProductStatus {
+  published
+  draft
+  archived
+}
+
 model User {
   id           String    @id @default(cuid())
   username     String    @unique @db.VarChar(50)
@@ -14,6 +20,7 @@ model User {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   sessions     Session[]
+  products     Product[]
 
   @@map("users")
 }
@@ -29,4 +36,20 @@ model Session {
   @@index([userId])
   @@index([expiresAt])
   @@map("sessions")
+}
+
+model Product {
+  id          String        @id @default(cuid())
+  name        String
+  sku         String        @default("Not specified")
+  status      ProductStatus @default(draft)
+  imageUrl    String?
+  description String        @default("No description provided.")
+  userId      String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("products")
 }

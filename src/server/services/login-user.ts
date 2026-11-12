@@ -2,6 +2,7 @@ import "server-only";
 
 import argon2 from "argon2";
 import { loginCredentialsSchema } from "@/lib/validations/auth";
+import { formatValidationErrors } from "@/lib/validations/format-validation-errors";
 import { prisma } from "@/server/db/prisma";
 
 export class LoginError extends Error {
@@ -20,7 +21,7 @@ export async function loginUser(input: unknown) {
   if (!validationResult.success) {
     throw new LoginError(
       "INVALID_INPUT",
-      validationResult.error.issues.map((issue) => issue.message).join(" "),
+      formatValidationErrors(validationResult.error),
     );
   }
 
