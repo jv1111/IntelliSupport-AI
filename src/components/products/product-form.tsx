@@ -1,19 +1,13 @@
 "use client";
 
-import Image from "next/image";
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from "react";
-import { Archive, ArrowLeft, ImagePlus } from "lucide-react";
+import { useCallback, useMemo, useRef, useSyncExternalStore } from "react";
+import { Archive, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { FieldLabel, fieldControlStyles } from "@/components/ui/field";
 import { getProductFormDraftStorageKey } from "@/components/products/product-form-draft";
+import { ProductImagePicker } from "@/components/products/product-image-picker";
 import type {
   Product,
   ProductInput,
@@ -34,7 +28,6 @@ interface ProductFormProps {
 interface ProductFormValues {
   name: string;
   sku: string;
-  imageUrl: string;
   description: string;
 }
 
@@ -93,7 +86,6 @@ function getInitialValues(product: Product | null): ProductFormValues {
   return {
     name: product?.name ?? "",
     sku: product?.sku === "Not specified" ? "" : (product?.sku ?? ""),
-    imageUrl: product?.imageUrl ?? "",
     description: product?.description ?? "",
   };
 }
@@ -122,10 +114,6 @@ function restoreValues(
     return {
       name: typeof parsed.name === "string" ? parsed.name : initialValues.name,
       sku: typeof parsed.sku === "string" ? parsed.sku : initialValues.sku,
-      imageUrl:
-        typeof parsed.imageUrl === "string"
-          ? parsed.imageUrl
-          : initialValues.imageUrl,
       description:
         typeof parsed.description === "string"
           ? parsed.description
@@ -147,7 +135,6 @@ export function ProductForm({
   onPublish,
 }: ProductFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
-  const [imageError, setImageError] = useState(false);
 
   const draftStorageKey = getProductFormDraftStorageKey(product?.id);
 
@@ -192,7 +179,7 @@ export function ProductForm({
     const input: ProductInput = {
       name: values.name.trim(),
       sku: values.sku.trim() || undefined,
-      imageUrl: values.imageUrl.trim() || null,
+      imageUrl: null,
       description: values.description.trim(),
     };
 
@@ -359,49 +346,10 @@ export function ProductForm({
             </div>
           </div>
 
-          <div>
-            <FieldLabel htmlFor="product-image-url">
-              Product Image URL
-            </FieldLabel>
-
-            <div className="space-y-3">
-              <Input
-                id="product-image-url"
-                type="url"
-                value={values.imageUrl}
-                onChange={(event) => {
-                  updateField("imageUrl", event.target.value);
-                  setImageError(false);
-                }}
-                placeholder="https://example.com/product-image.jpg"
-                className="bg-surface-muted px-3.5 py-2.5"
-                disabled={isPending}
-              />
-
-              <div className="flex min-h-36 items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-border bg-surface-muted p-4">
-                {values.imageUrl && !imageError ? (
-                  <Image
-                    src={values.imageUrl}
-                    alt={values.name || "Product preview"}
-                    width={320}
-                    height={240}
-                    unoptimized
-                    onError={() => setImageError(true)}
-                    className="max-h-48 w-auto rounded-lg object-contain"
-                  />
-                ) : (
-                  <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                    <ImagePlus className="size-8" aria-hidden="true" />
-                    <span className="text-xs">
-                      {values.imageUrl
-                        ? "Unable to load image"
-                        : "Enter an image URL to preview your product"}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+            <ProductImagePicker
+              productName={values.name}
+              disabled={isPending}
+            />
 
           <div>
             <FieldLabel htmlFor="product-description" required>

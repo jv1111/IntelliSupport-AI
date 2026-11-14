@@ -112,7 +112,7 @@ export function useProductEditor(productId?: string) {
           name: product.name,
           sku: product.sku,
           description: product.description,
-          imageUrl: product.imageUrl,
+          imageUrl: null,
           status,
         });
 
