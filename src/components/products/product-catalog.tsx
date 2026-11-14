@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { PackageOpen } from "lucide-react";
+import { PackageOpen, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { SearchInput } from "@/components/ui/search-input";
 import { ProductCard } from "@/components/products/product-card";
 import { useProductCatalog } from "@/components/products/hooks/use-product-catalog";
@@ -32,8 +33,13 @@ export function ProductCatalog({ initialStatus }: ProductCatalogProps) {
     fetchError,
     actionError,
     unarchivingProductId,
+    productPendingDeletion,
+    deletingProductId,
     changeStatus,
     unarchiveProduct,
+    openDeleteConfirmation,
+    closeDeleteConfirmation,
+    confirmDeleteProduct,
     clearSearch,
     retry,
   } = useProductCatalog(initialStatus);
@@ -91,7 +97,7 @@ export function ProductCatalog({ initialStatus }: ProductCatalogProps) {
           </p>
         </div>
 
-        {(fetchError || actionError) && (
+        {(fetchError || (actionError && !productPendingDeletion)) && (
           <div
             role="alert"
             className="flex shrink-0 flex-wrap items-center justify-between gap-3 rounded-xl border border-danger/20 bg-danger/5 p-4 text-xs text-danger"
@@ -125,6 +131,8 @@ export function ProductCatalog({ initialStatus }: ProductCatalogProps) {
                   product={product}
                   onUnarchive={unarchiveProduct}
                   isUnarchiving={unarchivingProductId === product.id}
+                  onDelete={openDeleteConfirmation}
+                  isDeleting={deletingProductId === product.id}
                 />
               ))}
             </div>
@@ -160,6 +168,19 @@ export function ProductCatalog({ initialStatus }: ProductCatalogProps) {
           </Card>
         )}
       </section>
+      <ConfirmationDialog
+        open={Boolean(productPendingDeletion)}
+        title="Delete archived product?"
+        description={`"${productPendingDeletion?.name ?? ""}" will be permanently deleted. This action cannot be undone.`}
+        confirmLabel="Delete Product"
+        pendingLabel="Deleting..."
+        variant="danger"
+        icon={Trash2}
+        isPending={Boolean(deletingProductId)}
+        error={productPendingDeletion ? actionError : null}
+        onConfirm={confirmDeleteProduct}
+        onCancel={closeDeleteConfirmation}
+      />
     </main>
   );
 }

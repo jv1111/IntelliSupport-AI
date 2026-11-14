@@ -50,6 +50,45 @@ function assertError(result, expectedCode) {
   );
 }
 
+async function archiveProductForDeletion(productId, cookie) {
+  const published = await graphql(
+    `
+      mutation UpdateProduct($id: ID!, $input: UpdateProductInput!) {
+        updateProduct(id: $id, input: $input) {
+          id
+          status
+        }
+      }
+    `,
+    {
+      id: productId,
+      input: { status: "published" },
+    },
+    cookie,
+  );
+
+  assertSuccess(published);
+
+  const archived = await graphql(
+    `
+      mutation UpdateProduct($id: ID!, $input: UpdateProductInput!) {
+        updateProduct(id: $id, input: $input) {
+          id
+          status
+        }
+      }
+    `,
+    {
+      id: productId,
+      input: { status: "archived" },
+    },
+    cookie,
+  );
+
+  assertSuccess(archived);
+  assert.equal(archived.payload.data.updateProduct.status, "archived");
+}
+
 test("unauthenticated users cannot read or mutate products", async () => {
   const products = await graphql(`
     query Products {
@@ -134,6 +173,8 @@ test("authenticated users can create, update, and delete products", async (t) =>
   t.after(async () => {
     try {
       for (const listingProductId of listingProductIds) {
+        await archiveProductForDeletion(listingProductId, cookie);
+
         const cleanup = await graphql(
           `
             mutation DeleteProduct($id: ID!) {
@@ -148,6 +189,8 @@ test("authenticated users can create, update, and delete products", async (t) =>
       }
 
       if (productId && cookie) {
+        await archiveProductForDeletion(productId, cookie);
+
         const cleanup = await graphql(
           `
             mutation DeleteProduct($id: ID!) {
@@ -250,6 +293,18 @@ test("authenticated users can create, update, and delete products", async (t) =>
   assert.ok(product.createdAt);
   assert.ok(product.updatedAt);
 
+  const draftDeleteAttempt = await graphql(
+    `
+      mutation DeleteProduct($id: ID!) {
+        deleteProduct(id: $id)
+      }
+    `,
+    { id: productId },
+    cookie,
+  );
+
+  assertError(draftDeleteAttempt, "INVALID_STATUS_TRANSITION");
+
   const draftArchiveAttempt = await graphql(
     `
       mutation UpdateProduct($id: ID!, $input: UpdateProductInput!) {
@@ -346,6 +401,18 @@ test("authenticated users can create, update, and delete products", async (t) =>
   assert.equal(updatedProduct.sku, "Not specified");
   assert.equal(updatedProduct.status, "published");
   assert.equal(updatedProduct.description, "Integration test update.");
+
+  const publishedDeleteAttempt = await graphql(
+    `
+      mutation DeleteProduct($id: ID!) {
+        deleteProduct(id: $id)
+      }
+    `,
+    { id: productId },
+    cookie,
+  );
+
+  assertError(publishedDeleteAttempt, "INVALID_STATUS_TRANSITION");
 
   const archived = await graphql(
     `

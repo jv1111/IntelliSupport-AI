@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArchiveRestore, Pencil } from "lucide-react";
+import { ArchiveRestore, Pencil, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ProductImagePlaceholder } from "@/components/products/product-image-placeholder";
 import type { Product } from "@/lib/products";
@@ -17,12 +18,16 @@ interface ProductCardProps {
   product: Product;
   onUnarchive: (productId: string) => void;
   isUnarchiving: boolean;
+  onDelete: (product: Product) => void;
+  isDeleting: boolean;
 }
 
 export function ProductCard({
   product,
   onUnarchive,
   isUnarchiving,
+  onDelete,
+  isDeleting,
 }: ProductCardProps) {
   return (
     <article className="h-full">
@@ -46,6 +51,20 @@ export function ProductCard({
           >
             {product.status}
           </span>
+
+          {product.status === "archived" && (
+            <Button
+              variant="danger-subtle"
+              fullWidth={false}
+              aria-label={`Delete ${product.name}`}
+              title="Delete archived product"
+              onClick={() => onDelete(product)}
+              disabled={isDeleting}
+              className="absolute top-3 left-3 z-10 size-9! rounded-full! p-0! shadow-sm"
+            >
+              <Trash2 className="size-4" aria-hidden="true" />
+            </Button>
+          )}
         </div>
 
         <div className="flex flex-1 flex-col justify-between gap-4 p-5">

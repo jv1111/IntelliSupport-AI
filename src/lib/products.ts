@@ -140,3 +140,16 @@ export async function updateProduct(
 
   return data.updateProduct;
 }
+
+export async function deleteProduct(id: string): Promise<boolean> {
+  const data = await graphqlRequest<{ deleteProduct: boolean }, { id: string }>(
+    `
+      mutation DeleteProduct($id: ID!) {
+        deleteProduct(id: $id)
+      }
+    `,
+    { id },
+  );
+
+  return data.deleteProduct;
+}

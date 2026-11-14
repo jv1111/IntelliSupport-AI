@@ -141,7 +141,7 @@ export function AccountMenu({ username, onNavigate }: AccountMenuProps) {
         {isOpen ? (
           <div
             id="account-options-panel"
-            className="absolute right-0 bottom-full z-[60] mb-2 w-52 overflow-hidden rounded-xl border border-border bg-surface py-1 shadow-xl shadow-foreground/10"
+            className="absolute right-0 bottom-full z-60 mb-2 w-52 overflow-hidden rounded-xl border border-border bg-surface py-1 shadow-xl shadow-foreground/10"
           >
             <div className="border-b border-border bg-surface-muted/50 px-3 py-2.5">
               <p className="truncate text-xs font-semibold text-foreground">

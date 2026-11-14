@@ -194,10 +194,28 @@ export async function deleteProduct(
     where: {
       id,
       userId,
+      status: "archived",
     },
   });
 
   if (result.count === 0) {
+    const existingProduct = await prisma.product.findFirst({
+      where: {
+        id,
+        userId,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (existingProduct) {
+      throw new ProductError(
+        "INVALID_STATUS_TRANSITION",
+        "Only archived products can be deleted.",
+      );
+    }
+
     throw new ProductError("NOT_FOUND", "Product not found.");
   }
 

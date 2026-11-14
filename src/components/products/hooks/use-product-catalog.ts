@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import {
+  deleteProduct as deleteProductRequest,
   fetchProducts,
   updateProduct,
+  type Product,
   type ProductPage,
   type ProductStatus,
 } from "@/lib/products";
@@ -30,6 +32,11 @@ export function useProductCatalog(initialStatus: ProductStatus) {
   const [unarchivingProductId, setUnarchivingProductId] = useState<
     string | null
   >(null);
+  const [productPendingDeletion, setProductPendingDeletion] =
+    useState<Product | null>(null);
+  const [deletingProductId, setDeletingProductId] = useState<string | null>(
+    null,
+  );
   const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
@@ -106,6 +113,51 @@ export function useProductCatalog(initialStatus: ProductStatus) {
     }
   }
 
+  function openDeleteConfirmation(product: Product) {
+    if (product.status !== "archived") {
+      return;
+    }
+
+    setActionError(null);
+    setProductPendingDeletion(product);
+  }
+
+  function closeDeleteConfirmation() {
+    if (deletingProductId) {
+      return;
+    }
+
+    setProductPendingDeletion(null);
+    setActionError(null);
+  }
+
+  async function confirmDeleteProduct() {
+    if (
+      !productPendingDeletion ||
+      productPendingDeletion.status !== "archived" ||
+      deletingProductId
+    ) {
+      return;
+    }
+
+    setDeletingProductId(productPendingDeletion.id);
+    setActionError(null);
+
+    try {
+      await deleteProductRequest(productPendingDeletion.id);
+      setProductPendingDeletion(null);
+      setRefreshKey((current) => current + 1);
+    } catch (error) {
+      setActionError(
+        error instanceof Error
+          ? error.message
+          : "Unable to delete product. Please try again.",
+      );
+    } finally {
+      setDeletingProductId(null);
+    }
+  }
+
   function clearSearch() {
     setSearchInput("");
     setSearch("");
@@ -124,8 +176,13 @@ export function useProductCatalog(initialStatus: ProductStatus) {
     fetchError,
     actionError,
     unarchivingProductId,
+    productPendingDeletion,
+    deletingProductId,
     changeStatus,
     unarchiveProduct,
+    openDeleteConfirmation,
+    closeDeleteConfirmation,
+    confirmDeleteProduct,
     clearSearch,
     retry,
   };
