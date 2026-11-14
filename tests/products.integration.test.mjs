@@ -6,6 +6,7 @@ const endpoint = process.env.GRAPHQL_URL ?? "http://localhost:3000/api/graphql";
 
 const username = process.env.PRODUCT_TEST_USERNAME;
 const password = process.env.PRODUCT_TEST_PASSWORD;
+const secondaryPassword = process.env.PRODUCT_TEST_SECONDARY_PASSWORD;
 
 async function graphql(query, variables = {}, cookie) {
   const headers = {
@@ -649,6 +650,10 @@ test("authenticated users can create, update, and delete products", async (t) =>
 test("users cannot access or mutate another user's products", async (t) => {
   assert.ok(username, "PRODUCT_TEST_USERNAME is required.");
   assert.ok(password, "PRODUCT_TEST_PASSWORD is required.");
+  assert.ok(
+    secondaryPassword,
+    "PRODUCT_TEST_SECONDARY_PASSWORD is required.",
+  );
 
   let ownerCookie;
   let otherCookie;
@@ -695,14 +700,10 @@ test("users cannot access or mutate another user's products", async (t) => {
 
   ownerCookie = await login(username, password);
 
-  const secondaryUsername = `product-test-${createHash("sha256")
+  const secondaryUsername = `product-test-v2-${createHash("sha256")
     .update(username)
     .digest("hex")
     .slice(0, 16)}`;
-
-  const secondaryPassword = `ProductTest-${createHash("sha256")
-    .update(username)
-    .digest("hex")}`;
 
   const registration = await graphql(
     `
