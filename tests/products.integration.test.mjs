@@ -575,6 +575,19 @@ test("authenticated users can create, update, and delete products", async (t) =>
 
   assert.deepEqual(returnedNames, [...listingProductNames].sort());
 
+  const maxPageSizeResult = await graphql(
+    productsQuery,
+    {
+      page: 1,
+      limit: 15,
+      search,
+    },
+    cookie,
+  );
+
+  assertSuccess(maxPageSizeResult);
+  assert.equal(maxPageSizeResult.payload.data.products.items.length, 3);
+
   const invalidPage = await graphql(
     productsQuery,
     {
@@ -591,7 +604,7 @@ test("authenticated users can create, update, and delete products", async (t) =>
     productsQuery,
     {
       page: 1,
-      limit: 11,
+      limit: 16,
       search,
     },
     cookie,

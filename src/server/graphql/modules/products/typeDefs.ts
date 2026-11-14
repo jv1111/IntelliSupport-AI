@@ -46,7 +46,7 @@ export const productTypeDefs = `#graphql
 
     products(
       page: Int = 1
-      limit: Int = 10
+      limit: Int = 15
       search: String
       status: ProductStatus
     ): ProductPage!

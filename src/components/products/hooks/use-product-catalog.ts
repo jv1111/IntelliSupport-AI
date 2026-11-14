@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   deleteProduct as deleteProductRequest,
   fetchProducts,
@@ -10,7 +10,7 @@ import {
   type ProductStatus,
 } from "@/lib/products";
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 15;
 
 const emptyPage: ProductPage = {
   items: [],
@@ -38,6 +38,9 @@ export function useProductCatalog(initialStatus: ProductStatus) {
     null,
   );
   const [refreshKey, setRefreshKey] = useState(0);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const isLoadingMoreRef = useRef(false);
+  const requestIdRef = useRef(0);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -48,12 +51,15 @@ export function useProductCatalog(initialStatus: ProductStatus) {
   }, [searchInput]);
 
   useEffect(() => {
+    requestIdRef.current += 1;
+    isLoadingMoreRef.current = false;
+    setIsLoadingMore(false);
+    setIsLoading(true);
+    setFetchError(null);
+
     let cancelled = false;
 
     const timeout = window.setTimeout(async () => {
-      setIsLoading(true);
-      setFetchError(null);
-
       try {
         const result = await fetchProducts({
           page: 1,
@@ -85,6 +91,58 @@ export function useProductCatalog(initialStatus: ProductStatus) {
       window.clearTimeout(timeout);
     };
   }, [search, status, refreshKey]);
+
+  const loadMore = useCallback(async () => {
+    if (
+      isLoadingMoreRef.current ||
+      isLoading ||
+      !productPage.hasNextPage ||
+      fetchError
+    ) {
+      return;
+    }
+
+    const requestId = requestIdRef.current;
+
+    isLoadingMoreRef.current = true;
+    setIsLoadingMore(true);
+
+    try {
+      const result = await fetchProducts({
+        page: productPage.currentPage + 1,
+        limit: PAGE_SIZE,
+        search: search || null,
+        status,
+      });
+
+      if (requestId === requestIdRef.current) {
+        setProductPage((currentPage) => ({
+          ...result,
+          items: [...currentPage.items, ...result.items],
+        }));
+      }
+    } catch (error) {
+      if (requestId === requestIdRef.current) {
+        setFetchError(
+          error instanceof Error
+            ? error.message
+            : "Unable to load more products. Please try again.",
+        );
+      }
+    } finally {
+      if (requestId === requestIdRef.current) {
+        isLoadingMoreRef.current = false;
+        setIsLoadingMore(false);
+      }
+    }
+  }, [
+    fetchError,
+    isLoading,
+    productPage.currentPage,
+    productPage.hasNextPage,
+    search,
+    status,
+  ]);
 
   function changeStatus(nextStatus: ProductStatus) {
     setActionError(null);
@@ -173,6 +231,8 @@ export function useProductCatalog(initialStatus: ProductStatus) {
     setSearchInput,
     productPage,
     isLoading,
+    isLoadingMore,
+    loadMore,
     fetchError,
     actionError,
     unarchivingProductId,

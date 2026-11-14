@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import Link from "next/link";
 import { PackageOpen, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,7 @@ import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { SearchInput } from "@/components/ui/search-input";
 import { ProductCard } from "@/components/products/product-card";
 import { useProductCatalog } from "@/components/products/hooks/use-product-catalog";
+import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 import type { ProductStatus } from "@/lib/products";
 
 interface ProductCatalogProps {
@@ -30,6 +32,8 @@ export function ProductCatalog({ initialStatus }: ProductCatalogProps) {
     setSearchInput,
     productPage,
     isLoading,
+    isLoadingMore,
+    loadMore,
     fetchError,
     actionError,
     unarchivingProductId,
@@ -43,6 +47,20 @@ export function ProductCatalog({ initialStatus }: ProductCatalogProps) {
     clearSearch,
     retry,
   } = useProductCatalog(initialStatus);
+
+  const productScrollRef = useRef<HTMLDivElement>(null);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  useInfiniteScroll({
+    rootRef: productScrollRef,
+    targetRef: loadMoreRef,
+    enabled:
+      productPage.hasNextPage &&
+      !isLoading &&
+      !isLoadingMore &&
+      !fetchError,
+    onLoadMore: loadMore,
+  });
 
   return (
     <main className="mx-auto flex h-full min-h-0 w-full flex-col overflow-hidden p-6">
@@ -123,8 +141,11 @@ export function ProductCatalog({ initialStatus }: ProductCatalogProps) {
             Loading products...
           </div>
         ) : productPage.items.length > 0 ? (
-          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-2">
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          <div
+            ref={productScrollRef}
+            className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-2"
+          >
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 2xl:grid-cols-5">
               {productPage.items.map((product) => (
                 <ProductCard
                   key={product.id}
@@ -136,6 +157,22 @@ export function ProductCatalog({ initialStatus }: ProductCatalogProps) {
                 />
               ))}
             </div>
+
+            {productPage.hasNextPage && (
+              <div
+                ref={loadMoreRef}
+                className="flex min-h-16 items-center justify-center py-4"
+              >
+                {isLoadingMore && (
+                  <p
+                    className="text-xs font-medium text-muted-foreground"
+                    role="status"
+                  >
+                    Loading more products...
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         ) : (
           <Card className="flex min-h-72 flex-1 flex-col items-center justify-center border-dashed px-6 py-12 text-center shadow-sm">
