@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import test from "node:test";
 
 const endpoint = process.env.GRAPHQL_URL ?? "http://localhost:3000/api/graphql";
@@ -48,6 +48,39 @@ function assertError(result, expectedCode) {
     expectedCode,
     JSON.stringify(result.payload.errors),
   );
+}
+
+async function login(username, password) {
+  const result = await graphql(
+    `
+      mutation Login($input: LoginInput!) {
+        login(input: $input) {
+          id
+          username
+        }
+      }
+    `,
+    {
+      input: {
+        username,
+        password,
+      },
+    },
+  );
+
+  assertSuccess(result);
+
+  const cookies = result.response.headers.getSetCookie?.() ?? [
+    result.response.headers.get("set-cookie") ?? "",
+  ];
+
+  const sessionCookie = cookies.find((value) =>
+    value.startsWith("intellisupport_session="),
+  );
+
+  assert.ok(sessionCookie, "Session cookie was not returned.");
+
+  return sessionCookie.split(";")[0];
 }
 
 async function archiveProductForDeletion(productId, cookie) {
@@ -611,4 +644,292 @@ test("authenticated users can create, update, and delete products", async (t) =>
   );
 
   assertError(invalidLimit, "INVALID_INPUT");
+});
+
+test("users cannot access or mutate another user's products", async (t) => {
+  assert.ok(username, "PRODUCT_TEST_USERNAME is required.");
+  assert.ok(password, "PRODUCT_TEST_PASSWORD is required.");
+
+  let ownerCookie;
+  let otherCookie;
+  let productId;
+
+  t.after(async () => {
+    try {
+      if (productId && ownerCookie) {
+        await archiveProductForDeletion(productId, ownerCookie);
+
+        const cleanup = await graphql(
+          `
+            mutation DeleteProduct($id: ID!) {
+              deleteProduct(id: $id)
+            }
+          `,
+          { id: productId },
+          ownerCookie,
+        );
+
+        assertSuccess(cleanup);
+      }
+    } finally {
+      for (const cookie of [otherCookie, ownerCookie]) {
+        if (!cookie) {
+          continue;
+        }
+
+        const logout = await graphql(
+          `
+            mutation Logout {
+              logout
+            }
+          `,
+          {},
+          cookie,
+        );
+
+        assertSuccess(logout);
+        assert.equal(logout.payload.data.logout, true);
+      }
+    }
+  });
+
+  ownerCookie = await login(username, password);
+
+  const secondaryUsername = `product-test-${createHash("sha256")
+    .update(username)
+    .digest("hex")
+    .slice(0, 16)}`;
+
+  const secondaryPassword = `ProductTest-${createHash("sha256")
+    .update(username)
+    .digest("hex")}`;
+
+  const registration = await graphql(
+    `
+      mutation Register($input: RegisterInput!) {
+        register(input: $input) {
+          id
+          username
+        }
+      }
+    `,
+    {
+      input: {
+        username: secondaryUsername,
+        password: secondaryPassword,
+      },
+    },
+  );
+
+  if (
+    registration.payload.errors?.[0]?.extensions?.code !== "USERNAME_TAKEN"
+  ) {
+    assertSuccess(registration);
+  }
+
+  otherCookie = await login(secondaryUsername, secondaryPassword);
+
+  const ownerSession = await graphql(
+    `
+      query Me {
+        me {
+          id
+          username
+        }
+      }
+    `,
+    {},
+    ownerCookie,
+  );
+
+  assertSuccess(ownerSession);
+
+  const owner = ownerSession.payload.data.me;
+
+  assert.ok(owner.id);
+  assert.ok(owner.username);
+
+  const otherSession = await graphql(
+    `
+      query Me {
+        me {
+          id
+          username
+        }
+      }
+    `,
+    {},
+    otherCookie,
+  );
+
+  assertSuccess(otherSession);
+  assert.notEqual(otherSession.payload.data.me.id, owner.id);
+
+  const productName = `Ownership Test ${randomUUID()}`;
+
+  const created = await graphql(
+    `
+      mutation CreateProduct($input: CreateProductInput!) {
+        createProduct(input: $input) {
+          id
+          name
+          status
+        }
+      }
+    `,
+    {
+      input: {
+        name: productName,
+      },
+    },
+    ownerCookie,
+  );
+
+  assertSuccess(created);
+
+  const product = created.payload.data.createProduct;
+
+  productId = product.id;
+
+  assert.ok(productId);
+  assert.equal(product.name, productName);
+
+  const unauthorizedRead = await graphql(
+    `
+      query Product($id: ID!) {
+        product(id: $id) {
+          id
+          name
+        }
+      }
+    `,
+    { id: productId },
+    otherCookie,
+  );
+
+  assertError(unauthorizedRead, "NOT_FOUND");
+
+  const unauthorizedList = await graphql(
+    `
+      query Products($search: String) {
+        products(search: $search) {
+          items {
+            id
+            name
+          }
+          totalCount
+        }
+      }
+    `,
+    { search: productName },
+    otherCookie,
+  );
+
+  assertSuccess(unauthorizedList);
+  assert.equal(unauthorizedList.payload.data.products.totalCount, 0);
+  assert.deepEqual(unauthorizedList.payload.data.products.items, []);
+
+  const unauthorizedCreate = await graphql(
+    `
+      mutation CreateProductForAnotherUser {
+        createProduct(
+          input: {
+            name: "Unauthorized Ownership Test"
+            userId: "${owner.id}"
+          }
+        ) {
+          id
+        }
+      }
+    `,
+    {},
+    otherCookie,
+  );
+
+  assertError(unauthorizedCreate, "GRAPHQL_VALIDATION_FAILED");
+
+  const unauthorizedUpdate = await graphql(
+    `
+      mutation UpdateProduct($id: ID!, $input: UpdateProductInput!) {
+        updateProduct(id: $id, input: $input) {
+          id
+          name
+        }
+      }
+    `,
+    {
+      id: productId,
+      input: {
+        name: "Unauthorized Product Update",
+      },
+    },
+    otherCookie,
+  );
+
+  assertError(unauthorizedUpdate, "NOT_FOUND");
+
+  const ownerProduct = await graphql(
+    `
+      query Product($id: ID!) {
+        product(id: $id) {
+          id
+          name
+          status
+        }
+      }
+    `,
+    { id: productId },
+    ownerCookie,
+  );
+
+  assertSuccess(ownerProduct);
+  assert.equal(ownerProduct.payload.data.product.name, productName);
+
+  await archiveProductForDeletion(productId, ownerCookie);
+
+  const unauthorizedDelete = await graphql(
+    `
+      mutation DeleteProduct($id: ID!) {
+        deleteProduct(id: $id)
+      }
+    `,
+    { id: productId },
+    otherCookie,
+  );
+
+  assertError(unauthorizedDelete, "NOT_FOUND");
+
+  const ownerProductAfterAttempts = await graphql(
+    `
+      query Product($id: ID!) {
+        product(id: $id) {
+          id
+          name
+          status
+        }
+      }
+    `,
+    { id: productId },
+    ownerCookie,
+  );
+
+  assertSuccess(ownerProductAfterAttempts);
+  assert.equal(ownerProductAfterAttempts.payload.data.product.id, productId);
+  assert.equal(ownerProductAfterAttempts.payload.data.product.name, productName);
+  assert.equal(ownerProductAfterAttempts.payload.data.product.status, "archived");
+
+  const ownerDelete = await graphql(
+    `
+      mutation DeleteProduct($id: ID!) {
+        deleteProduct(id: $id)
+      }
+    `,
+    { id: productId },
+    ownerCookie,
+  );
+
+  assertSuccess(ownerDelete);
+  assert.equal(ownerDelete.payload.data.deleteProduct, true);
+
+  productId = null;
 });
