@@ -127,6 +127,40 @@ export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedStringNullableFilter<$PrismaModel>
 }
 
+export type EnumArticleScopeFilter<$PrismaModel = never> = {
+  equals?: $Enums.ArticleScope | Prisma.EnumArticleScopeFieldRefInput<$PrismaModel>
+  in?: $Enums.ArticleScope[] | Prisma.ListEnumArticleScopeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ArticleScope[] | Prisma.ListEnumArticleScopeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumArticleScopeFilter<$PrismaModel> | $Enums.ArticleScope
+}
+
+export type EnumArticleCategoryTagFilter<$PrismaModel = never> = {
+  equals?: $Enums.ArticleCategoryTag | Prisma.EnumArticleCategoryTagFieldRefInput<$PrismaModel>
+  in?: $Enums.ArticleCategoryTag[] | Prisma.ListEnumArticleCategoryTagFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ArticleCategoryTag[] | Prisma.ListEnumArticleCategoryTagFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumArticleCategoryTagFilter<$PrismaModel> | $Enums.ArticleCategoryTag
+}
+
+export type EnumArticleScopeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ArticleScope | Prisma.EnumArticleScopeFieldRefInput<$PrismaModel>
+  in?: $Enums.ArticleScope[] | Prisma.ListEnumArticleScopeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ArticleScope[] | Prisma.ListEnumArticleScopeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumArticleScopeWithAggregatesFilter<$PrismaModel> | $Enums.ArticleScope
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumArticleScopeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumArticleScopeFilter<$PrismaModel>
+}
+
+export type EnumArticleCategoryTagWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ArticleCategoryTag | Prisma.EnumArticleCategoryTagFieldRefInput<$PrismaModel>
+  in?: $Enums.ArticleCategoryTag[] | Prisma.ListEnumArticleCategoryTagFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ArticleCategoryTag[] | Prisma.ListEnumArticleCategoryTagFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumArticleCategoryTagWithAggregatesFilter<$PrismaModel> | $Enums.ArticleCategoryTag
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumArticleCategoryTagFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumArticleCategoryTagFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -251,6 +285,40 @@ export type NestedIntNullableFilter<$PrismaModel = never> = {
   gt?: number | Prisma.IntFieldRefInput<$PrismaModel>
   gte?: number | Prisma.IntFieldRefInput<$PrismaModel>
   not?: Prisma.NestedIntNullableFilter<$PrismaModel> | number | null
+}
+
+export type NestedEnumArticleScopeFilter<$PrismaModel = never> = {
+  equals?: $Enums.ArticleScope | Prisma.EnumArticleScopeFieldRefInput<$PrismaModel>
+  in?: $Enums.ArticleScope[] | Prisma.ListEnumArticleScopeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ArticleScope[] | Prisma.ListEnumArticleScopeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumArticleScopeFilter<$PrismaModel> | $Enums.ArticleScope
+}
+
+export type NestedEnumArticleCategoryTagFilter<$PrismaModel = never> = {
+  equals?: $Enums.ArticleCategoryTag | Prisma.EnumArticleCategoryTagFieldRefInput<$PrismaModel>
+  in?: $Enums.ArticleCategoryTag[] | Prisma.ListEnumArticleCategoryTagFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ArticleCategoryTag[] | Prisma.ListEnumArticleCategoryTagFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumArticleCategoryTagFilter<$PrismaModel> | $Enums.ArticleCategoryTag
+}
+
+export type NestedEnumArticleScopeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ArticleScope | Prisma.EnumArticleScopeFieldRefInput<$PrismaModel>
+  in?: $Enums.ArticleScope[] | Prisma.ListEnumArticleScopeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ArticleScope[] | Prisma.ListEnumArticleScopeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumArticleScopeWithAggregatesFilter<$PrismaModel> | $Enums.ArticleScope
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumArticleScopeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumArticleScopeFilter<$PrismaModel>
+}
+
+export type NestedEnumArticleCategoryTagWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ArticleCategoryTag | Prisma.EnumArticleCategoryTagFieldRefInput<$PrismaModel>
+  in?: $Enums.ArticleCategoryTag[] | Prisma.ListEnumArticleCategoryTagFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ArticleCategoryTag[] | Prisma.ListEnumArticleCategoryTagFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumArticleCategoryTagWithAggregatesFilter<$PrismaModel> | $Enums.ArticleCategoryTag
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumArticleCategoryTagFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumArticleCategoryTagFilter<$PrismaModel>
 }
 
 

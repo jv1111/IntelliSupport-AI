@@ -11,7 +11,8 @@
     "format:check": "prettier --check .",
     "test:products": "node --env-file=.env.test.local --test tests/products.integration.test.mjs",
     "test:graphql-auth": "node --env-file=.env.test.local --test tests/graphql-auth.integration.test.mjs",
-    "test:graphql": "node --env-file=.env.test.local --test tests/products.integration.test.mjs tests/graphql-auth.integration.test.mjs"
+    "test:graphql": "node --env-file=.env.test.local --test tests/products.integration.test.mjs tests/graphql-auth.integration.test.mjs tests/knowledge-base.integration.test.mjs",
+    "test:knowledge-base": "node --env-file=.env.test.local --test tests/knowledge-base.integration.test.mjs"
   },
   "dependencies": {
     "@apollo/server": "5.5.1",

@@ -184,6 +184,7 @@ export type UserWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   sessions?: Prisma.SessionListRelationFilter
   products?: Prisma.ProductListRelationFilter
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -194,6 +195,7 @@ export type UserOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   sessions?: Prisma.SessionOrderByRelationAggregateInput
   products?: Prisma.ProductOrderByRelationAggregateInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -207,6 +209,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   sessions?: Prisma.SessionListRelationFilter
   products?: Prisma.ProductListRelationFilter
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleListRelationFilter
 }, "id" | "username">
 
 export type UserOrderByWithAggregationInput = {
@@ -239,6 +242,7 @@ export type UserCreateInput = {
   updatedAt?: Date | string
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   products?: Prisma.ProductCreateNestedManyWithoutUserInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -249,6 +253,7 @@ export type UserUncheckedCreateInput = {
   updatedAt?: Date | string
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutUserInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -259,6 +264,7 @@ export type UserUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   products?: Prisma.ProductUpdateManyWithoutUserNestedInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -269,6 +275,7 @@ export type UserUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   products?: Prisma.ProductUncheckedUpdateManyWithoutUserNestedInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -360,6 +367,20 @@ export type UserUpdateOneRequiredWithoutProductsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutProductsInput, Prisma.UserUpdateWithoutProductsInput>, Prisma.UserUncheckedUpdateWithoutProductsInput>
 }
 
+export type UserCreateNestedOneWithoutKnowledgeBaseArticlesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutKnowledgeBaseArticlesInput, Prisma.UserUncheckedCreateWithoutKnowledgeBaseArticlesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutKnowledgeBaseArticlesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutKnowledgeBaseArticlesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutKnowledgeBaseArticlesInput, Prisma.UserUncheckedCreateWithoutKnowledgeBaseArticlesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutKnowledgeBaseArticlesInput
+  upsert?: Prisma.UserUpsertWithoutKnowledgeBaseArticlesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutKnowledgeBaseArticlesInput, Prisma.UserUpdateWithoutKnowledgeBaseArticlesInput>, Prisma.UserUncheckedUpdateWithoutKnowledgeBaseArticlesInput>
+}
+
 export type UserCreateWithoutSessionsInput = {
   id?: string
   username: string
@@ -367,6 +388,7 @@ export type UserCreateWithoutSessionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   products?: Prisma.ProductCreateNestedManyWithoutUserInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -376,6 +398,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutUserInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -401,6 +424,7 @@ export type UserUpdateWithoutSessionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   products?: Prisma.ProductUpdateManyWithoutUserNestedInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -410,6 +434,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   products?: Prisma.ProductUncheckedUpdateManyWithoutUserNestedInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutProductsInput = {
@@ -419,6 +444,7 @@ export type UserCreateWithoutProductsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutProductsInput = {
@@ -428,6 +454,7 @@ export type UserUncheckedCreateWithoutProductsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutProductsInput = {
@@ -453,6 +480,7 @@ export type UserUpdateWithoutProductsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProductsInput = {
@@ -462,6 +490,63 @@ export type UserUncheckedUpdateWithoutProductsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutKnowledgeBaseArticlesInput = {
+  id?: string
+  username: string
+  passwordHash: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  products?: Prisma.ProductCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutKnowledgeBaseArticlesInput = {
+  id?: string
+  username: string
+  passwordHash: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutKnowledgeBaseArticlesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutKnowledgeBaseArticlesInput, Prisma.UserUncheckedCreateWithoutKnowledgeBaseArticlesInput>
+}
+
+export type UserUpsertWithoutKnowledgeBaseArticlesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutKnowledgeBaseArticlesInput, Prisma.UserUncheckedUpdateWithoutKnowledgeBaseArticlesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutKnowledgeBaseArticlesInput, Prisma.UserUncheckedCreateWithoutKnowledgeBaseArticlesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutKnowledgeBaseArticlesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutKnowledgeBaseArticlesInput, Prisma.UserUncheckedUpdateWithoutKnowledgeBaseArticlesInput>
+}
+
+export type UserUpdateWithoutKnowledgeBaseArticlesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  products?: Prisma.ProductUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutKnowledgeBaseArticlesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -472,11 +557,13 @@ export type UserUncheckedUpdateWithoutProductsInput = {
 export type UserCountOutputType = {
   sessions: number
   products: number
+  knowledgeBaseArticles: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sessions?: boolean | UserCountOutputTypeCountSessionsArgs
   products?: boolean | UserCountOutputTypeCountProductsArgs
+  knowledgeBaseArticles?: boolean | UserCountOutputTypeCountKnowledgeBaseArticlesArgs
 }
 
 /**
@@ -503,6 +590,13 @@ export type UserCountOutputTypeCountProductsArgs<ExtArgs extends runtime.Types.E
   where?: Prisma.ProductWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountKnowledgeBaseArticlesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.KnowledgeBaseArticleWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -512,6 +606,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   updatedAt?: boolean
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   products?: boolean | Prisma.User$productsArgs<ExtArgs>
+  knowledgeBaseArticles?: boolean | Prisma.User$knowledgeBaseArticlesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -543,6 +638,7 @@ export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = run
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   products?: boolean | Prisma.User$productsArgs<ExtArgs>
+  knowledgeBaseArticles?: boolean | Prisma.User$knowledgeBaseArticlesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -553,6 +649,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   objects: {
     sessions: Prisma.$SessionPayload<ExtArgs>[]
     products: Prisma.$ProductPayload<ExtArgs>[]
+    knowledgeBaseArticles: Prisma.$KnowledgeBaseArticlePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -956,6 +1053,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   readonly [Symbol.toStringTag]: "PrismaPromise"
   sessions<T extends Prisma.User$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   products<T extends Prisma.User$productsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$productsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  knowledgeBaseArticles<T extends Prisma.User$knowledgeBaseArticlesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$knowledgeBaseArticlesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$KnowledgeBaseArticlePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1428,6 +1526,30 @@ export type User$productsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.ProductScalarFieldEnum | Prisma.ProductScalarFieldEnum[]
+}
+
+/**
+ * User.knowledgeBaseArticles
+ */
+export type User$knowledgeBaseArticlesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the KnowledgeBaseArticle
+   */
+  select?: Prisma.KnowledgeBaseArticleSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the KnowledgeBaseArticle
+   */
+  omit?: Prisma.KnowledgeBaseArticleOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.KnowledgeBaseArticleInclude<ExtArgs> | null
+  where?: Prisma.KnowledgeBaseArticleWhereInput
+  orderBy?: Prisma.KnowledgeBaseArticleOrderByWithRelationInput | Prisma.KnowledgeBaseArticleOrderByWithRelationInput[]
+  cursor?: Prisma.KnowledgeBaseArticleWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.KnowledgeBaseArticleScalarFieldEnum | Prisma.KnowledgeBaseArticleScalarFieldEnum[]
 }
 
 /**

@@ -32,3 +32,8 @@ export type Session = Prisma.SessionModel
  * 
  */
 export type Product = Prisma.ProductModel
+/**
+ * Model KnowledgeBaseArticle
+ * 
+ */
+export type KnowledgeBaseArticle = Prisma.KnowledgeBaseArticleModel

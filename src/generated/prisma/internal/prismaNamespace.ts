@@ -399,7 +399,8 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   User: 'User',
   Session: 'Session',
-  Product: 'Product'
+  Product: 'Product',
+  KnowledgeBaseArticle: 'KnowledgeBaseArticle'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -415,7 +416,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "product"
+    modelProps: "user" | "session" | "product" | "knowledgeBaseArticle"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -641,6 +642,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    KnowledgeBaseArticle: {
+      payload: Prisma.$KnowledgeBaseArticlePayload<ExtArgs>
+      fields: Prisma.KnowledgeBaseArticleFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.KnowledgeBaseArticleFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KnowledgeBaseArticlePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.KnowledgeBaseArticleFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KnowledgeBaseArticlePayload>
+        }
+        findFirst: {
+          args: Prisma.KnowledgeBaseArticleFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KnowledgeBaseArticlePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.KnowledgeBaseArticleFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KnowledgeBaseArticlePayload>
+        }
+        findMany: {
+          args: Prisma.KnowledgeBaseArticleFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KnowledgeBaseArticlePayload>[]
+        }
+        create: {
+          args: Prisma.KnowledgeBaseArticleCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KnowledgeBaseArticlePayload>
+        }
+        createMany: {
+          args: Prisma.KnowledgeBaseArticleCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.KnowledgeBaseArticleCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KnowledgeBaseArticlePayload>[]
+        }
+        delete: {
+          args: Prisma.KnowledgeBaseArticleDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KnowledgeBaseArticlePayload>
+        }
+        update: {
+          args: Prisma.KnowledgeBaseArticleUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KnowledgeBaseArticlePayload>
+        }
+        deleteMany: {
+          args: Prisma.KnowledgeBaseArticleDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.KnowledgeBaseArticleUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.KnowledgeBaseArticleUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KnowledgeBaseArticlePayload>[]
+        }
+        upsert: {
+          args: Prisma.KnowledgeBaseArticleUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KnowledgeBaseArticlePayload>
+        }
+        aggregate: {
+          args: Prisma.KnowledgeBaseArticleAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateKnowledgeBaseArticle>
+        }
+        groupBy: {
+          args: Prisma.KnowledgeBaseArticleGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.KnowledgeBaseArticleGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.KnowledgeBaseArticleCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.KnowledgeBaseArticleCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -717,6 +792,20 @@ export const ProductScalarFieldEnum = {
 export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
 
 
+export const KnowledgeBaseArticleScalarFieldEnum = {
+  id: 'id',
+  scope: 'scope',
+  categoryTag: 'categoryTag',
+  title: 'title',
+  context: 'context',
+  userId: 'userId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type KnowledgeBaseArticleScalarFieldEnum = (typeof KnowledgeBaseArticleScalarFieldEnum)[keyof typeof KnowledgeBaseArticleScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -786,6 +875,34 @@ export type EnumProductStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
  * Reference to a field of type 'ProductStatus[]'
  */
 export type ListEnumProductStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProductStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ArticleScope'
+ */
+export type EnumArticleScopeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ArticleScope'>
+    
+
+
+/**
+ * Reference to a field of type 'ArticleScope[]'
+ */
+export type ListEnumArticleScopeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ArticleScope[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ArticleCategoryTag'
+ */
+export type EnumArticleCategoryTagFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ArticleCategoryTag'>
+    
+
+
+/**
+ * Reference to a field of type 'ArticleCategoryTag[]'
+ */
+export type ListEnumArticleCategoryTagFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ArticleCategoryTag[]'>
     
 
 
@@ -956,6 +1073,7 @@ export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   session?: Prisma.SessionOmit
   product?: Prisma.ProductOmit
+  knowledgeBaseArticle?: Prisma.KnowledgeBaseArticleOmit
 }
 
 /* Types for Logging */

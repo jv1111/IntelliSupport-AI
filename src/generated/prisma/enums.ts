@@ -16,3 +16,20 @@ export const ProductStatus = {
 } as const
 
 export type ProductStatus = (typeof ProductStatus)[keyof typeof ProductStatus]
+
+
+export const ArticleScope = {
+  generic: 'generic',
+  specific: 'specific'
+} as const
+
+export type ArticleScope = (typeof ArticleScope)[keyof typeof ArticleScope]
+
+
+export const ArticleCategoryTag = {
+  troubleshooting: 'troubleshooting',
+  installation_setup: 'installation_setup',
+  others: 'others'
+} as const
+
+export type ArticleCategoryTag = (typeof ArticleCategoryTag)[keyof typeof ArticleCategoryTag]
