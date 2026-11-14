@@ -1,4 +1,5 @@
 import { ProductStatus } from "@/generated/prisma/enums";
+import { DEFAULT_PAGE_SIZE } from "@/lib/pagination";
 import { z } from "zod";
 
 const productNameSchema = z.string().trim().min(1, "Product name is required.");
@@ -7,7 +8,12 @@ const productStatusSchema = z.enum(ProductStatus);
 
 export const listProductsSchema = z.object({
   page: z.number().int().min(1).default(1),
-  limit: z.number().int().min(1).max(15).default(15),
+  limit: z
+    .number()
+    .int()
+    .min(1)
+    .max(DEFAULT_PAGE_SIZE)
+    .default(DEFAULT_PAGE_SIZE),
   search: z
     .string()
     .trim()

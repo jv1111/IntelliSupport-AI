@@ -1,4 +1,9 @@
-import { ArticleCategoryTag, ArticleScope } from "@/generated/prisma/enums";
+import {
+  ArticleCategoryTag,
+  ArticleScope,
+  ProductStatus,
+} from "@/generated/prisma/enums";
+import { DEFAULT_PAGE_SIZE } from "@/lib/pagination";
 import { z } from "zod";
 
 const articleTitleSchema = z
@@ -13,10 +18,16 @@ const articleContextSchema = z
 
 const articleScopeSchema = z.enum(ArticleScope);
 const articleCategoryTagSchema = z.enum(ArticleCategoryTag);
+const articleStatusSchema = z.enum(ProductStatus);
 
 export const listKnowledgeBaseArticlesSchema = z.object({
   page: z.number().int().min(1).default(1),
-  limit: z.number().int().min(1).max(15).default(15),
+  limit: z
+    .number()
+    .int()
+    .min(1)
+    .max(DEFAULT_PAGE_SIZE)
+    .default(DEFAULT_PAGE_SIZE),
   search: z
     .string()
     .trim()
@@ -26,6 +37,9 @@ export const listKnowledgeBaseArticlesSchema = z.object({
   categoryTag: articleCategoryTagSchema
     .nullish()
     .transform((value) => value ?? undefined),
+  status: articleStatusSchema
+    .nullish()
+    .transform((value) => value ?? undefined),
 });
 
 export const createKnowledgeBaseArticleSchema = z.object({
@@ -33,6 +47,7 @@ export const createKnowledgeBaseArticleSchema = z.object({
   categoryTag: articleCategoryTagSchema,
   title: articleTitleSchema,
   context: articleContextSchema,
+  status: articleStatusSchema.default("draft"),
 });
 
 export const updateKnowledgeBaseArticleSchema = z
@@ -41,6 +56,7 @@ export const updateKnowledgeBaseArticleSchema = z
     categoryTag: articleCategoryTagSchema.optional(),
     title: articleTitleSchema.optional(),
     context: articleContextSchema.optional(),
+    status: articleStatusSchema.optional(),
   })
   .refine(
     (input) => Object.values(input).some((value) => value !== undefined),

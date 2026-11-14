@@ -1,16 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { DEFAULT_PAGE_SIZE } from "@/lib/pagination";
 import {
   deleteProduct as deleteProductRequest,
   fetchProducts,
   updateProduct,
-  type Product,
-  type ProductPage,
-  type ProductStatus,
 } from "@/lib/products";
-
-const PAGE_SIZE = 15;
+import type { Product, ProductPage, ProductStatus } from "@/lib/products/types";
 
 const emptyPage: ProductPage = {
   items: [],
@@ -53,17 +50,18 @@ export function useProductCatalog(initialStatus: ProductStatus) {
   useEffect(() => {
     requestIdRef.current += 1;
     isLoadingMoreRef.current = false;
-    setIsLoadingMore(false);
-    setIsLoading(true);
-    setFetchError(null);
 
     let cancelled = false;
 
     const timeout = window.setTimeout(async () => {
+      setIsLoadingMore(false);
+      setIsLoading(true);
+      setFetchError(null);
+
       try {
         const result = await fetchProducts({
           page: 1,
-          limit: PAGE_SIZE,
+          limit: DEFAULT_PAGE_SIZE,
           search: search || null,
           status,
         });
@@ -110,7 +108,7 @@ export function useProductCatalog(initialStatus: ProductStatus) {
     try {
       const result = await fetchProducts({
         page: productPage.currentPage + 1,
-        limit: PAGE_SIZE,
+        limit: DEFAULT_PAGE_SIZE,
         search: search || null,
         status,
       });

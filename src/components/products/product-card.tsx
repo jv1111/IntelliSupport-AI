@@ -5,14 +5,9 @@ import Link from "next/link";
 import { ArchiveRestore, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { ProductImagePlaceholder } from "@/components/products/product-image-placeholder";
-import type { Product } from "@/lib/products";
-
-const statusStyles: Record<Product["status"], string> = {
-  published: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  draft: "border-amber-200 bg-amber-50 text-amber-700",
-  archived: "border-slate-200 bg-slate-100 text-slate-600",
-};
+import type { Product } from "@/lib/products/types";
 
 interface ProductCardProps {
   product: Product;
@@ -46,11 +41,10 @@ export function ProductCard({
             <ProductImagePlaceholder />
           )}
 
-          <span
-            className={`absolute top-3 right-3 rounded-lg border px-2.5 py-1 text-[10px] font-bold tracking-wide uppercase ${statusStyles[product.status]}`}
-          >
-            {product.status}
-          </span>
+          <StatusBadge
+            status={product.status}
+            className="absolute top-3 right-3"
+          />
 
           {product.status === "archived" && (
             <Button

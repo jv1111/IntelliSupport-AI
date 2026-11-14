@@ -1,3 +1,4 @@
+import { DEFAULT_PAGE_SIZE } from "@/lib/pagination";
 import { ProductStatus } from "@/generated/prisma/enums";
 
 export const productTypeDefs = `#graphql
@@ -46,7 +47,7 @@ export const productTypeDefs = `#graphql
 
     products(
       page: Int = 1
-      limit: Int = 15
+      limit: Int = ${DEFAULT_PAGE_SIZE}
       search: String
       status: ProductStatus
     ): ProductPage!

@@ -7,6 +7,7 @@ import {
   updateKnowledgeBaseArticleSchema,
 } from "@/lib/validations/knowledge-base";
 import { formatValidationErrors } from "@/lib/validations/format-validation-errors";
+import { createPaginationMetadata } from "@/lib/pagination";
 import { prisma } from "@/server/db/prisma";
 
 const knowledgeBaseArticleIdSchema = z
@@ -18,6 +19,7 @@ const knowledgeBaseArticleSelect = {
   id: true,
   scope: true,
   categoryTag: true,
+  status: true,
   title: true,
   context: true,
   createdAt: true,
@@ -26,7 +28,8 @@ const knowledgeBaseArticleSelect = {
 
 export class KnowledgeBaseArticleError extends Error {
   constructor(
-    public readonly code: "INVALID_INPUT" | "NOT_FOUND",
+    public readonly code:
+      "INVALID_INPUT" | "NOT_FOUND" | "INVALID_STATUS_TRANSITION",
     message: string,
   ) {
     super(message);
@@ -57,12 +60,14 @@ export async function getKnowledgeBaseArticles(userId: string, input: unknown) {
     );
   }
 
-  const { page, limit, search, scope, categoryTag } = validationResult.data;
+  const { page, limit, search, scope, categoryTag, status } =
+    validationResult.data;
 
   const where = {
     userId,
     ...(scope ? { scope } : {}),
     ...(categoryTag ? { categoryTag } : {}),
+    ...(status ? { status } : {}),
     ...(search
       ? {
           title: {
@@ -84,15 +89,9 @@ export async function getKnowledgeBaseArticles(userId: string, input: unknown) {
     prisma.knowledgeBaseArticle.count({ where }),
   ]);
 
-  const totalPages = Math.ceil(totalCount / limit);
-
   return {
     items,
-    totalCount,
-    totalPages,
-    currentPage: page,
-    hasNextPage: page < totalPages,
-    hasPreviousPage: page > 1,
+    ...createPaginationMetadata(page, limit, totalCount),
   };
 }
 
@@ -165,12 +164,29 @@ export async function updateKnowledgeBaseArticle(
     where: {
       id,
       userId,
+      ...(validationResult.data.status === "archived"
+        ? { status: "published" as const }
+        : {}),
     },
     data: validationResult.data,
     select: knowledgeBaseArticleSelect,
   });
 
   if (!article) {
+    if (validationResult.data.status === "archived") {
+      const existingArticle = await prisma.knowledgeBaseArticle.findFirst({
+        where: { id, userId },
+        select: { status: true },
+      });
+
+      if (existingArticle) {
+        throw new KnowledgeBaseArticleError(
+          "INVALID_STATUS_TRANSITION",
+          "Only published articles can be archived.",
+        );
+      }
+    }
+
     throw new KnowledgeBaseArticleError(
       "NOT_FOUND",
       "Knowledge Base article not found.",
@@ -190,10 +206,23 @@ export async function deleteKnowledgeBaseArticle(
     where: {
       id,
       userId,
+      status: "archived",
     },
   });
 
   if (result.count === 0) {
+    const existingArticle = await prisma.knowledgeBaseArticle.findFirst({
+      where: { id, userId },
+      select: { id: true },
+    });
+
+    if (existingArticle) {
+      throw new KnowledgeBaseArticleError(
+        "INVALID_STATUS_TRANSITION",
+        "Only archived articles can be deleted.",
+      );
+    }
+
     throw new KnowledgeBaseArticleError(
       "NOT_FOUND",
       "Knowledge Base article not found.",

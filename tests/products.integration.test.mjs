@@ -650,10 +650,7 @@ test("authenticated users can create, update, and delete products", async (t) =>
 test("users cannot access or mutate another user's products", async (t) => {
   assert.ok(username, "PRODUCT_TEST_USERNAME is required.");
   assert.ok(password, "PRODUCT_TEST_PASSWORD is required.");
-  assert.ok(
-    secondaryPassword,
-    "PRODUCT_TEST_SECONDARY_PASSWORD is required.",
-  );
+  assert.ok(secondaryPassword, "PRODUCT_TEST_SECONDARY_PASSWORD is required.");
 
   let ownerCookie;
   let otherCookie;
@@ -722,9 +719,7 @@ test("users cannot access or mutate another user's products", async (t) => {
     },
   );
 
-  if (
-    registration.payload.errors?.[0]?.extensions?.code !== "USERNAME_TAKEN"
-  ) {
+  if (registration.payload.errors?.[0]?.extensions?.code !== "USERNAME_TAKEN") {
     assertSuccess(registration);
   }
 
@@ -916,8 +911,14 @@ test("users cannot access or mutate another user's products", async (t) => {
 
   assertSuccess(ownerProductAfterAttempts);
   assert.equal(ownerProductAfterAttempts.payload.data.product.id, productId);
-  assert.equal(ownerProductAfterAttempts.payload.data.product.name, productName);
-  assert.equal(ownerProductAfterAttempts.payload.data.product.status, "archived");
+  assert.equal(
+    ownerProductAfterAttempts.payload.data.product.name,
+    productName,
+  );
+  assert.equal(
+    ownerProductAfterAttempts.payload.data.product.status,
+    "archived",
+  );
 
   const ownerDelete = await graphql(
     `

@@ -796,6 +796,7 @@ export const KnowledgeBaseArticleScalarFieldEnum = {
   id: 'id',
   scope: 'scope',
   categoryTag: 'categoryTag',
+  status: 'status',
   title: 'title',
   context: 'context',
   userId: 'userId',

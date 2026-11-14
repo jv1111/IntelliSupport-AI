@@ -14,7 +14,11 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { FieldLabel, fieldControlStyles } from "@/components/ui/field";
 import { getProductFormDraftStorageKey } from "@/components/products/product-form-draft";
-import type { Product, ProductInput, ProductStatus } from "@/lib/products";
+import type {
+  Product,
+  ProductInput,
+  ProductStatus,
+} from "@/lib/products/types";
 
 interface ProductFormProps {
   product: Product | null;

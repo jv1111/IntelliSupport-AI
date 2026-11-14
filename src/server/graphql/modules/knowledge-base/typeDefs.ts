@@ -1,3 +1,4 @@
+import { DEFAULT_PAGE_SIZE } from "@/lib/pagination";
 import { ArticleCategoryTag, ArticleScope } from "@/generated/prisma/enums";
 
 export const knowledgeBaseTypeDefs = `#graphql
@@ -13,6 +14,7 @@ export const knowledgeBaseTypeDefs = `#graphql
     id: ID!
     scope: ArticleScope!
     categoryTag: ArticleCategoryTag!
+    status: ProductStatus!
     title: String!
     context: String!
     createdAt: String!
@@ -24,6 +26,7 @@ export const knowledgeBaseTypeDefs = `#graphql
     categoryTag: ArticleCategoryTag!
     title: String!
     context: String!
+    status: ProductStatus
   }
 
   input UpdateKnowledgeBaseArticleInput {
@@ -31,6 +34,7 @@ export const knowledgeBaseTypeDefs = `#graphql
     categoryTag: ArticleCategoryTag
     title: String
     context: String
+    status: ProductStatus
   }
 
   type KnowledgeBaseArticlePage {
@@ -47,10 +51,11 @@ export const knowledgeBaseTypeDefs = `#graphql
 
     knowledgeBaseArticles(
       page: Int = 1
-      limit: Int = 15
+      limit: Int = ${DEFAULT_PAGE_SIZE}
       search: String
       scope: ArticleScope
       categoryTag: ArticleCategoryTag
+      status: ProductStatus
     ): KnowledgeBaseArticlePage!
   }
 

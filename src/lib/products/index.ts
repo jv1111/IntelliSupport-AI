@@ -1,36 +1,12 @@
 import { graphqlRequest } from "@/lib/graphql/client";
 
-export type ProductStatus = "published" | "draft" | "archived";
-
-export interface Product {
-  id: string;
-  name: string;
-  sku: string;
-  status: ProductStatus;
-  imageUrl: string | null;
-  description: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface ProductPage {
-  items: Product[];
-  totalCount: number;
-  totalPages: number;
-  currentPage: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-}
-
-export interface ProductInput {
-  name: string;
-  sku?: string;
-  status?: ProductStatus;
-  imageUrl?: string | null;
-  description?: string;
-}
-
-export type ProductUpdateInput = Partial<ProductInput>;
+import type {
+  Product,
+  ProductInput,
+  ProductPage,
+  ProductStatus,
+  ProductUpdateInput,
+} from "@/lib/products/types";
 
 type ProductsVariables = Record<string, unknown> & {
   page: number;

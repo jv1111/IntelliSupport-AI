@@ -1,29 +1,27 @@
 "use client";
 
 import { useRef } from "react";
-import Link from "next/link";
 import { PackageOpen, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { SearchInput } from "@/components/ui/search-input";
+import { PrimaryActionLink } from "@/components/ui/primary-action-link";
 import { ProductCard } from "@/components/products/product-card";
 import { useProductCatalog } from "@/components/products/hooks/use-product-catalog";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
-import type { ProductStatus } from "@/lib/products";
+import { productStatusLabels } from "@/components/products/data";
+import type { ProductStatus } from "@/lib/products/types";
 
 interface ProductCatalogProps {
   initialStatus: ProductStatus;
 }
 
 const statusTabs: { label: string; value: ProductStatus }[] = [
-  { label: "Published Products", value: "published" },
-  { label: "Drafts", value: "draft" },
-  { label: "Archived", value: "archived" },
+  { label: productStatusLabels.published, value: "published" },
+  { label: productStatusLabels.draft, value: "draft" },
+  { label: productStatusLabels.archived, value: "archived" },
 ];
-
-const addProductLinkStyles =
-  "inline-flex items-center justify-center rounded-xl bg-linear-to-r from-primary to-secondary p-3 text-xs font-bold tracking-wider text-primary-foreground transition-all duration-150 ease-out hover:scale-[1.01] hover:from-primary-hover focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/15";
 
 export function ProductCatalog({ initialStatus }: ProductCatalogProps) {
   const {
@@ -55,10 +53,7 @@ export function ProductCatalog({ initialStatus }: ProductCatalogProps) {
     rootRef: productScrollRef,
     targetRef: loadMoreRef,
     enabled:
-      productPage.hasNextPage &&
-      !isLoading &&
-      !isLoadingMore &&
-      !fetchError,
+      productPage.hasNextPage && !isLoading && !isLoadingMore && !fetchError,
     onLoadMore: loadMore,
   });
 
@@ -76,9 +71,9 @@ export function ProductCatalog({ initialStatus }: ProductCatalogProps) {
             </p>
           </div>
 
-          <Link href="/products/new" className={addProductLinkStyles}>
+          <PrimaryActionLink href="/products/new">
             Add Product
-          </Link>
+          </PrimaryActionLink>
         </div>
 
         <div className="flex shrink-0 flex-wrap items-center gap-2 border-b border-border pb-3">
@@ -195,12 +190,9 @@ export function ProductCatalog({ initialStatus }: ProductCatalogProps) {
                 Clear Search
               </Button>
             ) : (
-              <Link
-                href="/products/new"
-                className={`${addProductLinkStyles} mt-4 px-4`}
-              >
+              <PrimaryActionLink href="/products/new" className="mt-4 px-4">
                 Add Product
-              </Link>
+              </PrimaryActionLink>
             )}
           </Card>
         )}

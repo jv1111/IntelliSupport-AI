@@ -7,6 +7,7 @@ import {
   updateProductSchema,
 } from "@/lib/validations/product";
 import { formatValidationErrors } from "@/lib/validations/format-validation-errors";
+import { createPaginationMetadata } from "@/lib/pagination";
 import { prisma } from "@/server/db/prisma";
 
 const productIdSchema = z.string().trim().min(1, "Product ID is required.");
@@ -83,15 +84,9 @@ export async function getProducts(userId: string, input: unknown) {
     prisma.product.count({ where }),
   ]);
 
-  const totalPages = Math.ceil(totalCount / limit);
-
   return {
     items,
-    totalCount,
-    totalPages,
-    currentPage: page,
-    hasNextPage: page < totalPages,
-    hasPreviousPage: page > 1,
+    ...createPaginationMetadata(page, limit, totalCount),
   };
 }
 

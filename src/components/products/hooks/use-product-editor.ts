@@ -2,14 +2,12 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  createProduct,
-  fetchProduct,
-  updateProduct,
-  type Product,
-  type ProductInput,
-  type ProductStatus,
-} from "@/lib/products";
+import { createProduct, fetchProduct, updateProduct } from "@/lib/products";
+import type {
+  Product,
+  ProductInput,
+  ProductStatus,
+} from "@/lib/products/types";
 import { clearProductFormDraft } from "@/components/products/product-form-draft";
 
 export function useProductEditor(productId?: string) {

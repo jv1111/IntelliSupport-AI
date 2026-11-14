@@ -3,6 +3,7 @@ import "server-only";
 import {
   type ArticleCategoryTag as ArticleCategoryTagValue,
   type ArticleScope as ArticleScopeValue,
+  type ProductStatus as ProductStatusValue,
 } from "@/generated/prisma/enums";
 import { GraphQLError } from "graphql";
 import {
@@ -21,6 +22,7 @@ interface CreateKnowledgeBaseArticleInput {
   categoryTag: ArticleCategoryTagValue;
   title: string;
   context: string;
+  status?: ProductStatusValue;
 }
 
 interface UpdateKnowledgeBaseArticleInput {
@@ -28,6 +30,7 @@ interface UpdateKnowledgeBaseArticleInput {
   categoryTag?: ArticleCategoryTagValue;
   title?: string;
   context?: string;
+  status?: ProductStatusValue;
 }
 
 type KnowledgeBaseArticleResult = Awaited<
@@ -80,6 +83,7 @@ export const knowledgeBaseResolvers = {
         search?: string | null;
         scope?: ArticleScopeValue | null;
         categoryTag?: ArticleCategoryTagValue | null;
+        status?: ProductStatusValue | null;
       },
       context: GraphQLContext,
     ): Promise<Awaited<ReturnType<typeof getKnowledgeBaseArticles>>> => {

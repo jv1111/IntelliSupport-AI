@@ -109,6 +109,27 @@ async function logout(cookie) {
   assert.equal(result.payload.data.logout, true);
 }
 
+async function updateArticleStatus(id, status, cookie) {
+  const result = await graphql(
+    `
+      mutation UpdateKnowledgeBaseArticle(
+        $id: ID!
+        $input: UpdateKnowledgeBaseArticleInput!
+      ) {
+        updateKnowledgeBaseArticle(id: $id, input: $input) {
+          id
+          status
+        }
+      }
+    `,
+    { id, input: { status } },
+    cookie,
+  );
+
+  assertSuccess(result);
+  return result.payload.data.updateKnowledgeBaseArticle;
+}
+
 test("unauthenticated users cannot access Knowledge Base articles", async () => {
   const list = await graphql(`
     query KnowledgeBaseArticles {
@@ -207,6 +228,9 @@ test("authenticated users can manage private Knowledge Base articles", async (t)
           continue;
         }
 
+        await updateArticleStatus(article.id, "published", article.cookie);
+        await updateArticleStatus(article.id, "archived", article.cookie);
+
         const cleanup = await graphql(
           `
             mutation DeleteKnowledgeBaseArticle($id: ID!) {
@@ -272,6 +296,7 @@ test("authenticated users can manage private Knowledge Base articles", async (t)
             id
             scope
             categoryTag
+            status
             title
             context
             createdAt
@@ -306,6 +331,7 @@ test("authenticated users can manage private Knowledge Base articles", async (t)
             id
             scope
             categoryTag
+            status
             title
             context
             createdAt
@@ -330,6 +356,7 @@ test("authenticated users can manage private Knowledge Base articles", async (t)
     {
       scope: "specific",
       categoryTag: "installation_setup",
+      status: "published",
       title: `Knowledge Base ${searchToken} Beta`,
       context: "Installation article context.",
     },
@@ -351,6 +378,9 @@ test("authenticated users can manage private Knowledge Base articles", async (t)
 
   assert.equal(createdArticle.scope, "generic");
   assert.equal(createdArticle.categoryTag, "troubleshooting");
+  assert.equal(createdArticle.status, "draft");
+  assert.equal(ownerArticles[1].status, "published");
+  assert.equal(ownerArticles[2].status, "draft");
   assert.equal(createdArticle.title, ownerInputs[0].title);
   assert.equal(createdArticle.context, ownerInputs[0].context);
   assert.ok(createdArticle.createdAt);
@@ -364,6 +394,7 @@ test("authenticated users can manage private Knowledge Base articles", async (t)
     id: createdArticle.id,
     scope: createdArticle.scope,
     categoryTag: createdArticle.categoryTag,
+    status: createdArticle.status,
     title: createdArticle.title,
     context: createdArticle.context,
     createdAt: createdArticle.createdAt,
@@ -447,6 +478,7 @@ test("authenticated users can manage private Knowledge Base articles", async (t)
           id
           scope
           categoryTag
+          status
           title
           context
           updatedAt
@@ -458,6 +490,7 @@ test("authenticated users can manage private Knowledge Base articles", async (t)
       input: {
         scope: "specific",
         categoryTag: "installation_setup",
+        status: "published",
         title: updatedTitle,
         context: "Updated article context.",
       },
@@ -472,6 +505,7 @@ test("authenticated users can manage private Knowledge Base articles", async (t)
   assert.equal(updatedArticle.id, createdArticle.id);
   assert.equal(updatedArticle.scope, "specific");
   assert.equal(updatedArticle.categoryTag, "installation_setup");
+  assert.equal(updatedArticle.status, "published");
   assert.equal(updatedArticle.title, updatedTitle);
   assert.equal(updatedArticle.context, "Updated article context.");
   assert.ok(updatedArticle.updatedAt);
@@ -483,6 +517,7 @@ test("authenticated users can manage private Knowledge Base articles", async (t)
       $search: String
       $scope: ArticleScope
       $categoryTag: ArticleCategoryTag
+      $status: ProductStatus
     ) {
       knowledgeBaseArticles(
         page: $page
@@ -490,11 +525,13 @@ test("authenticated users can manage private Knowledge Base articles", async (t)
         search: $search
         scope: $scope
         categoryTag: $categoryTag
+        status: $status
       ) {
         items {
           id
           scope
           categoryTag
+          status
           title
         }
         totalCount
@@ -551,6 +588,54 @@ test("authenticated users can manage private Knowledge Base articles", async (t)
   assert.equal(secondPage.hasNextPage, false);
   assert.equal(secondPage.hasPreviousPage, true);
 
+  const publishedStatusResult = await graphql(
+    listQuery,
+    {
+      page: 1,
+      limit: 15,
+      search: searchToken,
+      scope: null,
+      categoryTag: null,
+      status: "published",
+    },
+    ownerCookie,
+  );
+
+  assertSuccess(publishedStatusResult);
+
+  const publishedStatusPage =
+    publishedStatusResult.payload.data.knowledgeBaseArticles;
+
+  assert.equal(publishedStatusPage.totalCount, 2);
+  assert.ok(
+    publishedStatusPage.items.every(
+      (article) => article.status === "published",
+    ),
+  );
+
+  const draftStatusResult = await graphql(
+    listQuery,
+    {
+      page: 1,
+      limit: 15,
+      search: searchToken,
+      scope: null,
+      categoryTag: null,
+      status: "draft",
+    },
+    ownerCookie,
+  );
+
+  assertSuccess(draftStatusResult);
+
+  const draftStatusPage =
+    draftStatusResult.payload.data.knowledgeBaseArticles;
+
+  assert.equal(draftStatusPage.totalCount, 1);
+  assert.ok(
+    draftStatusPage.items.every((article) => article.status === "draft"),
+  );
+
   const filteredResult = await graphql(
     listQuery,
     {
@@ -571,6 +656,7 @@ test("authenticated users can manage private Knowledge Base articles", async (t)
   assert.equal(filteredArticles.items.length, 1);
   assert.equal(filteredArticles.items[0].categoryTag, "others");
   assert.equal(filteredArticles.items[0].scope, "generic");
+  assert.equal(filteredArticles.items[0].status, "draft");
 
   const invalidPage = await graphql(
     listQuery,
@@ -716,6 +802,74 @@ test("authenticated users can manage private Knowledge Base articles", async (t)
     ownerAfterAttempts.payload.data.knowledgeBaseArticle.title,
     updatedTitle,
   );
+
+  const draftArchiveAttempt = await graphql(
+    `
+      mutation UpdateKnowledgeBaseArticle(
+        $id: ID!
+        $input: UpdateKnowledgeBaseArticleInput!
+      ) {
+        updateKnowledgeBaseArticle(id: $id, input: $input) {
+          id
+          status
+        }
+      }
+    `,
+    {
+      id: ownerArticles[2].id,
+      input: { status: "archived" },
+    },
+    ownerCookie,
+  );
+
+  assertError(draftArchiveAttempt, "INVALID_STATUS_TRANSITION");
+
+  const draftDeleteAttempt = await graphql(
+    `
+      mutation DeleteKnowledgeBaseArticle($id: ID!) {
+        deleteKnowledgeBaseArticle(id: $id)
+      }
+    `,
+    { id: ownerArticles[2].id },
+    ownerCookie,
+  );
+
+  assertError(draftDeleteAttempt, "INVALID_STATUS_TRANSITION");
+
+  const publishedArticle = await updateArticleStatus(
+    ownerArticles[2].id,
+    "published",
+    ownerCookie,
+  );
+  assert.equal(publishedArticle.status, "published");
+
+  const archivedArticle = await updateArticleStatus(
+    ownerArticles[2].id,
+    "archived",
+    ownerCookie,
+  );
+  assert.equal(archivedArticle.status, "archived");
+
+  const restoredArticle = await updateArticleStatus(
+    ownerArticles[2].id,
+    "draft",
+    ownerCookie,
+  );
+  assert.equal(restoredArticle.status, "draft");
+
+  const republishedArticle = await updateArticleStatus(
+    ownerArticles[2].id,
+    "published",
+    ownerCookie,
+  );
+  assert.equal(republishedArticle.status, "published");
+
+  const archivedAgain = await updateArticleStatus(
+    ownerArticles[2].id,
+    "archived",
+    ownerCookie,
+  );
+  assert.equal(archivedAgain.status, "archived");
 
   const deleteResult = await graphql(
     `

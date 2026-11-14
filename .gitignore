@@ -42,3 +42,4 @@ next-env.d.ts
 
 # Allow the committed environment template
 !.env.example
+backup/
