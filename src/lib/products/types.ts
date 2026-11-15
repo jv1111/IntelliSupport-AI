@@ -26,7 +26,7 @@ export interface ProductInput {
   name: string;
   sku?: string;
   status?: ProductStatus;
-  imageUrl?: string | null;
+  imageKey?: string | null;
   description?: string;
 }
 

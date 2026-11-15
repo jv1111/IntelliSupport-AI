@@ -6,6 +6,17 @@ export const productTypeDefs = `#graphql
     ${Object.values(ProductStatus).join("\n    ")}
   }
 
+  type ProductImageUploadField {
+    name: String!
+    value: String!
+  }
+
+  type ProductImageUpload {
+    imageKey: String!
+    uploadUrl: String!
+    fields: [ProductImageUploadField!]!
+  }
+
   type Product {
     id: ID!
     name: String!
@@ -21,7 +32,7 @@ export const productTypeDefs = `#graphql
     name: String!
     sku: String
     status: ProductStatus
-    imageUrl: String
+    imageKey: String
     description: String
   }
 
@@ -29,7 +40,7 @@ export const productTypeDefs = `#graphql
     name: String
     sku: String
     status: ProductStatus
-    imageUrl: String
+    imageKey: String
     description: String
   }
 
@@ -54,6 +65,11 @@ export const productTypeDefs = `#graphql
   }
 
   extend type Mutation {
+    requestProductImageUpload(
+      contentType: String!
+      size: Int!
+    ): ProductImageUpload!
+
     createProduct(input: CreateProductInput!): Product!
     updateProduct(id: ID!, input: UpdateProductInput!): Product!
     deleteProduct(id: ID!): Boolean!

@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { ProductImage } from "@/components/products/product-image";
 import Link from "next/link";
 import { ArchiveRestore, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -29,11 +29,9 @@ export function ProductCard({
       <Card variant="interactive" className="flex h-full flex-col">
         <div className="relative aspect-4/3 shrink-0 overflow-hidden bg-surface-muted">
           {product.imageUrl ? (
-            <Image
+            <ProductImage
               src={product.imageUrl}
               alt={product.name}
-              fill
-              unoptimized
               sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
               className="object-cover transition-transform duration-300 group-hover:scale-105"
             />

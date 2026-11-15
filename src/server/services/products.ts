@@ -9,6 +9,7 @@ import {
 import { formatValidationErrors } from "@/lib/validations/format-validation-errors";
 import { createPaginationMetadata } from "@/lib/pagination";
 import { prisma } from "@/server/db/prisma";
+import { verifyProductImage } from "@/server/storage/google-cloud-storage";
 
 const productIdSchema = z.string().trim().min(1, "Product ID is required.");
 
@@ -46,6 +47,17 @@ function validateProductId(productId: string): string {
   }
 
   return result.data;
+}
+
+async function validateProductImageKey(
+  imageKey: string | null | undefined,
+  userId: string,
+): Promise<void> {
+  if (imageKey == null) {
+    return;
+  }
+
+  await verifyProductImage(userId, imageKey);
 }
 
 export async function getProducts(userId: string, input: unknown) {
@@ -118,9 +130,14 @@ export async function createProduct(userId: string, input: unknown) {
     );
   }
 
+  const { imageKey, ...productData } = validationResult.data;
+
+  await validateProductImageKey(imageKey, userId);
+
   return prisma.product.create({
     data: {
-      ...validationResult.data,
+      ...productData,
+      imageUrl: imageKey ?? null,
       user: {
         connect: {
           id: userId,
@@ -146,6 +163,10 @@ export async function updateProduct(
     );
   }
 
+  const { imageKey, ...productData } = validationResult.data;
+
+  await validateProductImageKey(imageKey, userId);
+
   const [product] = await prisma.product.updateManyAndReturn({
     where: {
       id,
@@ -154,7 +175,10 @@ export async function updateProduct(
         ? { status: "published" as const }
         : {}),
     },
-    data: validationResult.data,
+    data: {
+      ...productData,
+      ...(imageKey !== undefined ? { imageUrl: imageKey } : {}),
+    },
     select: productSelect,
   });
 

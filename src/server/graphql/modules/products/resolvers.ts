@@ -11,13 +11,18 @@ import {
   getProducts,
 } from "@/server/services/products";
 import { requireAuthenticatedUser } from "@/server/graphql/shared/require-authenticated-user";
+import {
+  createProductImageReadUrl,
+  createProductImageUploadPolicy,
+  ProductImageStorageError,
+} from "@/server/storage/google-cloud-storage";
 import type { GraphQLContext } from "@/server/graphql/context";
 
 interface CreateProductInput {
   name: string;
   sku?: string;
   status?: ProductStatusValue;
-  imageUrl?: string | null;
+  imageKey?: string | null;
   description?: string;
 }
 
@@ -25,7 +30,7 @@ interface UpdateProductInput {
   name?: string;
   sku?: string;
   status?: ProductStatusValue;
-  imageUrl?: string | null;
+  imageKey?: string | null;
   description?: string;
 }
 
@@ -36,6 +41,14 @@ function throwProductGraphQLError(
   fallbackMessage: string,
 ): never {
   if (error instanceof ProductError) {
+    throw new GraphQLError(error.message, {
+      extensions: {
+        code: error.code,
+      },
+    });
+  }
+
+  if (error instanceof ProductImageStorageError) {
     throw new GraphQLError(error.message, {
       extensions: {
         code: error.code,
@@ -87,6 +100,36 @@ export const productResolvers = {
   },
 
   Mutation: {
+    requestProductImageUpload: async (
+      _parent: unknown,
+      args: { contentType: string; size: number },
+      context: GraphQLContext,
+    ) => {
+      const user = requireAuthenticatedUser(context);
+
+      try {
+        const policy = await createProductImageUploadPolicy(
+          user.id,
+          args.contentType,
+          args.size,
+        );
+
+        return {
+          imageKey: policy.imageKey,
+          uploadUrl: policy.uploadUrl,
+          fields: Object.entries(policy.fields).map(([name, value]) => ({
+            name,
+            value,
+          })),
+        };
+      } catch (error) {
+        throwProductGraphQLError(
+          error,
+          "Unable to authorize product image upload.",
+        );
+      }
+    },
+
     createProduct: async (
       _parent: unknown,
       args: { input: CreateProductInput },
@@ -133,5 +176,21 @@ export const productResolvers = {
   Product: {
     createdAt: (parent: ProductResult) => parent.createdAt.toISOString(),
     updatedAt: (parent: ProductResult) => parent.updatedAt.toISOString(),
+    imageUrl: async (parent: ProductResult): Promise<string | null> => {
+      if (!parent.imageUrl) {
+        return null;
+      }
+
+      try {
+        return await createProductImageReadUrl(parent.imageUrl);
+      } catch (error) {
+        console.error("Unable to generate product image read URL:", {
+          productId: parent.id,
+          error,
+        });
+
+        return null;
+      }
+    },
   },
 };

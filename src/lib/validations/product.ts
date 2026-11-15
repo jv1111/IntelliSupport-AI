@@ -32,7 +32,7 @@ export const createProductSchema = z.object({
     .optional()
     .transform((value) => value || "Not specified"),
   status: productStatusSchema.default("draft"),
-  imageUrl: z
+  imageKey: z
     .string()
     .trim()
     .nullable()
@@ -56,7 +56,7 @@ export const updateProductSchema = z
         value === undefined ? undefined : value || "Not specified",
       ),
     status: productStatusSchema.optional(),
-    imageUrl: z
+    imageKey: z
       .string()
       .trim()
       .nullable()

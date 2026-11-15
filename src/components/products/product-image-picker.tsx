@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { ProductImage } from "@/components/products/product-image";
 import { useRef, useState } from "react";
 import type { ChangeEvent, DragEvent } from "react";
 import { ImagePlus, RefreshCw, Trash2 } from "lucide-react";
@@ -11,7 +11,9 @@ import { formatFileSize } from "@/lib/files/format-file-size";
 
 interface ProductImagePickerProps {
   productName: string;
+  imageUrl?: string | null;
   disabled?: boolean;
+  onChange: (file: File | null, removeImage: boolean) => void;
 }
 
 const dropzoneStyles =
@@ -27,15 +29,29 @@ const previewCardStyles =
 
 export function ProductImagePicker({
   productName,
+  imageUrl,
   disabled = false,
+  onChange,
 }: ProductImagePickerProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isRemoved, setIsRemoved] = useState(false);
+
   const { selectedImage, error, selectFile, clear, reportPreviewFailure } =
     useImageSelection();
 
+  const previewUrl =
+    selectedImage?.previewUrl ?? (!isRemoved ? imageUrl : null);
+
   function openFilePicker() {
     inputRef.current?.click();
+  }
+
+  function handleFileSelection(file: File) {
+    if (selectFile(file)) {
+      setIsRemoved(false);
+      onChange(file, false);
+    }
   }
 
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
@@ -44,7 +60,7 @@ export function ProductImagePicker({
     event.target.value = "";
 
     if (file) {
-      selectFile(file);
+      handleFileSelection(file);
     }
   }
 
@@ -63,8 +79,14 @@ export function ProductImagePicker({
     const file = event.dataTransfer.files?.[0];
 
     if (file && !disabled) {
-      selectFile(file);
+      handleFileSelection(file);
     }
+  }
+
+  function handleClear() {
+    clear();
+    setIsRemoved(true);
+    onChange(null, true);
   }
 
   return (
@@ -75,33 +97,33 @@ export function ProductImagePicker({
         ref={inputRef}
         id="product-image"
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/webp,image/gif"
         onChange={handleChange}
         disabled={disabled}
         className="sr-only"
       />
 
-      {selectedImage ? (
+      {previewUrl ? (
         <div className={previewCardStyles}>
           <div className="relative aspect-4/3 w-full shrink-0 overflow-hidden rounded-xl border border-border bg-surface sm:w-44">
-            <Image
-              src={selectedImage.previewUrl}
-              alt={productName || "Selected product image"}
-              fill
-              sizes="(min-width: 640px) 11rem, 100vw"
-              unoptimized
-              onError={reportPreviewFailure}
-              className="object-contain p-2"
-            />
+            <ProductImage
+                src={previewUrl}
+                alt={productName || "Product image"}
+                sizes="(min-width: 640px) 11rem, 100vw"
+                onError={selectedImage ? reportPreviewFailure : undefined}
+                className="object-contain p-2"
+              />
           </div>
 
           <div className="min-w-0 flex-1 space-y-3">
             <div>
               <p className="truncate text-xs font-bold text-foreground">
-                {selectedImage.name}
+                {selectedImage?.name ?? "Current product image"}
               </p>
               <p className="mt-0.5 text-[11px] text-muted-foreground">
-                {formatFileSize(selectedImage.size)}
+                {selectedImage
+                  ? formatFileSize(selectedImage.size)
+                  : "Saved product image"}
               </p>
             </div>
 
@@ -121,7 +143,7 @@ export function ProductImagePicker({
                 variant="danger-subtle"
                 fullWidth={false}
                 className="gap-1.5"
-                onClick={clear}
+                onClick={handleClear}
                 disabled={disabled}
               >
                 <Trash2 className="size-3.5" aria-hidden="true" />
@@ -150,13 +172,13 @@ export function ProductImagePicker({
             or drag and drop it here
           </span>
           <span className="text-[10px] text-muted-foreground">
-            PNG, JPG, WEBP or GIF
+            PNG, JPG, WEBP or GIF · Max 5 MB
           </span>
         </button>
       )}
 
       <p className="mt-1.5 text-[11px] text-muted-foreground">
-        Selected images are only previewed. Saving images will be added later.
+        Product images are stored securely.
       </p>
 
       {error && (

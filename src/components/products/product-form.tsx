@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useSyncExternalStore } from "react";
+import { useCallback, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { Archive, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -19,7 +19,11 @@ interface ProductFormProps {
   isPending: boolean;
   error: string | null;
   onCancel: () => void;
-  onSave: (input: ProductInput) => Promise<boolean>;
+  onSave: (
+    input: ProductInput,
+    imageFile: File | null,
+    removeImage: boolean,
+  ) => Promise<boolean>;
   onArchive: () => void;
   onUnarchive: () => void;
   onPublish: () => void;
@@ -135,6 +139,8 @@ export function ProductForm({
   onPublish,
 }: ProductFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
+  const [removeProductImage, setRemoveProductImage] = useState(false);
 
   const draftStorageKey = getProductFormDraftStorageKey(product?.id);
 
@@ -169,6 +175,11 @@ export function ProductForm({
     });
   }
 
+  function handleImageChange(file: File | null, removeImage: boolean) {
+    setSelectedImageFile(file);
+    setRemoveProductImage(removeImage);
+  }
+
   async function handleSave(nextStatus?: ProductStatus) {
     const form = formRef.current;
 
@@ -179,7 +190,6 @@ export function ProductForm({
     const input: ProductInput = {
       name: values.name.trim(),
       sku: values.sku.trim() || undefined,
-      imageUrl: null,
       description: values.description.trim(),
     };
 
@@ -187,7 +197,11 @@ export function ProductForm({
       input.status = nextStatus;
     }
 
-    const saved = await onSave(input);
+    const saved = await onSave(
+      input,
+      selectedImageFile,
+      removeProductImage,
+    );
 
     if (saved) {
       clearDraft(draftStorageKey);
@@ -348,7 +362,9 @@ export function ProductForm({
 
             <ProductImagePicker
               productName={values.name}
+              imageUrl={product?.imageUrl}
               disabled={isPending}
+              onChange={handleImageChange}
             />
 
           <div>

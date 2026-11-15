@@ -9,6 +9,7 @@ import type {
   ProductStatus,
 } from "@/lib/products/types";
 import { clearProductFormDraft } from "@/components/products/product-form-draft";
+import { uploadProductImage } from "@/lib/products/upload-product-image";
 
 export function useProductEditor(productId?: string) {
   const router = useRouter();
@@ -59,14 +60,26 @@ export function useProductEditor(productId?: string) {
   }, [router]);
 
   const saveProduct = useCallback(
-    async (input: ProductInput): Promise<boolean> => {
+    async (
+      input: ProductInput,
+      imageFile: File | null,
+      removeImage: boolean,
+    ): Promise<boolean> => {
       setIsSaving(true);
       setActionError(null);
 
       try {
+        const nextInput = { ...input };
+
+        if (imageFile) {
+          nextInput.imageKey = await uploadProductImage(imageFile);
+        } else if (removeImage) {
+          nextInput.imageKey = null;
+        }
+
         const savedProduct = product
-          ? await updateProduct(product.id, input)
-          : await createProduct(input);
+          ? await updateProduct(product.id, nextInput)
+          : await createProduct(nextInput);
 
         router.replace(`/products?status=${savedProduct.status}`);
         return true;
@@ -112,7 +125,6 @@ export function useProductEditor(productId?: string) {
           name: product.name,
           sku: product.sku,
           description: product.description,
-          imageUrl: null,
           status,
         });
 
