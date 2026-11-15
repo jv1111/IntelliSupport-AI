@@ -1,6 +1,8 @@
 import "server-only";
 
 import { randomUUID } from "node:crypto";
+import { Readable, Transform } from "node:stream";
+import { pipeline } from "node:stream/promises";
 import { Storage } from "@google-cloud/storage";
 
 export const MAX_PRODUCT_IMAGE_SIZE = 5 * 1024 * 1024;
@@ -18,9 +20,9 @@ const productImageTypes = {
     extension: "png",
     matches: (buffer: Buffer) =>
       buffer.length >= 8 &&
-      buffer.subarray(0, 8).equals(
-        Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
-      ),
+      buffer
+        .subarray(0, 8)
+        .equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])),
   },
   "image/webp": {
     extension: "webp",
@@ -41,7 +43,7 @@ export type ProductImageContentType = keyof typeof productImageTypes;
 
 export class ProductImageStorageError extends Error {
   constructor(
-    public readonly code: "INVALID_INPUT" | "INVALID_IMAGE",
+    public readonly code: "INVALID_INPUT" | "INVALID_IMAGE" | "FILE_TOO_LARGE",
     message: string,
   ) {
     super(message);
@@ -65,57 +67,15 @@ export function isSupportedProductImage(
   contentType: string,
   buffer: Buffer,
 ): contentType is ProductImageContentType {
-  const imageType =
-    productImageTypes[contentType as ProductImageContentType];
+  const imageType = productImageTypes[contentType as ProductImageContentType];
 
   return Boolean(imageType && imageType.matches(buffer));
 }
 
-export async function createProductImageUploadPolicy(
-  userId: string,
+export function isSupportedProductImageType(
   contentType: string,
-  size: number,
-) {
-  if (!Object.hasOwn(productImageTypes, contentType)) {
-    throw new ProductImageStorageError(
-      "INVALID_INPUT",
-      "Unsupported product image format.",
-    );
-  }
-
-  if (
-    !Number.isSafeInteger(size) ||
-    size < 1 ||
-    size > MAX_PRODUCT_IMAGE_SIZE
-  ) {
-    throw new ProductImageStorageError(
-      "INVALID_INPUT",
-      "Image must not exceed 5 MB.",
-    );
-  }
-
-  const extension =
-    productImageTypes[contentType as ProductImageContentType].extension;
-
-  const imageKey = `products/${userId}/${randomUUID()}.${extension}`;
-
-  const [policy] = await getBucket()
-    .file(imageKey)
-    .generateSignedPostPolicyV4({
-      expires: Date.now() + 5 * 60 * 1000,
-      fields: {
-        "Content-Type": contentType,
-      },
-      conditions: [
-        ["content-length-range", size, size],
-      ],
-    });
-
-  return {
-    imageKey,
-    uploadUrl: policy.url,
-    fields: policy.fields,
-  };
+): contentType is ProductImageContentType {
+  return Object.hasOwn(productImageTypes, contentType);
 }
 
 export async function verifyProductImage(
@@ -163,12 +123,9 @@ export async function verifyProductImage(
     );
   }
 
-  const [buffer] = await file.download();
+  const [buffer] = await file.download({ start: 0, end: 11 });
 
-  if (
-    buffer.length !== size ||
-    !isSupportedProductImage(contentType, buffer)
-  ) {
+  if (!isSupportedProductImage(contentType, buffer)) {
     throw new ProductImageStorageError(
       "INVALID_IMAGE",
       "Uploaded file does not contain a valid image.",
@@ -176,22 +133,109 @@ export async function verifyProductImage(
   }
 }
 
+async function* readWebStream(
+  body: ReadableStream<Uint8Array>,
+): AsyncGenerator<Uint8Array> {
+  const reader = body.getReader();
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+
+      if (done) {
+        return;
+      }
+
+      yield value;
+    }
+  } finally {
+    await reader.cancel().catch(() => undefined);
+    reader.releaseLock();
+  }
+}
+
 export async function saveProductImage(
   userId: string,
-  buffer: Buffer,
-  contentType: ProductImageContentType,
+  body: ReadableStream<Uint8Array>,
+  contentType: string,
 ): Promise<string> {
+  if (!isSupportedProductImageType(contentType)) {
+    throw new ProductImageStorageError(
+      "INVALID_INPUT",
+      "Unsupported product image format.",
+    );
+  }
+
   const extension = productImageTypes[contentType].extension;
   const objectName = `products/${userId}/${randomUUID()}.${extension}`;
+  const file = getBucket().file(objectName);
+  const header = Buffer.alloc(12);
+  let headerLength = 0;
+  let totalSize = 0;
 
-  await getBucket().file(objectName).save(buffer, {
-    resumable: false,
-    metadata: {
-      contentType,
-      contentDisposition: "inline",
-      cacheControl: "private, max-age=300",
+  const validator = new Transform({
+    transform(chunk, _encoding, callback) {
+      const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+
+      totalSize += buffer.length;
+
+      if (totalSize > MAX_PRODUCT_IMAGE_SIZE) {
+        callback(
+          new ProductImageStorageError(
+            "FILE_TOO_LARGE",
+            "Image must not exceed 5 MB.",
+          ),
+        );
+        return;
+      }
+
+      if (headerLength < header.length) {
+        const bytesToCopy = Math.min(
+          header.length - headerLength,
+          buffer.length,
+        );
+
+        buffer.copy(header, headerLength, 0, bytesToCopy);
+        headerLength += bytesToCopy;
+      }
+
+      callback(null, buffer);
+    },
+    flush(callback) {
+      if (
+        totalSize === 0 ||
+        !isSupportedProductImage(contentType, header.subarray(0, headerLength))
+      ) {
+        callback(
+          new ProductImageStorageError(
+            "INVALID_IMAGE",
+            "Uploaded file does not contain a valid image.",
+          ),
+        );
+        return;
+      }
+
+      callback();
     },
   });
+
+  try {
+    await pipeline(
+      Readable.from(readWebStream(body)),
+      validator,
+      file.createWriteStream({
+        resumable: false,
+        metadata: {
+          contentType,
+          contentDisposition: "inline",
+          cacheControl: "private, max-age=300",
+        },
+      }),
+    );
+  } catch (error) {
+    await file.delete().catch(() => undefined);
+    throw error;
+  }
 
   return objectName;
 }
@@ -199,11 +243,13 @@ export async function saveProductImage(
 export async function createProductImageReadUrl(
   objectName: string,
 ): Promise<string> {
-  const [url] = await getBucket().file(objectName).getSignedUrl({
-    version: "v4",
-    action: "read",
-    expires: Date.now() + 60 * 60 * 1000,
-  });
+  const [url] = await getBucket()
+    .file(objectName)
+    .getSignedUrl({
+      version: "v4",
+      action: "read",
+      expires: Date.now() + 60 * 60 * 1000,
+    });
 
   return url;
 }

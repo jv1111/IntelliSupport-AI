@@ -1,12 +1,19 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { Archive, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { FieldLabel, fieldControlStyles } from "@/components/ui/field";
 import { getProductFormDraftStorageKey } from "@/components/products/product-form-draft";
+import { PRODUCT_FIELD_LIMITS } from "@/lib/products/constants";
 import { ProductImagePicker } from "@/components/products/product-image-picker";
 import type {
   Product,
@@ -197,11 +204,7 @@ export function ProductForm({
       input.status = nextStatus;
     }
 
-    const saved = await onSave(
-      input,
-      selectedImageFile,
-      removeProductImage,
-    );
+    const saved = await onSave(input, selectedImageFile, removeProductImage);
 
     if (saved) {
       clearDraft(draftStorageKey);
@@ -337,7 +340,7 @@ export function ProductForm({
               <Input
                 id="product-name"
                 required
-                maxLength={120}
+                maxLength={PRODUCT_FIELD_LIMITS.name}
                 value={values.name}
                 onChange={(event) => updateField("name", event.target.value)}
                 placeholder="e.g. Smart Doorbell Pro"
@@ -350,7 +353,7 @@ export function ProductForm({
               <FieldLabel htmlFor="product-sku">Model / SKU</FieldLabel>
               <Input
                 id="product-sku"
-                maxLength={80}
+                maxLength={PRODUCT_FIELD_LIMITS.sku}
                 value={values.sku}
                 onChange={(event) => updateField("sku", event.target.value)}
                 placeholder="e.g. DOOR-BELL-PRO"
@@ -360,12 +363,12 @@ export function ProductForm({
             </div>
           </div>
 
-            <ProductImagePicker
-              productName={values.name}
-              imageUrl={product?.imageUrl}
-              disabled={isPending}
-              onChange={handleImageChange}
-            />
+          <ProductImagePicker
+            productName={values.name}
+            imageUrl={product?.imageUrl}
+            disabled={isPending}
+            onChange={handleImageChange}
+          />
 
           <div>
             <FieldLabel htmlFor="product-description" required>
@@ -378,14 +381,15 @@ export function ProductForm({
                 updateField("description", event.target.value)
               }
               required
-              maxLength={3000}
+              maxLength={PRODUCT_FIELD_LIMITS.description}
               rows={6}
               disabled={isPending}
               placeholder="Describe product details and key features for AI matching..."
               className={`${fieldControlStyles} resize-y px-3.5 py-2.5 leading-relaxed`}
             />
             <p className="mt-1.5 text-right text-[10px] text-muted-foreground">
-              {values.description.length}/3000 characters
+              {values.description.length}/{PRODUCT_FIELD_LIMITS.description}{" "}
+              characters
             </p>
           </div>
 

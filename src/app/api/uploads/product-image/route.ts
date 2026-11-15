@@ -1,9 +1,12 @@
 import { getCurrentUser } from "@/server/auth/current-user";
 import {
-  isSupportedProductImage,
+  isSupportedProductImageType,
   MAX_PRODUCT_IMAGE_SIZE,
+  ProductImageStorageError,
   saveProductImage,
 } from "@/server/storage/google-cloud-storage";
+
+export const runtime = "nodejs";
 
 export async function POST(request: Request): Promise<Response> {
   try {
@@ -27,56 +30,41 @@ export async function POST(request: Request): Promise<Response> {
 
     const contentLength = request.headers.get("content-length");
 
-    if (
-      contentLength &&
-      Number(contentLength) > MAX_PRODUCT_IMAGE_SIZE + 64 * 1024
-    ) {
+    if (contentLength && Number(contentLength) > MAX_PRODUCT_IMAGE_SIZE) {
       return Response.json(
         { message: "Image must not exceed 5 MB." },
         { status: 413 },
       );
     }
 
-    let formData: FormData;
+    const contentType =
+      request.headers.get("content-type")?.split(";", 1)[0].trim() ?? "";
 
-    try {
-      formData = await request.formData();
-    } catch {
+    if (!isSupportedProductImageType(contentType)) {
       return Response.json(
-        { message: "Invalid upload request." },
+        { message: "Only JPEG, PNG, WEBP, and GIF images are allowed." },
         { status: 400 },
       );
     }
 
-    const file = formData.get("file");
-
-    if (!(file instanceof File)) {
+    if (!request.body) {
       return Response.json(
         { message: "An image file is required." },
         { status: 400 },
       );
     }
 
-    if (file.size === 0 || file.size > MAX_PRODUCT_IMAGE_SIZE) {
-      return Response.json(
-        { message: "Image must be between 1 byte and 5 MB." },
-        { status: 400 },
-      );
-    }
-
-    const buffer = Buffer.from(await file.arrayBuffer());
-
-    if (!isSupportedProductImage(file.type, buffer)) {
-      return Response.json(
-        { message: "Only valid JPEG, PNG, WEBP, and GIF images are allowed." },
-        { status: 400 },
-      );
-    }
-
-    const imageKey = await saveProductImage(user.id, buffer, file.type);
+    const imageKey = await saveProductImage(user.id, request.body, contentType);
 
     return Response.json({ imageKey });
   } catch (error) {
+    if (error instanceof ProductImageStorageError) {
+      return Response.json(
+        { message: error.message },
+        { status: error.code === "FILE_TOO_LARGE" ? 413 : 400 },
+      );
+    }
+
     console.error("Product image upload failed:", error);
 
     return Response.json(

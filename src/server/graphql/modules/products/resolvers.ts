@@ -13,7 +13,6 @@ import {
 import { requireAuthenticatedUser } from "@/server/graphql/shared/require-authenticated-user";
 import {
   createProductImageReadUrl,
-  createProductImageUploadPolicy,
   ProductImageStorageError,
 } from "@/server/storage/google-cloud-storage";
 import type { GraphQLContext } from "@/server/graphql/context";
@@ -100,36 +99,6 @@ export const productResolvers = {
   },
 
   Mutation: {
-    requestProductImageUpload: async (
-      _parent: unknown,
-      args: { contentType: string; size: number },
-      context: GraphQLContext,
-    ) => {
-      const user = requireAuthenticatedUser(context);
-
-      try {
-        const policy = await createProductImageUploadPolicy(
-          user.id,
-          args.contentType,
-          args.size,
-        );
-
-        return {
-          imageKey: policy.imageKey,
-          uploadUrl: policy.uploadUrl,
-          fields: Object.entries(policy.fields).map(([name, value]) => ({
-            name,
-            value,
-          })),
-        };
-      } catch (error) {
-        throwProductGraphQLError(
-          error,
-          "Unable to authorize product image upload.",
-        );
-      }
-    },
-
     createProduct: async (
       _parent: unknown,
       args: { input: CreateProductInput },

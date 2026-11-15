@@ -4,9 +4,6 @@ interface ProductImageUploadResponse {
 }
 
 export async function uploadProductImage(file: File): Promise<string> {
-  const formData = new FormData();
-  formData.append("file", file);
-
   let response: Response;
 
   try {
@@ -14,7 +11,10 @@ export async function uploadProductImage(file: File): Promise<string> {
       method: "POST",
       credentials: "same-origin",
       cache: "no-store",
-      body: formData,
+      headers: {
+        "Content-Type": file.type,
+      },
+      body: file,
     });
   } catch {
     throw new Error("Unable to connect to the server.");
