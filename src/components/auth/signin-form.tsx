@@ -107,7 +107,7 @@ export function SignInForm({ onSignUp }: SignInFormProps) {
                 <Button
                   variant="text"
                   type="button"
-                  className="absolute top-0 right-0"
+                  className="absolute right-0 bottom-[2.2rem]"
                 >
                   Forgot?
                 </Button>

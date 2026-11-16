@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useRef } from "react";
 import { BookOpen, Trash2 } from "lucide-react";
 import { ArticleCard } from "@/components/knowledge-base/article-card";
@@ -12,6 +13,7 @@ import { Card } from "@/components/ui/card";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { SearchInput } from "@/components/ui/search-input";
 import { PrimaryActionLink } from "@/components/ui/primary-action-link";
+import { PageHeader } from "@/components/ui/page-header";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 
 interface KnowledgeBaseProps {
@@ -25,6 +27,8 @@ const statusTabs: { label: string; value: KnowledgeBaseStatus }[] = [
 ];
 
 export function KnowledgeBase({ initialStatus }: KnowledgeBaseProps) {
+  const router = useRouter();
+
   const {
     articles,
     totalCount,
@@ -66,22 +70,14 @@ export function KnowledgeBase({ initialStatus }: KnowledgeBaseProps) {
   return (
     <main className="mx-auto flex h-full min-h-0 w-full flex-col overflow-hidden p-6">
       <section className="flex min-h-0 flex-1 flex-col gap-6">
-        <div className="flex shrink-0 flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="text-base font-bold text-foreground">
-              Knowledge Base & AI Resources
-            </h1>
-
-            <p className="mt-1 max-w-2xl text-xs leading-relaxed text-muted-foreground">
-              Curate general policies, installation guides, and troubleshooting
-              instructions used as context for AI-generated answers.
-            </p>
-          </div>
-
-          <PrimaryActionLink href="/knowledge-base/new">
-            Add KB Article
-          </PrimaryActionLink>
-        </div>
+        <PageHeader
+          title="Knowledge Base & AI Resources"
+          description="Curate general policies, installation guides, and troubleshooting instructions used as context for AI-generated answers."
+          action={{
+            label: "Add KB Article",
+            onClick: () => router.push("/knowledge-base/new"),
+          }}
+        />
 
         <div className="flex shrink-0 flex-wrap items-center gap-2 border-b border-border pb-3">
           {statusTabs.map((tab) => {

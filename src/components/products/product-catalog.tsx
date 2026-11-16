@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useRef } from "react";
 import { PackageOpen, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { SearchInput } from "@/components/ui/search-input";
 import { PrimaryActionLink } from "@/components/ui/primary-action-link";
+import { PageHeader } from "@/components/ui/page-header";
 import { ProductCard } from "@/components/products/product-card";
 import { useProductCatalog } from "@/components/products/hooks/use-product-catalog";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
@@ -24,6 +26,8 @@ const statusTabs: { label: string; value: ProductStatus }[] = [
 ];
 
 export function ProductCatalog({ initialStatus }: ProductCatalogProps) {
+  const router = useRouter();
+
   const {
     status,
     searchInput,
@@ -60,21 +64,14 @@ export function ProductCatalog({ initialStatus }: ProductCatalogProps) {
   return (
     <main className="mx-auto flex h-full min-h-0 w-full flex-col overflow-hidden p-6">
       <section className="flex min-h-0 flex-1 flex-col gap-6">
-        <div className="flex shrink-0 flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="text-base font-bold text-foreground">
-              Registered Products Catalog
-            </h1>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Manage published items for AI response generation or save products
-              as drafts.
-            </p>
-          </div>
-
-          <PrimaryActionLink href="/products/new">
-            Add Product
-          </PrimaryActionLink>
-        </div>
+        <PageHeader
+          title="Registered Products Catalog"
+          description="Manage published items for AI response generation or save products as drafts."
+          action={{
+            label: "Add Product",
+            onClick: () => router.push("/products/new"),
+          }}
+        />
 
         <div className="flex shrink-0 flex-wrap items-center gap-2 border-b border-border pb-3">
           {statusTabs.map((tab) => {
