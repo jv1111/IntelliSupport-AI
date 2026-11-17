@@ -6,6 +6,11 @@ import {
   registerUser,
 } from "@/server/services/register-user";
 import { LoginError, loginUser } from "@/server/services/login-user";
+import {
+  ChangePasswordError,
+  changePassword as changeUserPassword,
+} from "@/server/services/change-password";
+import { requireAuthenticatedUser } from "@/server/graphql/shared/require-authenticated-user";
 import { createSession, revokeSession } from "@/server/auth/session";
 import type { GraphQLContext } from "@/server/graphql/context";
 
@@ -17,6 +22,12 @@ interface RegisterInput {
 interface LoginInput {
   username: string;
   password: string;
+}
+
+interface ChangePasswordInput {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
 }
 
 type UserResult = Awaited<ReturnType<typeof registerUser>>;
@@ -79,6 +90,38 @@ export const authResolvers = {
         }
 
         throw new GraphQLError("Unable to log in.", {
+          extensions: {
+            code: "INTERNAL_SERVER_ERROR",
+          },
+        });
+      }
+    },
+
+    changePassword: async (
+      _parent: unknown,
+      args: { input: ChangePasswordInput },
+      context: GraphQLContext,
+    ): Promise<boolean> => {
+      const user = requireAuthenticatedUser(context);
+
+      try {
+        await changeUserPassword(user.id, args.input);
+
+        context.sessionCookieChange = {
+          type: "clear",
+        };
+
+        return true;
+      } catch (error) {
+        if (error instanceof ChangePasswordError) {
+          throw new GraphQLError(error.message, {
+            extensions: {
+              code: error.code,
+            },
+          });
+        }
+
+        throw new GraphQLError("Unable to change password.", {
           extensions: {
             code: "INTERNAL_SERVER_ERROR",
           },

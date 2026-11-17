@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState, type FormEvent } from "react";
-import { Form, Formik } from "formik";
+import { Form, Formik, type FormikHelpers } from "formik";
 import { KeyRound, Lock, Mail, Phone, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -12,6 +12,8 @@ import { InlineBadge } from "@/components/ui/inline-badge";
 import { Input } from "@/components/ui/input";
 import { SuccessBadge } from "@/components/ui/success-badge";
 import { VerificationDialog } from "@/components/settings/verification-dialog";
+import { StatusDialog } from "@/components/ui/status-dialog";
+import { useAccountSettings } from "@/components/settings/hooks/use-account-settings";
 import {
   validateChangePassword,
   type ChangePasswordFormValues,
@@ -34,6 +36,9 @@ interface AccountSettingsProps {
 }
 
 export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
+  const { passwordDialog, changePassword, closePasswordDialog } =
+    useAccountSettings();
+
   const [emails, setEmails] = useState<string[]>([]);
   const [phones, setPhones] = useState<string[]>([]);
   const [verificationTarget, setVerificationTarget] =
@@ -46,7 +51,6 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
   const [phone, setPhone] = useState("");
   const [emailMessage, setEmailMessage] = useState("");
   const [phoneMessage, setPhoneMessage] = useState("");
-
   const initial = username.slice(0, 1).toUpperCase() || "U";
 
   const memberSince = new Intl.DateTimeFormat("en", {
@@ -104,6 +108,41 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
     setPhones((current) => [...current, value]);
     setPhone("");
     setPhoneMessage("Phone number added to this page preview.");
+  }
+
+  async function handleChangePassword(
+    values: ChangePasswordFormValues,
+    {
+      resetForm,
+      setStatus,
+      setFieldError,
+      setFieldTouched,
+    }: FormikHelpers<ChangePasswordFormValues>,
+  ): Promise<void> {
+    setStatus(undefined);
+
+    if (
+      values.currentPassword === "" &&
+      values.newPassword === "" &&
+      values.confirmPassword === ""
+    ) {
+      setStatus({
+        message: "Enter your current password and a new password to continue.",
+      });
+      return;
+    }
+
+    const result = await changePassword(values);
+
+    if (result.success) {
+      resetForm();
+      return;
+    }
+
+    if (result.code === "INVALID_CURRENT_PASSWORD") {
+      setFieldError("currentPassword", "Your current password is incorrect.");
+      await setFieldTouched("currentPassword", true, false);
+    }
   }
 
   return (
@@ -396,21 +435,15 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
               </div>
 
               <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                Change your sign-in password. This form is currently a frontend
-                preview and does not update your account.
+                Verify your current password before setting a new sign-in
+                password for your account.
               </p>
             </div>
 
             <Formik
               initialValues={initialPasswordValues}
               validate={validateChangePassword}
-              onSubmit={(_values, { resetForm, setStatus }) => {
-                resetForm();
-                setStatus({
-                  message:
-                    "Validation passed. No password was changed because this is frontend-only.",
-                });
-              }}
+              onSubmit={handleChangePassword}
             >
               {({ status, isSubmitting }) => {
                 const feedback = status as { message: string } | undefined;
@@ -474,6 +507,15 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
         method={verificationTarget?.method ?? "email"}
         destination={verificationTarget?.destination ?? ""}
         onClose={handleCloseVerificationDialog}
+      />
+
+      <StatusDialog
+        open={passwordDialog !== null}
+        status={passwordDialog?.status ?? "loading"}
+        title={passwordDialog?.title ?? ""}
+        message={passwordDialog?.message ?? ""}
+        actionLabel={passwordDialog?.actionLabel ?? "Close"}
+        onClose={closePasswordDialog}
       />
     </>
   );

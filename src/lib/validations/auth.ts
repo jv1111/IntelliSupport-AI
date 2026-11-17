@@ -85,6 +85,14 @@ export type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>;
 export function validateChangePassword(
   values: ChangePasswordFormValues,
 ): Partial<Record<keyof ChangePasswordFormValues, string>> {
+  if (
+    values.currentPassword === "" &&
+    values.newPassword === "" &&
+    values.confirmPassword === ""
+  ) {
+    return {};
+  }
+
   const result = changePasswordSchema.safeParse(values);
 
   if (result.success) {

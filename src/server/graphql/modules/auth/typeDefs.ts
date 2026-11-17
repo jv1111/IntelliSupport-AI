@@ -15,6 +15,12 @@ export const authTypeDefs = `#graphql
     password: String!
   }
 
+  input ChangePasswordInput {
+    currentPassword: String!
+    newPassword: String!
+    confirmPassword: String!
+  }
+
   extend type Query {
     me: User
   }
@@ -22,6 +28,7 @@ export const authTypeDefs = `#graphql
   type Mutation {
     register(input: RegisterInput!): User!
     login(input: LoginInput!): User!
+    changePassword(input: ChangePasswordInput!): Boolean!
     logout: Boolean!
   }
 `;
