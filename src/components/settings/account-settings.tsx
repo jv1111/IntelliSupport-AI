@@ -2,19 +2,11 @@
 
 import { useCallback, useState, type FormEvent } from "react";
 import { Form, Formik } from "formik";
-import {
-  Eye,
-  EyeOff,
-  KeyRound,
-  Lock,
-  Mail,
-  Phone,
-  ShieldCheck,
-} from "lucide-react";
+import { KeyRound, Lock, Mail, Phone, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
-import { FormikInput } from "@/components/ui/formik-input";
+import { PasswordFormikInput } from "@/components/ui/password-formik-input";
 import { FieldLabel } from "@/components/ui/field";
 import { InlineBadge } from "@/components/ui/inline-badge";
 import { Input } from "@/components/ui/input";
@@ -54,9 +46,6 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
   const [phone, setPhone] = useState("");
   const [emailMessage, setEmailMessage] = useState("");
   const [phoneMessage, setPhoneMessage] = useState("");
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const initial = username.slice(0, 1).toUpperCase() || "U";
 
@@ -428,92 +417,29 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
 
                 return (
                   <Form className="space-y-4" noValidate>
-                    <FormikInput
+                    <PasswordFormikInput
                       name="currentPassword"
                       label="Current password"
-                      type={showCurrentPassword ? "text" : "password"}
                       autoComplete="current-password"
                       placeholder="Enter your current password"
                       leadingIcon={Lock}
-                      trailingAction={
-                        <Button
-                          variant="icon"
-                          type="button"
-                          onClick={() =>
-                            setShowCurrentPassword((current) => !current)
-                          }
-                          aria-label={
-                            showCurrentPassword
-                              ? "Hide password"
-                              : "Show password"
-                          }
-                        >
-                          {showCurrentPassword ? (
-                            <EyeOff className="size-4" aria-hidden="true" />
-                          ) : (
-                            <Eye className="size-4" aria-hidden="true" />
-                          )}
-                        </Button>
-                      }
                     />
 
                     <div className="grid gap-4 sm:grid-cols-2">
-                      <FormikInput
+                      <PasswordFormikInput
                         name="newPassword"
                         label="New password"
-                        type={showNewPassword ? "text" : "password"}
                         autoComplete="new-password"
                         placeholder="At least 8 characters"
                         leadingIcon={Lock}
-                        trailingAction={
-                          <Button
-                            variant="icon"
-                            type="button"
-                            onClick={() =>
-                              setShowNewPassword((current) => !current)
-                            }
-                            aria-label={
-                              showNewPassword
-                                ? "Hide password"
-                                : "Show password"
-                            }
-                          >
-                            {showNewPassword ? (
-                              <EyeOff className="size-4" aria-hidden="true" />
-                            ) : (
-                              <Eye className="size-4" aria-hidden="true" />
-                            )}
-                          </Button>
-                        }
                       />
 
-                      <FormikInput
+                      <PasswordFormikInput
                         name="confirmPassword"
                         label="Confirm new password"
-                        type={showConfirmPassword ? "text" : "password"}
                         autoComplete="new-password"
                         placeholder="Re-enter new password"
                         leadingIcon={Lock}
-                        trailingAction={
-                          <Button
-                            variant="icon"
-                            type="button"
-                            onClick={() =>
-                              setShowConfirmPassword((current) => !current)
-                            }
-                            aria-label={
-                              showConfirmPassword
-                                ? "Hide password"
-                                : "Show password"
-                            }
-                          >
-                            {showConfirmPassword ? (
-                              <EyeOff className="size-4" aria-hidden="true" />
-                            ) : (
-                              <Eye className="size-4" aria-hidden="true" />
-                            )}
-                          </Button>
-                        }
                       />
                     </div>
 

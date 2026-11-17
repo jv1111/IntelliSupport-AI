@@ -1,13 +1,13 @@
 "use client";
 
 import { Form, Formik, type FormikHelpers } from "formik";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { FormikInput } from "@/components/ui/formik-input";
+import { PasswordFormikInput } from "@/components/ui/password-formik-input";
 import { registerUser } from "@/lib/auth/register-user";
 import { validateSignUp, type SignUpFormValues } from "@/lib/validations/auth";
-import { Eye, EyeOff, Lock, UserRound } from "lucide-react";
+import { Lock, UserRound } from "lucide-react";
 
 interface SignUpFormProps {
   onSignIn: () => void;
@@ -25,9 +25,6 @@ const initialValues: SignUpFormValues = {
 };
 
 export function SignUpForm({ onSignIn }: SignUpFormProps) {
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
   async function handleSubmit(
     { username, password }: SignUpFormValues,
     { setStatus }: FormikHelpers<SignUpFormValues>,
@@ -78,58 +75,20 @@ export function SignUpForm({ onSignIn }: SignUpFormProps) {
                 leadingIcon={UserRound}
               />
 
-              <FormikInput
+              <PasswordFormikInput
                 name="password"
                 label="Password"
-                type={showPassword ? "text" : "password"}
                 autoComplete="new-password"
                 placeholder="Create a password"
                 leadingIcon={Lock}
-                trailingAction={
-                  <Button
-                    variant="icon"
-                    type="button"
-                    onClick={() => setShowPassword((current) => !current)}
-                    aria-label={
-                      showPassword ? "Hide password" : "Show password"
-                    }
-                  >
-                    {showPassword ? (
-                      <EyeOff className="size-4" aria-hidden="true" />
-                    ) : (
-                      <Eye className="size-4" aria-hidden="true" />
-                    )}
-                  </Button>
-                }
               />
 
-              <FormikInput
+              <PasswordFormikInput
                 name="confirmPassword"
                 label="Confirm Password"
-                type={showConfirmPassword ? "text" : "password"}
                 autoComplete="new-password"
                 placeholder="Confirm your password"
                 leadingIcon={Lock}
-                trailingAction={
-                  <Button
-                    variant="icon"
-                    type="button"
-                    onClick={() =>
-                      setShowConfirmPassword((current) => !current)
-                    }
-                    aria-label={
-                      showConfirmPassword
-                        ? "Hide confirm password"
-                        : "Show confirm password"
-                    }
-                  >
-                    {showConfirmPassword ? (
-                      <EyeOff className="size-4" aria-hidden="true" />
-                    ) : (
-                      <Eye className="size-4" aria-hidden="true" />
-                    )}
-                  </Button>
-                }
               />
 
               <Button type="submit" disabled={isSubmitting}>

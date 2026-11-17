@@ -17,7 +17,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const baseStyles =
-  "inline-flex items-center justify-center font-bold tracking-wider focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/15 disabled:opacity-60 p-3";
+  "inline-flex items-center justify-center font-bold tracking-wider focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/15 disabled:opacity-60";
 
 const animatedStyles =
   "transition-all duration-150 ease-out hover:scale-[1.01] active:scale-[0.99] disabled:hover:scale-100 disabled:active:scale-100";
@@ -60,6 +60,7 @@ export function Button({
       : "";
 
   const isIconVariant = variant === "icon" || variant === "icon-surface";
+  const paddingStyles = isIconVariant ? "p-0" : "p-3";
   const widthStyles = isIconVariant ? "" : fullWidth ? "w-full" : "w-auto";
   const transitionStyles =
     variant === "tab" || variant === "icon-surface"
@@ -69,7 +70,7 @@ export function Button({
   return (
     <button
       type={type}
-      className={`${baseStyles} ${widthStyles} ${transitionStyles} ${variantStyles[variant]} ${stateStyles} ${className}`.trim()}
+      className={`${baseStyles} ${paddingStyles} ${widthStyles} ${transitionStyles} ${variantStyles[variant]} ${stateStyles} ${className}`.trim()}
       {...props}
     />
   );

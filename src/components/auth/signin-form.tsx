@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Form, Formik, type FormikHelpers } from "formik";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { FormikInput } from "@/components/ui/formik-input";
+import { PasswordFormikInput } from "@/components/ui/password-formik-input";
 import { loginUser } from "@/lib/auth/login-user";
 import { validateLogin, type LoginFormValues } from "@/lib/validations/auth";
-import { Eye, EyeOff, Lock, UserRound } from "lucide-react";
+import { Lock, UserRound } from "lucide-react";
 
 interface SignInFormProps {
   onSignUp: () => void;
@@ -25,7 +25,6 @@ const initialValues: LoginFormValues = {
 };
 
 export function SignInForm({ onSignUp }: SignInFormProps) {
-  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   async function handleSubmit(
@@ -79,29 +78,12 @@ export function SignInForm({ onSignUp }: SignInFormProps) {
               />
 
               <div className="relative">
-                <FormikInput
+                <PasswordFormikInput
                   name="password"
                   label="Password"
-                  type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   placeholder="Enter your password"
                   leadingIcon={Lock}
-                  trailingAction={
-                    <Button
-                      variant="icon"
-                      type="button"
-                      onClick={() => setShowPassword((current) => !current)}
-                      aria-label={
-                        showPassword ? "Hide password" : "Show password"
-                      }
-                    >
-                      {showPassword ? (
-                        <EyeOff className="size-4" aria-hidden="true" />
-                      ) : (
-                        <Eye className="size-4" aria-hidden="true" />
-                      )}
-                    </Button>
-                  }
                 />
 
                 <Button
