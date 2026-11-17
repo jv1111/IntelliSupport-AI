@@ -2,7 +2,7 @@
 
 import { useCallback, useState, type FormEvent } from "react";
 import { Form, Formik, type FormikHelpers } from "formik";
-import { KeyRound, Lock, Mail, Phone, ShieldCheck } from "lucide-react";
+import { KeyRound, Lock, Mail, Phone, ShieldCheck, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -11,6 +11,7 @@ import { FieldLabel } from "@/components/ui/field";
 import { InlineBadge } from "@/components/ui/inline-badge";
 import { Input } from "@/components/ui/input";
 import { SuccessBadge } from "@/components/ui/success-badge";
+import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { VerificationDialog } from "@/components/settings/verification-dialog";
 import { StatusDialog } from "@/components/ui/status-dialog";
 import { useAccountSettings } from "@/components/settings/hooks/use-account-settings";
@@ -25,7 +26,7 @@ const initialPasswordValues: ChangePasswordFormValues = {
   confirmPassword: "",
 };
 
-type VerificationTarget = {
+type ContactTarget = {
   method: "email" | "phone";
   destination: string;
 } | null;
@@ -42,11 +43,34 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
   const [emails, setEmails] = useState<string[]>([]);
   const [phones, setPhones] = useState<string[]>([]);
   const [verificationTarget, setVerificationTarget] =
-    useState<VerificationTarget>(null);
+    useState<ContactTarget>(null);
+  const [removalTarget, setRemovalTarget] = useState<ContactTarget>(null);
 
   const handleCloseVerificationDialog = useCallback(() => {
     setVerificationTarget(null);
   }, []);
+
+  const handleCloseRemovalDialog = useCallback(() => {
+    setRemovalTarget(null);
+  }, []);
+
+  const handleConfirmRemoval = useCallback(() => {
+    if (!removalTarget) {
+      return;
+    }
+
+    if (removalTarget.method === "email") {
+      setEmails((current) =>
+        current.filter((item) => item !== removalTarget.destination),
+      );
+    } else {
+      setPhones((current) =>
+        current.filter((item) => item !== removalTarget.destination),
+      );
+    }
+
+    setRemovalTarget(null);
+  }, [removalTarget]);
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [emailMessage, setEmailMessage] = useState("");
@@ -255,6 +279,19 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
                       >
                         Verify
                       </Button>
+                      <Button
+                        variant="text"
+                        type="button"
+                        className="!text-danger hover:!text-danger/80"
+                        onClick={() =>
+                          setRemovalTarget({
+                            method: "email",
+                            destination: item,
+                          })
+                        }
+                      >
+                        Remove
+                      </Button>
                     </div>
                   </li>
                 ))}
@@ -341,6 +378,19 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
                         }
                       >
                         Verify
+                      </Button>
+                      <Button
+                        variant="text"
+                        type="button"
+                        className="!text-danger hover:!text-danger/80"
+                        onClick={() =>
+                          setRemovalTarget({
+                            method: "phone",
+                            destination: item,
+                          })
+                        }
+                      >
+                        Remove
                       </Button>
                     </div>
                   </li>
@@ -507,6 +557,21 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
         method={verificationTarget?.method ?? "email"}
         destination={verificationTarget?.destination ?? ""}
         onClose={handleCloseVerificationDialog}
+      />
+
+      <ConfirmationDialog
+        open={removalTarget !== null}
+        title={
+          removalTarget?.method === "email"
+            ? "Remove email address?"
+            : "Remove phone number?"
+        }
+        description={`${removalTarget?.destination ?? "This contact"} will be removed from this page preview.`}
+        confirmLabel="Remove"
+        variant="danger"
+        icon={Trash2}
+        onConfirm={handleConfirmRemoval}
+        onCancel={handleCloseRemovalDialog}
       />
 
       <StatusDialog
