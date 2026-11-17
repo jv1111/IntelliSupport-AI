@@ -4,7 +4,7 @@ import { Form, Formik, type FormikHelpers } from "formik";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { FormikInput } from "@/components/auth/formik-input";
+import { FormikInput } from "@/components/ui/formik-input";
 import { registerUser } from "@/lib/auth/register-user";
 import { validateSignUp, type SignUpFormValues } from "@/lib/validations/auth";
 import { Eye, EyeOff, Lock, UserRound } from "lucide-react";

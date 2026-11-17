@@ -1,5 +1,6 @@
 import "server-only";
 
+import { cache } from "react";
 import { cookies } from "next/headers";
 import {
   getSessionUser,
@@ -7,9 +8,11 @@ import {
   type AuthenticatedUser,
 } from "@/server/auth/session";
 
-export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null;
+export const getCurrentUser = cache(
+  async (): Promise<AuthenticatedUser | null> => {
+    const cookieStore = await cookies();
+    const token = cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null;
 
-  return getSessionUser(token);
-}
+    return getSessionUser(token);
+  },
+);

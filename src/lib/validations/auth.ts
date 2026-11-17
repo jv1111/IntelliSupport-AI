@@ -65,6 +65,50 @@ export function validateSignUp(
   }, {});
 }
 
+export const changePasswordSchema = z
+  .object({
+    currentPassword: loginCredentialsSchema.shape.password,
+    newPassword: registerCredentialsSchema.shape.password,
+    confirmPassword: z.string().min(1, "Please confirm your password."),
+  })
+  .refine((values) => values.newPassword !== values.currentPassword, {
+    path: ["newPassword"],
+    message: "New password must be different from your current password.",
+  })
+  .refine((values) => values.newPassword === values.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "Passwords do not match.",
+  });
+
+export type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>;
+
+export function validateChangePassword(
+  values: ChangePasswordFormValues,
+): Partial<Record<keyof ChangePasswordFormValues, string>> {
+  const result = changePasswordSchema.safeParse(values);
+
+  if (result.success) {
+    return {};
+  }
+
+  return result.error.issues.reduce<
+    Partial<Record<keyof ChangePasswordFormValues, string>>
+  >((errors, issue) => {
+    const field = issue.path[0];
+
+    if (
+      (field === "currentPassword" ||
+        field === "newPassword" ||
+        field === "confirmPassword") &&
+      !errors[field]
+    ) {
+      errors[field] = issue.message;
+    }
+
+    return errors;
+  }, {});
+}
+
 export type LoginFormValues = z.infer<typeof loginCredentialsSchema>;
 
 export function validateLogin(

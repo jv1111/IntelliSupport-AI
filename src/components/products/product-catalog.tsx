@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useRef } from "react";
 import { PackageOpen, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { SearchInput } from "@/components/ui/search-input";
 import { PrimaryActionLink } from "@/components/ui/primary-action-link";
@@ -167,31 +167,27 @@ export function ProductCatalog({ initialStatus }: ProductCatalogProps) {
             )}
           </div>
         ) : (
-          <Card className="flex min-h-72 flex-1 flex-col items-center justify-center border-dashed px-6 py-12 text-center shadow-sm">
-            <div className="flex size-12 items-center justify-center rounded-xl bg-surface-muted text-muted-foreground">
-              <PackageOpen className="size-6" aria-hidden="true" />
-            </div>
-
-            <h2 className="mt-4 text-sm font-bold text-foreground">
-              No products found
-            </h2>
-
-            <p className="mt-1 max-w-sm text-xs leading-relaxed text-muted-foreground">
-              {searchInput.trim()
+          <EmptyState
+            variant="card"
+            icon={PackageOpen}
+            title="No products found"
+            description={
+              searchInput.trim()
                 ? "Try a different product name or clear your search."
-                : "Add a product or select another status to view your catalog."}
-            </p>
-
-            {searchInput.trim() ? (
-              <Button variant="text" onClick={clearSearch} className="mt-4">
-                Clear Search
-              </Button>
-            ) : (
-              <PrimaryActionLink href="/products/new" className="mt-4 px-4">
-                Add Product
-              </PrimaryActionLink>
-            )}
-          </Card>
+                : "Add a product or select another status to view your catalog."
+            }
+            action={
+              searchInput.trim() ? (
+                <Button variant="text" onClick={clearSearch} className="mt-4">
+                  Clear Search
+                </Button>
+              ) : (
+                <PrimaryActionLink href="/products/new" className="mt-4 px-4">
+                  Add Product
+                </PrimaryActionLink>
+              )
+            }
+          />
         )}
       </section>
       <ConfirmationDialog

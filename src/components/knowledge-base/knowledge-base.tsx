@@ -9,7 +9,7 @@ import { useKnowledgeBase } from "@/components/knowledge-base/hooks/use-knowledg
 import { knowledgeBaseStatusLabels } from "@/components/knowledge-base/data";
 import type { KnowledgeBaseStatus } from "@/lib/knowledge-base/types";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { SearchInput } from "@/components/ui/search-input";
 import { PrimaryActionLink } from "@/components/ui/primary-action-link";
@@ -178,41 +178,39 @@ export function KnowledgeBase({ initialStatus }: KnowledgeBaseProps) {
             )}
           </div>
         ) : (
-          <Card className="flex min-h-72 flex-1 flex-col items-center justify-center border-dashed px-6 py-12 text-center shadow-sm">
-            <div className="flex size-12 items-center justify-center rounded-xl bg-surface-muted text-muted-foreground">
-              <BookOpen className="size-6" aria-hidden="true" />
-            </div>
-
-            <h2 className="mt-4 text-sm font-bold text-foreground">
-              {hasActiveFilters
+          <EmptyState
+            variant="card"
+            icon={BookOpen}
+            title={
+              hasActiveFilters
                 ? "No articles found"
-                : "Your Knowledge Base is empty"}
-            </h2>
-
-            <p className="mt-1 max-w-sm text-xs leading-relaxed text-muted-foreground">
-              {hasActiveFilters
+                : "Your Knowledge Base is empty"
+            }
+            description={
+              hasActiveFilters
                 ? "Try another search term or select a different article scope."
-                : "Create your first article to start building your AI support resources."}
-            </p>
-
-            {hasActiveFilters ? (
-              <Button
-                variant="text"
-                fullWidth={false}
-                onClick={clearFilters}
-                className="mt-3 px-2 py-2"
-              >
-                Clear Filters
-              </Button>
-            ) : (
-              <PrimaryActionLink
-                href="/knowledge-base/new"
-                className="mt-4 px-4"
-              >
-                Add KB Article
-              </PrimaryActionLink>
-            )}
-          </Card>
+                : "Create your first article to start building your AI support resources."
+            }
+            action={
+              hasActiveFilters ? (
+                <Button
+                  variant="text"
+                  fullWidth={false}
+                  onClick={clearFilters}
+                  className="mt-3 px-2 py-2"
+                >
+                  Clear Filters
+                </Button>
+              ) : (
+                <PrimaryActionLink
+                  href="/knowledge-base/new"
+                  className="mt-4 px-4"
+                >
+                  Add KB Article
+                </PrimaryActionLink>
+              )
+            }
+          />
         )}
       </section>
 

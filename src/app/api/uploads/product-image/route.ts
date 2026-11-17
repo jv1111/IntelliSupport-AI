@@ -6,7 +6,6 @@ import {
   saveProductImage,
 } from "@/server/storage/google-cloud-storage";
 
-export const runtime = "nodejs";
 
 export async function POST(request: Request): Promise<Response> {
   try {

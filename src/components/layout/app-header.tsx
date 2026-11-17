@@ -45,8 +45,7 @@ const pageHeaders: Record<string, PageHeaderContent> = {
   },
   "/settings/account": {
     title: "Account Settings",
-    description:
-      "Profile details, email/phone verification, and security credentials.",
+    description: "Manage your account profile and sign-in security.",
   },
   "/settings/stores": {
     title: "Linked Storefronts",

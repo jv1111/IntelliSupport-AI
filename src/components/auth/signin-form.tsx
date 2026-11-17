@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Form, Formik, type FormikHelpers } from "formik";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { FormikInput } from "@/components/auth/formik-input";
+import { FormikInput } from "@/components/ui/formik-input";
 import { loginUser } from "@/lib/auth/login-user";
 import { validateLogin, type LoginFormValues } from "@/lib/validations/auth";
 import { Eye, EyeOff, Lock, UserRound } from "lucide-react";
