@@ -1,7 +1,7 @@
 import "server-only";
+import { throwGraphQLError } from "@/server/graphql/shared/throw-graphql-error";
 
 import { type ProductStatus as ProductStatusValue } from "@/generated/prisma/enums";
-import { GraphQLError } from "graphql";
 import {
   ProductError,
   createProduct,
@@ -35,33 +35,6 @@ interface UpdateProductInput {
 
 type ProductResult = Awaited<ReturnType<typeof createProduct>>;
 
-function throwProductGraphQLError(
-  error: unknown,
-  fallbackMessage: string,
-): never {
-  if (error instanceof ProductError) {
-    throw new GraphQLError(error.message, {
-      extensions: {
-        code: error.code,
-      },
-    });
-  }
-
-  if (error instanceof ProductImageStorageError) {
-    throw new GraphQLError(error.message, {
-      extensions: {
-        code: error.code,
-      },
-    });
-  }
-
-  throw new GraphQLError(fallbackMessage, {
-    extensions: {
-      code: "INTERNAL_SERVER_ERROR",
-    },
-  });
-}
-
 export const productResolvers = {
   Query: {
     product: async (
@@ -74,7 +47,10 @@ export const productResolvers = {
       try {
         return await getProduct(user.id, args.id);
       } catch (error) {
-        throwProductGraphQLError(error, "Unable to retrieve product.");
+        throwGraphQLError(error, "Unable to retrieve product.", [
+          ProductError,
+          ProductImageStorageError,
+        ]);
       }
     },
 
@@ -93,7 +69,10 @@ export const productResolvers = {
       try {
         return await getProducts(user.id, args);
       } catch (error) {
-        throwProductGraphQLError(error, "Unable to retrieve products.");
+        throwGraphQLError(error, "Unable to retrieve products.", [
+          ProductError,
+          ProductImageStorageError,
+        ]);
       }
     },
   },
@@ -109,7 +88,10 @@ export const productResolvers = {
       try {
         return await createProduct(user.id, args.input);
       } catch (error) {
-        throwProductGraphQLError(error, "Unable to create product.");
+        throwGraphQLError(error, "Unable to create product.", [
+          ProductError,
+          ProductImageStorageError,
+        ]);
       }
     },
 
@@ -123,7 +105,10 @@ export const productResolvers = {
       try {
         return await updateProduct(user.id, args.id, args.input);
       } catch (error) {
-        throwProductGraphQLError(error, "Unable to update product.");
+        throwGraphQLError(error, "Unable to update product.", [
+          ProductError,
+          ProductImageStorageError,
+        ]);
       }
     },
 
@@ -137,7 +122,10 @@ export const productResolvers = {
       try {
         return await deleteProduct(user.id, args.id);
       } catch (error) {
-        throwProductGraphQLError(error, "Unable to delete product.");
+        throwGraphQLError(error, "Unable to delete product.", [
+          ProductError,
+          ProductImageStorageError,
+        ]);
       }
     },
   },

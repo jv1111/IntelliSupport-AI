@@ -1,11 +1,11 @@
 import "server-only";
+import { throwGraphQLError } from "@/server/graphql/shared/throw-graphql-error";
 
 import {
   type ArticleCategoryTag as ArticleCategoryTagValue,
   type ArticleScope as ArticleScopeValue,
   type ProductStatus as ProductStatusValue,
 } from "@/generated/prisma/enums";
-import { GraphQLError } from "graphql";
 import {
   KnowledgeBaseArticleError,
   createKnowledgeBaseArticle,
@@ -37,25 +37,6 @@ type KnowledgeBaseArticleResult = Awaited<
   ReturnType<typeof createKnowledgeBaseArticle>
 >;
 
-function throwKnowledgeBaseArticleGraphQLError(
-  error: unknown,
-  fallbackMessage: string,
-): never {
-  if (error instanceof KnowledgeBaseArticleError) {
-    throw new GraphQLError(error.message, {
-      extensions: {
-        code: error.code,
-      },
-    });
-  }
-
-  throw new GraphQLError(fallbackMessage, {
-    extensions: {
-      code: "INTERNAL_SERVER_ERROR",
-    },
-  });
-}
-
 export const knowledgeBaseResolvers = {
   Query: {
     knowledgeBaseArticle: async (
@@ -68,10 +49,9 @@ export const knowledgeBaseResolvers = {
       try {
         return await getKnowledgeBaseArticle(user.id, args.id);
       } catch (error) {
-        throwKnowledgeBaseArticleGraphQLError(
-          error,
-          "Unable to retrieve Knowledge Base article.",
-        );
+        throwGraphQLError(error, "Unable to retrieve Knowledge Base article.", [
+          KnowledgeBaseArticleError,
+        ]);
       }
     },
 
@@ -92,9 +72,10 @@ export const knowledgeBaseResolvers = {
       try {
         return await getKnowledgeBaseArticles(user.id, args);
       } catch (error) {
-        throwKnowledgeBaseArticleGraphQLError(
+        throwGraphQLError(
           error,
           "Unable to retrieve Knowledge Base articles.",
+          [KnowledgeBaseArticleError],
         );
       }
     },
@@ -111,10 +92,9 @@ export const knowledgeBaseResolvers = {
       try {
         return await createKnowledgeBaseArticle(user.id, args.input);
       } catch (error) {
-        throwKnowledgeBaseArticleGraphQLError(
-          error,
-          "Unable to create Knowledge Base article.",
-        );
+        throwGraphQLError(error, "Unable to create Knowledge Base article.", [
+          KnowledgeBaseArticleError,
+        ]);
       }
     },
 
@@ -128,10 +108,9 @@ export const knowledgeBaseResolvers = {
       try {
         return await updateKnowledgeBaseArticle(user.id, args.id, args.input);
       } catch (error) {
-        throwKnowledgeBaseArticleGraphQLError(
-          error,
-          "Unable to update Knowledge Base article.",
-        );
+        throwGraphQLError(error, "Unable to update Knowledge Base article.", [
+          KnowledgeBaseArticleError,
+        ]);
       }
     },
 
@@ -145,10 +124,9 @@ export const knowledgeBaseResolvers = {
       try {
         return await deleteKnowledgeBaseArticle(user.id, args.id);
       } catch (error) {
-        throwKnowledgeBaseArticleGraphQLError(
-          error,
-          "Unable to delete Knowledge Base article.",
-        );
+        throwGraphQLError(error, "Unable to delete Knowledge Base article.", [
+          KnowledgeBaseArticleError,
+        ]);
       }
     },
   },

@@ -1,6 +1,6 @@
 import "server-only";
+import { throwGraphQLError } from "@/server/graphql/shared/throw-graphql-error";
 
-import { GraphQLError } from "graphql";
 import {
   addEmail,
   EmailError,
@@ -14,25 +14,6 @@ type AccountEmailResult = Awaited<ReturnType<typeof getAccountEmails>>[number];
 
 type AddEmailResult = Awaited<ReturnType<typeof addEmail>>;
 
-function throwEmailGraphQLError(
-  error: unknown,
-  fallbackMessage: string,
-): never {
-  if (error instanceof EmailError) {
-    throw new GraphQLError(error.message, {
-      extensions: {
-        code: error.code,
-      },
-    });
-  }
-
-  throw new GraphQLError(fallbackMessage, {
-    extensions: {
-      code: "INTERNAL_SERVER_ERROR",
-    },
-  });
-}
-
 export const emailResolvers = {
   Query: {
     accountEmails: async (
@@ -45,7 +26,9 @@ export const emailResolvers = {
       try {
         return await getAccountEmails(user.id);
       } catch (error) {
-        throwEmailGraphQLError(error, "Unable to retrieve account emails.");
+        throwGraphQLError(error, "Unable to retrieve account emails.", [
+          EmailError,
+        ]);
       }
     },
   },
@@ -61,7 +44,7 @@ export const emailResolvers = {
       try {
         return await addEmail(user.id, args);
       } catch (error) {
-        throwEmailGraphQLError(error, "Unable to add email.");
+        throwGraphQLError(error, "Unable to add email.", [EmailError]);
       }
     },
 
@@ -75,7 +58,7 @@ export const emailResolvers = {
       try {
         return await verifyEmail(user.id, args);
       } catch (error) {
-        throwEmailGraphQLError(error, "Unable to verify email.");
+        throwGraphQLError(error, "Unable to verify email.", [EmailError]);
       }
     },
   },

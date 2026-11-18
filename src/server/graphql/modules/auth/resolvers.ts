@@ -1,6 +1,6 @@
 import "server-only";
+import { throwGraphQLError } from "@/server/graphql/shared/throw-graphql-error";
 
-import { GraphQLError } from "graphql";
 import {
   RegistrationError,
   registerUser,
@@ -48,19 +48,9 @@ export const authResolvers = {
       try {
         return await registerUser(args.input);
       } catch (error) {
-        if (error instanceof RegistrationError) {
-          throw new GraphQLError(error.message, {
-            extensions: {
-              code: error.code,
-            },
-          });
-        }
-
-        throw new GraphQLError("Unable to register account.", {
-          extensions: {
-            code: "INTERNAL_SERVER_ERROR",
-          },
-        });
+        throwGraphQLError(error, "Unable to register account.", [
+          RegistrationError,
+        ]);
       }
     },
 
@@ -81,19 +71,7 @@ export const authResolvers = {
 
         return user;
       } catch (error) {
-        if (error instanceof LoginError) {
-          throw new GraphQLError(error.message, {
-            extensions: {
-              code: error.code,
-            },
-          });
-        }
-
-        throw new GraphQLError("Unable to log in.", {
-          extensions: {
-            code: "INTERNAL_SERVER_ERROR",
-          },
-        });
+        throwGraphQLError(error, "Unable to log in.", [LoginError]);
       }
     },
 
@@ -113,19 +91,9 @@ export const authResolvers = {
 
         return true;
       } catch (error) {
-        if (error instanceof ChangePasswordError) {
-          throw new GraphQLError(error.message, {
-            extensions: {
-              code: error.code,
-            },
-          });
-        }
-
-        throw new GraphQLError("Unable to change password.", {
-          extensions: {
-            code: "INTERNAL_SERVER_ERROR",
-          },
-        });
+        throwGraphQLError(error, "Unable to change password.", [
+          ChangePasswordError,
+        ]);
       }
     },
 
@@ -142,12 +110,8 @@ export const authResolvers = {
         };
 
         return true;
-      } catch {
-        throw new GraphQLError("Unable to log out.", {
-          extensions: {
-            code: "INTERNAL_SERVER_ERROR",
-          },
-        });
+      } catch (error) {
+        throwGraphQLError(error, "Unable to log out.");
       }
     },
   },
