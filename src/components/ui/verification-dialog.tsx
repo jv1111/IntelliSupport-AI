@@ -77,7 +77,7 @@ export function VerificationDialog({
   const [isResending, setIsResending] = useState(false);
   const [isInitialSending, setIsInitialSending] = useState(sendOnOpen);
   const [initialSendFailed, setInitialSendFailed] = useState(false);
-  const isSendingInitialEmail = isInitialSending;
+  const isSendingInitialCode = isInitialSending;
 
   const title =
     method === "email" ? "Verify email address" : "Verify phone number";
@@ -126,7 +126,7 @@ export function VerificationDialog({
       if (event.key === "Escape") {
         event.preventDefault();
 
-        if (!isSendingInitialEmail) {
+        if (!isSendingInitialCode) {
           handleClose();
         }
 
@@ -167,7 +167,7 @@ export function VerificationDialog({
         previousActiveElement.focus();
       }
     };
-  }, [open, portalContainer, handleClose, isSendingInitialEmail]);
+  }, [open, portalContainer, handleClose, isSendingInitialCode]);
 
   const handleResend = useCallback(
     async (isInitialSend = false) => {
@@ -194,16 +194,22 @@ export function VerificationDialog({
         setCode(Array(6).fill(""));
         setCooldown(cooldownDuration);
         setFeedback(
-          isInitialSend
-            ? "Verification email sent. Enter the code below."
-            : "A new verification code has been sent.",
-        );
+            isInitialSend
+              ? method === "email"
+                ? "Verification email sent. Enter the code below."
+                : "Verification SMS sent. Enter the code below."
+              : method === "email"
+                ? "A new verification email has been sent."
+                : "A new verification SMS has been sent.",
+          );
         setInitialSendFailed(false);
       } catch (error) {
         setError(
           error instanceof Error
             ? error.message
-            : "Unable to send the verification email.",
+            : method === "email"
+              ? "Unable to send the verification email."
+              : "Unable to send the verification SMS.",
         );
 
         if (isInitialSend) {
@@ -217,14 +223,13 @@ export function VerificationDialog({
         }
       }
     },
-    [onResend],
+    [onResend, method],
   );
 
   useEffect(() => {
     if (
       !open ||
       !sendOnOpen ||
-      method !== "email" ||
       initialSendStarted.current
     ) {
       return;
@@ -276,7 +281,7 @@ export function VerificationDialog({
       return;
     }
 
-    if (method !== "email" || !onVerify) {
+    if (!onVerify) {
       setError(null);
       setFeedback(
         "Code submitted in frontend preview. No verification was performed.",
@@ -295,7 +300,9 @@ export function VerificationDialog({
       setError(
         error instanceof Error
           ? error.message
-          : "Unable to verify the email address.",
+          : method === "email"
+            ? "Unable to verify the email address."
+            : "Unable to verify the phone number.",
       );
     } finally {
       setIsSubmitting(false);
@@ -311,7 +318,7 @@ export function VerificationDialog({
       <button
         type="button"
         aria-label="Close verification dialog"
-        disabled={isSendingInitialEmail}
+        disabled={isSendingInitialCode}
         onClick={handleClose}
         className="absolute inset-0 bg-foreground/40 backdrop-blur-sm"
       />
@@ -338,10 +345,12 @@ export function VerificationDialog({
               id={`${dialogId}-description`}
               className="mt-1 text-xs leading-relaxed text-muted-foreground"
             >
-              {isSendingInitialEmail
+              {isSendingInitialCode
                 ? `Sending a verification code to ${destination}.`
                 : initialSendFailed
-                  ? "The verification email could not be sent."
+                  ? method === "email"
+                    ? "The verification email could not be sent."
+                    : "The verification SMS could not be sent."
                   : `Enter the 6-digit verification code for ${destination}.`}
             </p>
           </div>
@@ -350,14 +359,14 @@ export function VerificationDialog({
             variant="icon"
             type="button"
             onClick={handleClose}
-            disabled={isSendingInitialEmail}
+            disabled={isSendingInitialCode}
             aria-label="Close verification dialog"
           >
             <X className="size-4" aria-hidden="true" />
           </Button>
         </div>
 
-        {isSendingInitialEmail ? (
+        {isSendingInitialCode ? (
           <div className="flex items-center gap-3 rounded-xl bg-primary/10 p-4">
             <LoaderCircle
               className="size-5 shrink-0 animate-spin text-primary"
@@ -365,7 +374,7 @@ export function VerificationDialog({
             />
             <div className="min-w-0">
               <p className="text-sm font-semibold text-foreground">
-                Sending email
+                {method === "email" ? "Sending email" : "Sending SMS"}
               </p>
               <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
                 Sending your verification code.
@@ -381,13 +390,16 @@ export function VerificationDialog({
               />
               <div className="min-w-0">
                 <p className="text-sm font-semibold text-foreground">
-                  Email could not be sent
+                  {method === "email" ? "Email could not be sent" : "SMS could not be sent"}
                 </p>
                 <p
                   role="alert"
                   className="mt-1 text-xs leading-relaxed text-danger"
                 >
-                  {error ?? "Unable to send the verification email."}
+                  {error ??
+                      (method === "email"
+                        ? "Unable to send the verification email."
+                        : "Unable to send the verification SMS.")}
                 </p>
               </div>
             </div>

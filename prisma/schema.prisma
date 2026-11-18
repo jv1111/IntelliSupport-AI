@@ -35,6 +35,8 @@ model User {
   knowledgeBaseArticles KnowledgeBaseArticle[]
   emails                UserEmail[]
   unverifiedEmails      UnverifiedEmail[]
+  phones                UserPhone[]
+  unverifiedPhones      UnverifiedPhone[]
 
   @@map("users")
 }
@@ -107,4 +109,29 @@ model UnverifiedEmail {
   @@index([userId, email])
   @@index([expiresAt])
   @@map("unverified_emails")
+}
+
+model UserPhone {
+  id         String   @id @default(cuid())
+  phone      String   @unique @db.VarChar(16)
+  userId     String
+  verifiedAt DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("user_phones")
+}
+
+model UnverifiedPhone {
+  id                   String   @id @default(cuid())
+  phone                String   @db.VarChar(16)
+  verificationCodeHash String   @db.VarChar(255)
+  expiresAt            DateTime
+  userId               String
+  createdAt            DateTime @default(now())
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, phone])
+  @@index([expiresAt])
+  @@map("unverified_phones")
 }

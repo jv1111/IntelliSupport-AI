@@ -16,10 +16,12 @@ import { VerificationDialog } from "@/components/ui/verification-dialog";
 import { StatusDialog } from "@/components/ui/status-dialog";
 import { useAccountPassword } from "@/components/settings/hooks/use-account-password";
 import { useAccountEmails } from "@/components/settings/hooks/use-account-emails";
+import { useAccountPhones } from "@/components/settings/hooks/use-account-phones";
 import {
   validateChangePassword,
   type ChangePasswordFormValues,
 } from "@/lib/validations/auth";
+import { phoneNumberSchema } from "@/lib/validations/phone";
 
 const initialPasswordValues: ChangePasswordFormValues = {
   currentPassword: "",
@@ -34,7 +36,7 @@ type ContactTarget = {
 
 type RemovalTarget =
   | { method: "email"; id: string; destination: string }
-  | { method: "phone"; destination: string }
+  | { method: "phone"; id: string; destination: string }
   | null;
 
 interface AccountSettingsProps {
@@ -58,7 +60,18 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
     emailDeletionError,
     clearEmailDeletionError,
   } = useAccountEmails();
-  const [phones, setPhones] = useState<string[]>([]);
+  const {
+    phones,
+    isPhonesLoading,
+    phoneMessage,
+    setPhoneMessage,
+    sendVerificationPhone,
+    verifyPhone,
+    deletePhone,
+    deletingPhoneId,
+    phoneDeletionError,
+    clearPhoneDeletionError,
+  } = useAccountPhones();
   const [verificationTarget, setVerificationTarget] =
     useState<ContactTarget>(null);
   const [shouldSendVerificationOnOpen, setShouldSendVerificationOnOpen] =
@@ -71,13 +84,19 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
   }, []);
 
   const handleCloseRemovalDialog = useCallback(() => {
-    if (deletingEmailId) {
+    if (deletingEmailId || deletingPhoneId) {
       return;
     }
 
     clearEmailDeletionError();
+    clearPhoneDeletionError();
     setRemovalTarget(null);
-  }, [clearEmailDeletionError, deletingEmailId]);
+  }, [
+    clearEmailDeletionError,
+    clearPhoneDeletionError,
+    deletingEmailId,
+    deletingPhoneId,
+  ]);
 
   const handleConfirmRemoval = useCallback(async () => {
     if (!removalTarget) {
@@ -91,16 +110,17 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
         return;
       }
     } else {
-      setPhones((current) =>
-        current.filter((item) => item !== removalTarget.destination),
-      );
+      const deleted = await deletePhone(removalTarget.id);
+
+      if (!deleted) {
+        return;
+      }
     }
 
     setRemovalTarget(null);
-  }, [deleteEmail, removalTarget]);
+  }, [deleteEmail, deletePhone, removalTarget]);
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [phoneMessage, setPhoneMessage] = useState("");
 
   const initial = username.slice(0, 1).toUpperCase() || "U";
 
@@ -153,29 +173,53 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
     }
   }
 
-  function handleAddPhone(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    const value = phone.trim();
-    const digits = value.replace(/\D/g, "");
-
-    if (
-      !/^\+?[0-9\s().-]+$/.test(value) ||
-      digits.length < 7 ||
-      digits.length > 15
-    ) {
-      setPhoneMessage("Enter a valid phone number with 7 to 15 digits.");
+  async function handleVerifyPhone(code: string): Promise<void> {
+    if (verificationTarget?.method !== "phone") {
       return;
     }
 
-    if (phones.some((item) => item.replace(/\D/g, "") === digits)) {
+    await verifyPhone(verificationTarget.destination, code);
+  }
+
+  async function handleResendPhone(): Promise<void> {
+    if (verificationTarget?.method !== "phone") {
+      return;
+    }
+
+    const result = await sendVerificationPhone(verificationTarget.destination);
+    const currentPhone = phoneNumberSchema.safeParse(phone);
+
+    if (currentPhone.success && currentPhone.data === result.phone) {
+      setPhone("");
+    }
+  }
+
+  function handleAddPhone(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const validationResult = phoneNumberSchema.safeParse(phone);
+
+    if (!validationResult.success) {
+      setPhoneMessage(
+        validationResult.error.issues[0]?.message ??
+          "Enter a valid phone number with its country code.",
+      );
+      return;
+    }
+
+    const normalizedPhone = validationResult.data;
+
+    if (phones.some((item) => item.phone === normalizedPhone)) {
       setPhoneMessage("This phone number has already been added.");
       return;
     }
 
-    setPhones((current) => [...current, value]);
-    setPhone("");
-    setPhoneMessage("Phone number added to this page preview.");
+    setPhoneMessage("");
+    setShouldSendVerificationOnOpen(true);
+    setVerificationTarget({
+      method: "phone",
+      destination: normalizedPhone,
+    });
   }
 
   async function handleChangePassword(
@@ -410,11 +454,15 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
           </div>
 
           <Card className="space-y-5 p-5 sm:p-6">
-            {phones.length > 0 ? (
+            {isPhonesLoading ? (
+              <p className="text-sm text-muted-foreground">
+                Loading phone numbers...
+              </p>
+            ) : phones.length > 0 ? (
               <ul className="space-y-2">
                 {phones.map((item) => (
                   <li
-                    key={item}
+                    key={item.id}
                     className="flex min-w-0 items-center gap-3 rounded-xl border border-border bg-surface-muted/60 px-4 py-3"
                   >
                     <Phone
@@ -422,32 +470,41 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
                       aria-hidden="true"
                     />
                     <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">
-                      {item}
+                      {item.phone}
                     </span>
                     <div className="flex shrink-0 items-center gap-2">
-                      <InlineBadge variant="warning">Unverified</InlineBadge>
-                      <Button
-                        variant="text"
-                        type="button"
-                        onClick={() =>
-                          setVerificationTarget({
-                            method: "phone",
-                            destination: item,
-                          })
-                        }
-                      >
-                        Verify
-                      </Button>
+                      {item.status === "VERIFIED" ? (
+                        <SuccessBadge label="Verified" />
+                      ) : (
+                        <>
+                          <InlineBadge variant="warning">Unverified</InlineBadge>
+                          <Button
+                            variant="text"
+                            type="button"
+                            onClick={() => {
+                              setShouldSendVerificationOnOpen(true);
+                              setVerificationTarget({
+                                method: "phone",
+                                destination: item.phone,
+                              });
+                            }}
+                          >
+                            Verify
+                          </Button>
+                        </>
+                      )}
                       <Button
                         variant="text"
                         type="button"
                         className="text-danger! hover:text-danger/80!"
-                        onClick={() =>
+                        onClick={() => {
+                          clearPhoneDeletionError();
                           setRemovalTarget({
                             method: "phone",
-                            destination: item,
-                          })
-                        }
+                            id: item.id,
+                            destination: item.phone,
+                          });
+                        }}
                       >
                         Remove
                       </Button>
@@ -617,14 +674,22 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
         method={verificationTarget?.method ?? "email"}
         destination={verificationTarget?.destination ?? ""}
         sendOnOpen={
-          shouldSendVerificationOnOpen && verificationTarget?.method === "email"
+          shouldSendVerificationOnOpen
         }
         onClose={handleCloseVerificationDialog}
         onVerify={
-          verificationTarget?.method === "email" ? handleVerifyEmail : undefined
+          verificationTarget?.method === "email"
+          ? handleVerifyEmail
+          : verificationTarget?.method === "phone"
+            ? handleVerifyPhone
+            : undefined
         }
         onResend={
-          verificationTarget?.method === "email" ? handleResendEmail : undefined
+          verificationTarget?.method === "email"
+          ? handleResendEmail
+          : verificationTarget?.method === "phone"
+            ? handleResendPhone
+            : undefined
         }
       />
 
@@ -638,14 +703,20 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
         description={
           removalTarget?.method === "email"
             ? `${removalTarget.destination} will be permanently removed from your account.`
-            : `${removalTarget?.destination ?? "This contact"} will be removed from this page preview.`
+            : `${removalTarget?.destination ?? "This contact"} will be permanently removed from your account.`
         }
         confirmLabel="Remove"
         pendingLabel="Removing..."
         variant="danger"
         icon={Trash2}
-        isPending={Boolean(deletingEmailId)}
-        error={removalTarget?.method === "email" ? emailDeletionError : null}
+        isPending={Boolean(deletingEmailId || deletingPhoneId)}
+        error={
+          removalTarget?.method === "email"
+            ? emailDeletionError
+            : removalTarget?.method === "phone"
+              ? phoneDeletionError
+              : null
+        }
         onConfirm={handleConfirmRemoval}
         onCancel={handleCloseRemovalDialog}
       />

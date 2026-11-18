@@ -402,7 +402,9 @@ export const ModelName = {
   Product: 'Product',
   KnowledgeBaseArticle: 'KnowledgeBaseArticle',
   UserEmail: 'UserEmail',
-  UnverifiedEmail: 'UnverifiedEmail'
+  UnverifiedEmail: 'UnverifiedEmail',
+  UserPhone: 'UserPhone',
+  UnverifiedPhone: 'UnverifiedPhone'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -418,7 +420,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "product" | "knowledgeBaseArticle" | "userEmail" | "unverifiedEmail"
+    modelProps: "user" | "session" | "product" | "knowledgeBaseArticle" | "userEmail" | "unverifiedEmail" | "userPhone" | "unverifiedPhone"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -866,6 +868,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    UserPhone: {
+      payload: Prisma.$UserPhonePayload<ExtArgs>
+      fields: Prisma.UserPhoneFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.UserPhoneFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPhonePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.UserPhoneFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPhonePayload>
+        }
+        findFirst: {
+          args: Prisma.UserPhoneFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPhonePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.UserPhoneFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPhonePayload>
+        }
+        findMany: {
+          args: Prisma.UserPhoneFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPhonePayload>[]
+        }
+        create: {
+          args: Prisma.UserPhoneCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPhonePayload>
+        }
+        createMany: {
+          args: Prisma.UserPhoneCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.UserPhoneCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPhonePayload>[]
+        }
+        delete: {
+          args: Prisma.UserPhoneDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPhonePayload>
+        }
+        update: {
+          args: Prisma.UserPhoneUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPhonePayload>
+        }
+        deleteMany: {
+          args: Prisma.UserPhoneDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.UserPhoneUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.UserPhoneUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPhonePayload>[]
+        }
+        upsert: {
+          args: Prisma.UserPhoneUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPhonePayload>
+        }
+        aggregate: {
+          args: Prisma.UserPhoneAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUserPhone>
+        }
+        groupBy: {
+          args: Prisma.UserPhoneGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserPhoneGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.UserPhoneCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserPhoneCountAggregateOutputType> | number
+        }
+      }
+    }
+    UnverifiedPhone: {
+      payload: Prisma.$UnverifiedPhonePayload<ExtArgs>
+      fields: Prisma.UnverifiedPhoneFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.UnverifiedPhoneFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UnverifiedPhonePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.UnverifiedPhoneFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UnverifiedPhonePayload>
+        }
+        findFirst: {
+          args: Prisma.UnverifiedPhoneFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UnverifiedPhonePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.UnverifiedPhoneFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UnverifiedPhonePayload>
+        }
+        findMany: {
+          args: Prisma.UnverifiedPhoneFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UnverifiedPhonePayload>[]
+        }
+        create: {
+          args: Prisma.UnverifiedPhoneCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UnverifiedPhonePayload>
+        }
+        createMany: {
+          args: Prisma.UnverifiedPhoneCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.UnverifiedPhoneCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UnverifiedPhonePayload>[]
+        }
+        delete: {
+          args: Prisma.UnverifiedPhoneDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UnverifiedPhonePayload>
+        }
+        update: {
+          args: Prisma.UnverifiedPhoneUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UnverifiedPhonePayload>
+        }
+        deleteMany: {
+          args: Prisma.UnverifiedPhoneDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.UnverifiedPhoneUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.UnverifiedPhoneUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UnverifiedPhonePayload>[]
+        }
+        upsert: {
+          args: Prisma.UnverifiedPhoneUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UnverifiedPhonePayload>
+        }
+        aggregate: {
+          args: Prisma.UnverifiedPhoneAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUnverifiedPhone>
+        }
+        groupBy: {
+          args: Prisma.UnverifiedPhoneGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UnverifiedPhoneGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.UnverifiedPhoneCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UnverifiedPhoneCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -977,6 +1127,28 @@ export const UnverifiedEmailScalarFieldEnum = {
 } as const
 
 export type UnverifiedEmailScalarFieldEnum = (typeof UnverifiedEmailScalarFieldEnum)[keyof typeof UnverifiedEmailScalarFieldEnum]
+
+
+export const UserPhoneScalarFieldEnum = {
+  id: 'id',
+  phone: 'phone',
+  userId: 'userId',
+  verifiedAt: 'verifiedAt'
+} as const
+
+export type UserPhoneScalarFieldEnum = (typeof UserPhoneScalarFieldEnum)[keyof typeof UserPhoneScalarFieldEnum]
+
+
+export const UnverifiedPhoneScalarFieldEnum = {
+  id: 'id',
+  phone: 'phone',
+  verificationCodeHash: 'verificationCodeHash',
+  expiresAt: 'expiresAt',
+  userId: 'userId',
+  createdAt: 'createdAt'
+} as const
+
+export type UnverifiedPhoneScalarFieldEnum = (typeof UnverifiedPhoneScalarFieldEnum)[keyof typeof UnverifiedPhoneScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1249,6 +1421,8 @@ export type GlobalOmitConfig = {
   knowledgeBaseArticle?: Prisma.KnowledgeBaseArticleOmit
   userEmail?: Prisma.UserEmailOmit
   unverifiedEmail?: Prisma.UnverifiedEmailOmit
+  userPhone?: Prisma.UserPhoneOmit
+  unverifiedPhone?: Prisma.UnverifiedPhoneOmit
 }
 
 /* Types for Logging */

@@ -71,3 +71,13 @@ export type UserEmail = Prisma.UserEmailModel
  * 
  */
 export type UnverifiedEmail = Prisma.UnverifiedEmailModel
+/**
+ * Model UserPhone
+ * 
+ */
+export type UserPhone = Prisma.UserPhoneModel
+/**
+ * Model UnverifiedPhone
+ * 
+ */
+export type UnverifiedPhone = Prisma.UnverifiedPhoneModel

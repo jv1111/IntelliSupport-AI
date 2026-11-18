@@ -56,7 +56,9 @@ export const ModelName = {
   Product: 'Product',
   KnowledgeBaseArticle: 'KnowledgeBaseArticle',
   UserEmail: 'UserEmail',
-  UnverifiedEmail: 'UnverifiedEmail'
+  UnverifiedEmail: 'UnverifiedEmail',
+  UserPhone: 'UserPhone',
+  UnverifiedPhone: 'UnverifiedPhone'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -147,6 +149,28 @@ export const UnverifiedEmailScalarFieldEnum = {
 } as const
 
 export type UnverifiedEmailScalarFieldEnum = (typeof UnverifiedEmailScalarFieldEnum)[keyof typeof UnverifiedEmailScalarFieldEnum]
+
+
+export const UserPhoneScalarFieldEnum = {
+  id: 'id',
+  phone: 'phone',
+  userId: 'userId',
+  verifiedAt: 'verifiedAt'
+} as const
+
+export type UserPhoneScalarFieldEnum = (typeof UserPhoneScalarFieldEnum)[keyof typeof UserPhoneScalarFieldEnum]
+
+
+export const UnverifiedPhoneScalarFieldEnum = {
+  id: 'id',
+  phone: 'phone',
+  verificationCodeHash: 'verificationCodeHash',
+  expiresAt: 'expiresAt',
+  userId: 'userId',
+  createdAt: 'createdAt'
+} as const
+
+export type UnverifiedPhoneScalarFieldEnum = (typeof UnverifiedPhoneScalarFieldEnum)[keyof typeof UnverifiedPhoneScalarFieldEnum]
 
 
 export const SortOrder = {
