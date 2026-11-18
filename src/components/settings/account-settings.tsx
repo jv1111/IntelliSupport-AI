@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { Form, Formik, type FormikHelpers } from "formik";
 import { KeyRound, Lock, Mail, Phone, ShieldCheck, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,12 @@ import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { VerificationDialog } from "@/components/settings/verification-dialog";
 import { StatusDialog } from "@/components/ui/status-dialog";
 import { useAccountSettings } from "@/components/settings/hooks/use-account-settings";
+import {
+  addAccountEmail,
+  fetchAccountEmails,
+  verifyAccountEmail,
+  type AccountEmail,
+} from "@/lib/auth/emails";
 import {
   validateChangePassword,
   type ChangePasswordFormValues,
@@ -40,7 +46,8 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
   const { passwordDialog, changePassword, closePasswordDialog } =
     useAccountSettings();
 
-  const [emails, setEmails] = useState<string[]>([]);
+  const [emails, setEmails] = useState<AccountEmail[]>([]);
+  const [isEmailsLoading, setIsEmailsLoading] = useState(true);
   const [phones, setPhones] = useState<string[]>([]);
   const [verificationTarget, setVerificationTarget] =
     useState<ContactTarget>(null);
@@ -61,7 +68,7 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
 
     if (removalTarget.method === "email") {
       setEmails((current) =>
-        current.filter((item) => item !== removalTarget.destination),
+        current.filter((item) => item.email !== removalTarget.destination),
       );
     } else {
       setPhones((current) =>
@@ -75,6 +82,36 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
   const [phone, setPhone] = useState("");
   const [emailMessage, setEmailMessage] = useState("");
   const [phoneMessage, setPhoneMessage] = useState("");
+
+  useEffect(() => {
+    let isActive = true;
+
+    fetchAccountEmails()
+      .then((items) => {
+        if (isActive) {
+          setEmails(items);
+        }
+      })
+      .catch((error) => {
+        if (isActive) {
+          setEmailMessage(
+            error instanceof Error
+              ? error.message
+              : "Unable to load email addresses.",
+          );
+        }
+      })
+      .finally(() => {
+        if (isActive) {
+          setIsEmailsLoading(false);
+        }
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
   const initial = username.slice(0, 1).toUpperCase() || "U";
 
   const memberSince = new Intl.DateTimeFormat("en", {
@@ -94,19 +131,71 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
     },
   ];
 
-  function handleAddEmail(event: FormEvent<HTMLFormElement>) {
+  async function handleAddEmail(
+    event: FormEvent<HTMLFormElement>,
+  ): Promise<void> {
     event.preventDefault();
 
     const value = email.trim().toLowerCase();
+    setEmailMessage("");
 
-    if (emails.includes(value)) {
-      setEmailMessage("This email address has already been added.");
+    try {
+      const result = await addAccountEmail(value);
+
+      setEmails((current) => [
+        result,
+        ...current.filter((item) => item.email !== value),
+      ]);
+      setEmail("");
+      setEmailMessage("Verification code generated.");
+
+      if (result.verificationCode) {
+        console.log("Email verification code:", result.verificationCode);
+      }
+
+      setVerificationTarget({
+        method: "email",
+        destination: value,
+      });
+    } catch (error) {
+      setEmailMessage(
+        error instanceof Error ? error.message : "Unable to add email address.",
+      );
+    }
+  }
+
+  async function handleVerifyEmail(code: string): Promise<void> {
+    if (verificationTarget?.method !== "email") {
       return;
     }
 
-    setEmails((current) => [...current, value]);
-    setEmail("");
-    setEmailMessage("Email added to this page preview.");
+    const verifiedEmail = await verifyAccountEmail(
+      verificationTarget.destination,
+      code,
+    );
+
+    setEmails((current) => [
+      verifiedEmail,
+      ...current.filter((item) => item.email !== verifiedEmail.email),
+    ]);
+    setEmailMessage("Email address verified successfully.");
+  }
+
+  async function handleResendEmail(): Promise<void> {
+    if (verificationTarget?.method !== "email") {
+      return;
+    }
+
+    const result = await addAccountEmail(verificationTarget.destination);
+
+    setEmails((current) => [
+      result,
+      ...current.filter((item) => item.email !== result.email),
+    ]);
+
+    if (result.verificationCode) {
+      console.log("Email verification code:", result.verificationCode);
+    }
   }
 
   function handleAddPhone(event: FormEvent<HTMLFormElement>) {
@@ -251,11 +340,15 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
           </div>
 
           <Card className="space-y-5 p-5 sm:p-6">
-            {emails.length > 0 ? (
+            {isEmailsLoading ? (
+              <p className="text-sm text-muted-foreground">
+                Loading email addresses...
+              </p>
+            ) : emails.length > 0 ? (
               <ul className="space-y-2">
                 {emails.map((item) => (
                   <li
-                    key={item}
+                    key={item.id}
                     className="flex min-w-0 items-center gap-3 rounded-xl border border-border bg-surface-muted/60 px-4 py-3"
                   >
                     <Mail
@@ -263,22 +356,30 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
                       aria-hidden="true"
                     />
                     <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">
-                      {item}
+                      {item.email}
                     </span>
                     <div className="flex shrink-0 items-center gap-2">
-                      <InlineBadge variant="warning">Unverified</InlineBadge>
-                      <Button
-                        variant="text"
-                        type="button"
-                        onClick={() =>
-                          setVerificationTarget({
-                            method: "email",
-                            destination: item,
-                          })
-                        }
-                      >
-                        Verify
-                      </Button>
+                      {item.status === "VERIFIED" ? (
+                        <SuccessBadge label="Verified" />
+                      ) : (
+                        <>
+                          <InlineBadge variant="warning">
+                            Unverified
+                          </InlineBadge>
+                          <Button
+                            variant="text"
+                            type="button"
+                            onClick={() =>
+                              setVerificationTarget({
+                                method: "email",
+                                destination: item.email,
+                              })
+                            }
+                          >
+                            Verify
+                          </Button>
+                        </>
+                      )}
                       <Button
                         variant="text"
                         type="button"
@@ -286,7 +387,7 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
                         onClick={() =>
                           setRemovalTarget({
                             method: "email",
-                            destination: item,
+                            destination: item.email,
                           })
                         }
                       >
@@ -557,6 +658,12 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
         method={verificationTarget?.method ?? "email"}
         destination={verificationTarget?.destination ?? ""}
         onClose={handleCloseVerificationDialog}
+        onVerify={
+          verificationTarget?.method === "email" ? handleVerifyEmail : undefined
+        }
+        onResend={
+          verificationTarget?.method === "email" ? handleResendEmail : undefined
+        }
       />
 
       <ConfirmationDialog

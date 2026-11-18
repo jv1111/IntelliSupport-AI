@@ -23,6 +23,8 @@ interface VerificationDialogProps {
   method: VerificationMethod;
   destination: string;
   onClose: () => void;
+  onVerify?: (code: string) => Promise<void>;
+  onResend?: () => Promise<void>;
 }
 
 function subscribeToPortalContainer() {
@@ -53,6 +55,8 @@ export function VerificationDialog({
   method,
   destination,
   onClose,
+  onVerify,
+  onResend,
 }: VerificationDialogProps) {
   const portalContainer = useSyncExternalStore(
     subscribeToPortalContainer,
@@ -66,6 +70,8 @@ export function VerificationDialog({
   const [cooldown, setCooldown] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isResending, setIsResending] = useState(false);
 
   const title =
     method === "email" ? "Verify email address" : "Verify phone number";
@@ -150,10 +156,32 @@ export function VerificationDialog({
     };
   }, [open, portalContainer, handleClose]);
 
-  function handleResend() {
-    setCooldown(cooldownDuration);
+  async function handleResend() {
     setError(null);
-    setFeedback("This is a frontend preview. No verification code was sent.");
+    setFeedback(null);
+
+    if (!onResend) {
+      setCooldown(cooldownDuration);
+      setFeedback("This is a frontend preview. No verification code was sent.");
+      return;
+    }
+
+    setIsResending(true);
+
+    try {
+      await onResend();
+      setCode(Array(6).fill(""));
+      setCooldown(cooldownDuration);
+      setFeedback("A new verification code has been generated.");
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Unable to resend the verification code.",
+      );
+    } finally {
+      setIsResending(false);
+    }
   }
 
   function focusCodeInput(index: number) {
@@ -189,7 +217,7 @@ export function VerificationDialog({
     focusCodeInput(nextIndex);
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (!code.every((digit) => /^\d$/.test(digit))) {
@@ -198,10 +226,30 @@ export function VerificationDialog({
       return;
     }
 
+    if (method !== "email" || !onVerify) {
+      setError(null);
+      setFeedback(
+        "Code submitted in frontend preview. No verification was performed.",
+      );
+      return;
+    }
+
+    setIsSubmitting(true);
     setError(null);
-    setFeedback(
-      "Code submitted in frontend preview. No verification was performed.",
-    );
+    setFeedback(null);
+
+    try {
+      await onVerify(code.join(""));
+      handleClose();
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Unable to verify the email address.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   if (!open || !portalContainer) {
@@ -335,18 +383,22 @@ export function VerificationDialog({
               type="button"
               variant="text"
               fullWidth={false}
-              disabled={cooldown > 0}
+              disabled={cooldown > 0 || isSubmitting || isResending}
               onClick={handleResend}
             >
-              {cooldown > 0 ? `Resend in ${cooldown}s` : "Resend code"}
+              {isResending
+                ? "Sending..."
+                : cooldown > 0
+                  ? `Resend in ${cooldown}s`
+                  : "Resend code"}
             </Button>
 
             <Button
               type="submit"
               fullWidth={false}
-              disabled={!code.every(Boolean)}
+              disabled={!code.every(Boolean) || isSubmitting || isResending}
             >
-              Submit
+              {isSubmitting ? "Verifying..." : "Submit"}
             </Button>
           </div>
         </form>

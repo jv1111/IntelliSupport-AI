@@ -400,7 +400,9 @@ export const ModelName = {
   User: 'User',
   Session: 'Session',
   Product: 'Product',
-  KnowledgeBaseArticle: 'KnowledgeBaseArticle'
+  KnowledgeBaseArticle: 'KnowledgeBaseArticle',
+  UserEmail: 'UserEmail',
+  UnverifiedEmail: 'UnverifiedEmail'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -416,7 +418,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "product" | "knowledgeBaseArticle"
+    modelProps: "user" | "session" | "product" | "knowledgeBaseArticle" | "userEmail" | "unverifiedEmail"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -716,6 +718,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    UserEmail: {
+      payload: Prisma.$UserEmailPayload<ExtArgs>
+      fields: Prisma.UserEmailFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.UserEmailFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserEmailPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.UserEmailFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserEmailPayload>
+        }
+        findFirst: {
+          args: Prisma.UserEmailFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserEmailPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.UserEmailFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserEmailPayload>
+        }
+        findMany: {
+          args: Prisma.UserEmailFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserEmailPayload>[]
+        }
+        create: {
+          args: Prisma.UserEmailCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserEmailPayload>
+        }
+        createMany: {
+          args: Prisma.UserEmailCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.UserEmailCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserEmailPayload>[]
+        }
+        delete: {
+          args: Prisma.UserEmailDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserEmailPayload>
+        }
+        update: {
+          args: Prisma.UserEmailUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserEmailPayload>
+        }
+        deleteMany: {
+          args: Prisma.UserEmailDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.UserEmailUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.UserEmailUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserEmailPayload>[]
+        }
+        upsert: {
+          args: Prisma.UserEmailUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserEmailPayload>
+        }
+        aggregate: {
+          args: Prisma.UserEmailAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUserEmail>
+        }
+        groupBy: {
+          args: Prisma.UserEmailGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserEmailGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.UserEmailCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserEmailCountAggregateOutputType> | number
+        }
+      }
+    }
+    UnverifiedEmail: {
+      payload: Prisma.$UnverifiedEmailPayload<ExtArgs>
+      fields: Prisma.UnverifiedEmailFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.UnverifiedEmailFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UnverifiedEmailPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.UnverifiedEmailFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UnverifiedEmailPayload>
+        }
+        findFirst: {
+          args: Prisma.UnverifiedEmailFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UnverifiedEmailPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.UnverifiedEmailFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UnverifiedEmailPayload>
+        }
+        findMany: {
+          args: Prisma.UnverifiedEmailFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UnverifiedEmailPayload>[]
+        }
+        create: {
+          args: Prisma.UnverifiedEmailCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UnverifiedEmailPayload>
+        }
+        createMany: {
+          args: Prisma.UnverifiedEmailCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.UnverifiedEmailCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UnverifiedEmailPayload>[]
+        }
+        delete: {
+          args: Prisma.UnverifiedEmailDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UnverifiedEmailPayload>
+        }
+        update: {
+          args: Prisma.UnverifiedEmailUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UnverifiedEmailPayload>
+        }
+        deleteMany: {
+          args: Prisma.UnverifiedEmailDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.UnverifiedEmailUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.UnverifiedEmailUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UnverifiedEmailPayload>[]
+        }
+        upsert: {
+          args: Prisma.UnverifiedEmailUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UnverifiedEmailPayload>
+        }
+        aggregate: {
+          args: Prisma.UnverifiedEmailAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUnverifiedEmail>
+        }
+        groupBy: {
+          args: Prisma.UnverifiedEmailGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UnverifiedEmailGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.UnverifiedEmailCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UnverifiedEmailCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -805,6 +955,28 @@ export const KnowledgeBaseArticleScalarFieldEnum = {
 } as const
 
 export type KnowledgeBaseArticleScalarFieldEnum = (typeof KnowledgeBaseArticleScalarFieldEnum)[keyof typeof KnowledgeBaseArticleScalarFieldEnum]
+
+
+export const UserEmailScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  userId: 'userId',
+  verifiedAt: 'verifiedAt'
+} as const
+
+export type UserEmailScalarFieldEnum = (typeof UserEmailScalarFieldEnum)[keyof typeof UserEmailScalarFieldEnum]
+
+
+export const UnverifiedEmailScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  verificationCodeHash: 'verificationCodeHash',
+  expiresAt: 'expiresAt',
+  userId: 'userId',
+  createdAt: 'createdAt'
+} as const
+
+export type UnverifiedEmailScalarFieldEnum = (typeof UnverifiedEmailScalarFieldEnum)[keyof typeof UnverifiedEmailScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1075,6 +1247,8 @@ export type GlobalOmitConfig = {
   session?: Prisma.SessionOmit
   product?: Prisma.ProductOmit
   knowledgeBaseArticle?: Prisma.KnowledgeBaseArticleOmit
+  userEmail?: Prisma.UserEmailOmit
+  unverifiedEmail?: Prisma.UnverifiedEmailOmit
 }
 
 /* Types for Logging */

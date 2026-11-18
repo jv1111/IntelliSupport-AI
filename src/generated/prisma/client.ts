@@ -61,3 +61,13 @@ export type Product = Prisma.ProductModel
  * 
  */
 export type KnowledgeBaseArticle = Prisma.KnowledgeBaseArticleModel
+/**
+ * Model UserEmail
+ * 
+ */
+export type UserEmail = Prisma.UserEmailModel
+/**
+ * Model UnverifiedEmail
+ * 
+ */
+export type UnverifiedEmail = Prisma.UnverifiedEmailModel

@@ -33,6 +33,8 @@ model User {
   sessions              Session[]
   products              Product[]
   knowledgeBaseArticles KnowledgeBaseArticle[]
+  emails                UserEmail[]
+  unverifiedEmails      UnverifiedEmail[]
 
   @@map("users")
 }
@@ -70,7 +72,7 @@ model KnowledgeBaseArticle {
   id          String             @id @default(cuid())
   scope       ArticleScope
   categoryTag ArticleCategoryTag
-  status      ProductStatus @default(draft)
+  status      ProductStatus      @default(draft)
   title       String
   context     String
   userId      String
@@ -80,4 +82,29 @@ model KnowledgeBaseArticle {
 
   @@index([userId, createdAt])
   @@map("knowledge_base_articles")
+}
+
+model UserEmail {
+  id         String   @id @default(cuid())
+  email      String   @unique @db.VarChar(254)
+  userId     String
+  verifiedAt DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("user_emails")
+}
+
+model UnverifiedEmail {
+  id                   String   @id @default(cuid())
+  email                String   @db.VarChar(254)
+  verificationCodeHash String   @db.VarChar(255)
+  expiresAt            DateTime
+  userId               String
+  createdAt            DateTime @default(now())
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, email])
+  @@index([expiresAt])
+  @@map("unverified_emails")
 }

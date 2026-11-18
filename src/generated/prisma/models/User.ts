@@ -185,6 +185,8 @@ export type UserWhereInput = {
   sessions?: Prisma.SessionListRelationFilter
   products?: Prisma.ProductListRelationFilter
   knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleListRelationFilter
+  emails?: Prisma.UserEmailListRelationFilter
+  unverifiedEmails?: Prisma.UnverifiedEmailListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -196,6 +198,8 @@ export type UserOrderByWithRelationInput = {
   sessions?: Prisma.SessionOrderByRelationAggregateInput
   products?: Prisma.ProductOrderByRelationAggregateInput
   knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleOrderByRelationAggregateInput
+  emails?: Prisma.UserEmailOrderByRelationAggregateInput
+  unverifiedEmails?: Prisma.UnverifiedEmailOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -210,6 +214,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   sessions?: Prisma.SessionListRelationFilter
   products?: Prisma.ProductListRelationFilter
   knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleListRelationFilter
+  emails?: Prisma.UserEmailListRelationFilter
+  unverifiedEmails?: Prisma.UnverifiedEmailListRelationFilter
 }, "id" | "username">
 
 export type UserOrderByWithAggregationInput = {
@@ -243,6 +249,8 @@ export type UserCreateInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   products?: Prisma.ProductCreateNestedManyWithoutUserInput
   knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleCreateNestedManyWithoutUserInput
+  emails?: Prisma.UserEmailCreateNestedManyWithoutUserInput
+  unverifiedEmails?: Prisma.UnverifiedEmailCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -254,6 +262,8 @@ export type UserUncheckedCreateInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutUserInput
   knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUncheckedCreateNestedManyWithoutUserInput
+  emails?: Prisma.UserEmailUncheckedCreateNestedManyWithoutUserInput
+  unverifiedEmails?: Prisma.UnverifiedEmailUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -265,6 +275,8 @@ export type UserUpdateInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   products?: Prisma.ProductUpdateManyWithoutUserNestedInput
   knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUpdateManyWithoutUserNestedInput
+  emails?: Prisma.UserEmailUpdateManyWithoutUserNestedInput
+  unverifiedEmails?: Prisma.UnverifiedEmailUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -276,6 +288,8 @@ export type UserUncheckedUpdateInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   products?: Prisma.ProductUncheckedUpdateManyWithoutUserNestedInput
   knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUncheckedUpdateManyWithoutUserNestedInput
+  emails?: Prisma.UserEmailUncheckedUpdateManyWithoutUserNestedInput
+  unverifiedEmails?: Prisma.UnverifiedEmailUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -381,6 +395,34 @@ export type UserUpdateOneRequiredWithoutKnowledgeBaseArticlesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutKnowledgeBaseArticlesInput, Prisma.UserUpdateWithoutKnowledgeBaseArticlesInput>, Prisma.UserUncheckedUpdateWithoutKnowledgeBaseArticlesInput>
 }
 
+export type UserCreateNestedOneWithoutEmailsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutEmailsInput, Prisma.UserUncheckedCreateWithoutEmailsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutEmailsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutEmailsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutEmailsInput, Prisma.UserUncheckedCreateWithoutEmailsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutEmailsInput
+  upsert?: Prisma.UserUpsertWithoutEmailsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutEmailsInput, Prisma.UserUpdateWithoutEmailsInput>, Prisma.UserUncheckedUpdateWithoutEmailsInput>
+}
+
+export type UserCreateNestedOneWithoutUnverifiedEmailsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutUnverifiedEmailsInput, Prisma.UserUncheckedCreateWithoutUnverifiedEmailsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUnverifiedEmailsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutUnverifiedEmailsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutUnverifiedEmailsInput, Prisma.UserUncheckedCreateWithoutUnverifiedEmailsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUnverifiedEmailsInput
+  upsert?: Prisma.UserUpsertWithoutUnverifiedEmailsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutUnverifiedEmailsInput, Prisma.UserUpdateWithoutUnverifiedEmailsInput>, Prisma.UserUncheckedUpdateWithoutUnverifiedEmailsInput>
+}
+
 export type UserCreateWithoutSessionsInput = {
   id?: string
   username: string
@@ -389,6 +431,8 @@ export type UserCreateWithoutSessionsInput = {
   updatedAt?: Date | string
   products?: Prisma.ProductCreateNestedManyWithoutUserInput
   knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleCreateNestedManyWithoutUserInput
+  emails?: Prisma.UserEmailCreateNestedManyWithoutUserInput
+  unverifiedEmails?: Prisma.UnverifiedEmailCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -399,6 +443,8 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   updatedAt?: Date | string
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutUserInput
   knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUncheckedCreateNestedManyWithoutUserInput
+  emails?: Prisma.UserEmailUncheckedCreateNestedManyWithoutUserInput
+  unverifiedEmails?: Prisma.UnverifiedEmailUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -425,6 +471,8 @@ export type UserUpdateWithoutSessionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   products?: Prisma.ProductUpdateManyWithoutUserNestedInput
   knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUpdateManyWithoutUserNestedInput
+  emails?: Prisma.UserEmailUpdateManyWithoutUserNestedInput
+  unverifiedEmails?: Prisma.UnverifiedEmailUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -435,6 +483,8 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   products?: Prisma.ProductUncheckedUpdateManyWithoutUserNestedInput
   knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUncheckedUpdateManyWithoutUserNestedInput
+  emails?: Prisma.UserEmailUncheckedUpdateManyWithoutUserNestedInput
+  unverifiedEmails?: Prisma.UnverifiedEmailUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutProductsInput = {
@@ -445,6 +495,8 @@ export type UserCreateWithoutProductsInput = {
   updatedAt?: Date | string
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleCreateNestedManyWithoutUserInput
+  emails?: Prisma.UserEmailCreateNestedManyWithoutUserInput
+  unverifiedEmails?: Prisma.UnverifiedEmailCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutProductsInput = {
@@ -455,6 +507,8 @@ export type UserUncheckedCreateWithoutProductsInput = {
   updatedAt?: Date | string
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUncheckedCreateNestedManyWithoutUserInput
+  emails?: Prisma.UserEmailUncheckedCreateNestedManyWithoutUserInput
+  unverifiedEmails?: Prisma.UnverifiedEmailUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutProductsInput = {
@@ -481,6 +535,8 @@ export type UserUpdateWithoutProductsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUpdateManyWithoutUserNestedInput
+  emails?: Prisma.UserEmailUpdateManyWithoutUserNestedInput
+  unverifiedEmails?: Prisma.UnverifiedEmailUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProductsInput = {
@@ -491,6 +547,8 @@ export type UserUncheckedUpdateWithoutProductsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUncheckedUpdateManyWithoutUserNestedInput
+  emails?: Prisma.UserEmailUncheckedUpdateManyWithoutUserNestedInput
+  unverifiedEmails?: Prisma.UnverifiedEmailUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutKnowledgeBaseArticlesInput = {
@@ -501,6 +559,8 @@ export type UserCreateWithoutKnowledgeBaseArticlesInput = {
   updatedAt?: Date | string
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   products?: Prisma.ProductCreateNestedManyWithoutUserInput
+  emails?: Prisma.UserEmailCreateNestedManyWithoutUserInput
+  unverifiedEmails?: Prisma.UnverifiedEmailCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutKnowledgeBaseArticlesInput = {
@@ -511,6 +571,8 @@ export type UserUncheckedCreateWithoutKnowledgeBaseArticlesInput = {
   updatedAt?: Date | string
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutUserInput
+  emails?: Prisma.UserEmailUncheckedCreateNestedManyWithoutUserInput
+  unverifiedEmails?: Prisma.UnverifiedEmailUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutKnowledgeBaseArticlesInput = {
@@ -537,6 +599,8 @@ export type UserUpdateWithoutKnowledgeBaseArticlesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   products?: Prisma.ProductUpdateManyWithoutUserNestedInput
+  emails?: Prisma.UserEmailUpdateManyWithoutUserNestedInput
+  unverifiedEmails?: Prisma.UnverifiedEmailUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutKnowledgeBaseArticlesInput = {
@@ -547,6 +611,136 @@ export type UserUncheckedUpdateWithoutKnowledgeBaseArticlesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   products?: Prisma.ProductUncheckedUpdateManyWithoutUserNestedInput
+  emails?: Prisma.UserEmailUncheckedUpdateManyWithoutUserNestedInput
+  unverifiedEmails?: Prisma.UnverifiedEmailUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutEmailsInput = {
+  id?: string
+  username: string
+  passwordHash: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  products?: Prisma.ProductCreateNestedManyWithoutUserInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleCreateNestedManyWithoutUserInput
+  unverifiedEmails?: Prisma.UnverifiedEmailCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutEmailsInput = {
+  id?: string
+  username: string
+  passwordHash: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutUserInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUncheckedCreateNestedManyWithoutUserInput
+  unverifiedEmails?: Prisma.UnverifiedEmailUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutEmailsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutEmailsInput, Prisma.UserUncheckedCreateWithoutEmailsInput>
+}
+
+export type UserUpsertWithoutEmailsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutEmailsInput, Prisma.UserUncheckedUpdateWithoutEmailsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutEmailsInput, Prisma.UserUncheckedCreateWithoutEmailsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutEmailsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutEmailsInput, Prisma.UserUncheckedUpdateWithoutEmailsInput>
+}
+
+export type UserUpdateWithoutEmailsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  products?: Prisma.ProductUpdateManyWithoutUserNestedInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUpdateManyWithoutUserNestedInput
+  unverifiedEmails?: Prisma.UnverifiedEmailUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutEmailsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutUserNestedInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUncheckedUpdateManyWithoutUserNestedInput
+  unverifiedEmails?: Prisma.UnverifiedEmailUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutUnverifiedEmailsInput = {
+  id?: string
+  username: string
+  passwordHash: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  products?: Prisma.ProductCreateNestedManyWithoutUserInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleCreateNestedManyWithoutUserInput
+  emails?: Prisma.UserEmailCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutUnverifiedEmailsInput = {
+  id?: string
+  username: string
+  passwordHash: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutUserInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUncheckedCreateNestedManyWithoutUserInput
+  emails?: Prisma.UserEmailUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutUnverifiedEmailsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutUnverifiedEmailsInput, Prisma.UserUncheckedCreateWithoutUnverifiedEmailsInput>
+}
+
+export type UserUpsertWithoutUnverifiedEmailsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutUnverifiedEmailsInput, Prisma.UserUncheckedUpdateWithoutUnverifiedEmailsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutUnverifiedEmailsInput, Prisma.UserUncheckedCreateWithoutUnverifiedEmailsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutUnverifiedEmailsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutUnverifiedEmailsInput, Prisma.UserUncheckedUpdateWithoutUnverifiedEmailsInput>
+}
+
+export type UserUpdateWithoutUnverifiedEmailsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  products?: Prisma.ProductUpdateManyWithoutUserNestedInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUpdateManyWithoutUserNestedInput
+  emails?: Prisma.UserEmailUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutUnverifiedEmailsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutUserNestedInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUncheckedUpdateManyWithoutUserNestedInput
+  emails?: Prisma.UserEmailUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -558,12 +752,16 @@ export type UserCountOutputType = {
   sessions: number
   products: number
   knowledgeBaseArticles: number
+  emails: number
+  unverifiedEmails: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sessions?: boolean | UserCountOutputTypeCountSessionsArgs
   products?: boolean | UserCountOutputTypeCountProductsArgs
   knowledgeBaseArticles?: boolean | UserCountOutputTypeCountKnowledgeBaseArticlesArgs
+  emails?: boolean | UserCountOutputTypeCountEmailsArgs
+  unverifiedEmails?: boolean | UserCountOutputTypeCountUnverifiedEmailsArgs
 }
 
 /**
@@ -597,6 +795,20 @@ export type UserCountOutputTypeCountKnowledgeBaseArticlesArgs<ExtArgs extends ru
   where?: Prisma.KnowledgeBaseArticleWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountEmailsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UserEmailWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountUnverifiedEmailsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UnverifiedEmailWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -607,6 +819,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   products?: boolean | Prisma.User$productsArgs<ExtArgs>
   knowledgeBaseArticles?: boolean | Prisma.User$knowledgeBaseArticlesArgs<ExtArgs>
+  emails?: boolean | Prisma.User$emailsArgs<ExtArgs>
+  unverifiedEmails?: boolean | Prisma.User$unverifiedEmailsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -639,6 +853,8 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   products?: boolean | Prisma.User$productsArgs<ExtArgs>
   knowledgeBaseArticles?: boolean | Prisma.User$knowledgeBaseArticlesArgs<ExtArgs>
+  emails?: boolean | Prisma.User$emailsArgs<ExtArgs>
+  unverifiedEmails?: boolean | Prisma.User$unverifiedEmailsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -650,6 +866,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     sessions: Prisma.$SessionPayload<ExtArgs>[]
     products: Prisma.$ProductPayload<ExtArgs>[]
     knowledgeBaseArticles: Prisma.$KnowledgeBaseArticlePayload<ExtArgs>[]
+    emails: Prisma.$UserEmailPayload<ExtArgs>[]
+    unverifiedEmails: Prisma.$UnverifiedEmailPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1054,6 +1272,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   sessions<T extends Prisma.User$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   products<T extends Prisma.User$productsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$productsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   knowledgeBaseArticles<T extends Prisma.User$knowledgeBaseArticlesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$knowledgeBaseArticlesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$KnowledgeBaseArticlePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  emails<T extends Prisma.User$emailsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$emailsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserEmailPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  unverifiedEmails<T extends Prisma.User$unverifiedEmailsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$unverifiedEmailsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UnverifiedEmailPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1550,6 +1770,54 @@ export type User$knowledgeBaseArticlesArgs<ExtArgs extends runtime.Types.Extensi
   take?: number
   skip?: number
   distinct?: Prisma.KnowledgeBaseArticleScalarFieldEnum | Prisma.KnowledgeBaseArticleScalarFieldEnum[]
+}
+
+/**
+ * User.emails
+ */
+export type User$emailsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserEmail
+   */
+  select?: Prisma.UserEmailSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserEmail
+   */
+  omit?: Prisma.UserEmailOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserEmailInclude<ExtArgs> | null
+  where?: Prisma.UserEmailWhereInput
+  orderBy?: Prisma.UserEmailOrderByWithRelationInput | Prisma.UserEmailOrderByWithRelationInput[]
+  cursor?: Prisma.UserEmailWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UserEmailScalarFieldEnum | Prisma.UserEmailScalarFieldEnum[]
+}
+
+/**
+ * User.unverifiedEmails
+ */
+export type User$unverifiedEmailsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UnverifiedEmail
+   */
+  select?: Prisma.UnverifiedEmailSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UnverifiedEmail
+   */
+  omit?: Prisma.UnverifiedEmailOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UnverifiedEmailInclude<ExtArgs> | null
+  where?: Prisma.UnverifiedEmailWhereInput
+  orderBy?: Prisma.UnverifiedEmailOrderByWithRelationInput | Prisma.UnverifiedEmailOrderByWithRelationInput[]
+  cursor?: Prisma.UnverifiedEmailWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UnverifiedEmailScalarFieldEnum | Prisma.UnverifiedEmailScalarFieldEnum[]
 }
 
 /**
