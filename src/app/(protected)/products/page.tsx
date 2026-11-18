@@ -1,24 +1,10 @@
 import { Suspense } from "react";
+import { PageLoadingFallback } from "@/components/layout/page-loading-fallback";
 import { ProductCatalog } from "@/components/products/product-catalog";
 import type { ProductStatus } from "@/lib/products/types";
 
 interface ProductsPageProps {
   searchParams: Promise<{ status?: string | string[] }>;
-}
-
-function ProductsFallback() {
-  return (
-    <main className="mx-auto flex h-full min-h-0 w-full flex-col overflow-hidden p-6">
-      <section className="flex min-h-0 flex-1 flex-col gap-6">
-        <div
-          className="flex min-h-64 flex-1 items-center justify-center text-xs font-medium text-muted-foreground"
-          role="status"
-        >
-          Loading products...
-        </div>
-      </section>
-    </main>
-  );
 }
 
 async function ProductsContent({ searchParams }: ProductsPageProps) {
@@ -32,7 +18,7 @@ async function ProductsContent({ searchParams }: ProductsPageProps) {
 
 export default function ProductsPage({ searchParams }: ProductsPageProps) {
   return (
-    <Suspense fallback={<ProductsFallback />}>
+    <Suspense fallback={<PageLoadingFallback message="Loading products..." />}>
       <ProductsContent searchParams={searchParams} />
     </Suspense>
   );
