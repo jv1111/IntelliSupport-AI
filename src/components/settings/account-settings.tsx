@@ -32,6 +32,11 @@ type ContactTarget = {
   destination: string;
 } | null;
 
+type RemovalTarget =
+  | { method: "email"; id: string; destination: string }
+  | { method: "phone"; destination: string }
+  | null;
+
 interface AccountSettingsProps {
   username: string;
   createdAt: Date;
@@ -48,14 +53,17 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
     setEmailMessage,
     sendVerificationEmail,
     verifyEmail,
-    removeEmailFromList,
+    deleteEmail,
+    deletingEmailId,
+    emailDeletionError,
+    clearEmailDeletionError,
   } = useAccountEmails();
   const [phones, setPhones] = useState<string[]>([]);
   const [verificationTarget, setVerificationTarget] =
     useState<ContactTarget>(null);
   const [shouldSendVerificationOnOpen, setShouldSendVerificationOnOpen] =
     useState(false);
-  const [removalTarget, setRemovalTarget] = useState<ContactTarget>(null);
+  const [removalTarget, setRemovalTarget] = useState<RemovalTarget>(null);
 
   const handleCloseVerificationDialog = useCallback(() => {
     setVerificationTarget(null);
@@ -63,16 +71,25 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
   }, []);
 
   const handleCloseRemovalDialog = useCallback(() => {
-    setRemovalTarget(null);
-  }, []);
+    if (deletingEmailId) {
+      return;
+    }
 
-  const handleConfirmRemoval = useCallback(() => {
+    clearEmailDeletionError();
+    setRemovalTarget(null);
+  }, [clearEmailDeletionError, deletingEmailId]);
+
+  const handleConfirmRemoval = useCallback(async () => {
     if (!removalTarget) {
       return;
     }
 
     if (removalTarget.method === "email") {
-      removeEmailFromList(removalTarget.destination);
+      const deleted = await deleteEmail(removalTarget.id);
+
+      if (!deleted) {
+        return;
+      }
     } else {
       setPhones((current) =>
         current.filter((item) => item !== removalTarget.destination),
@@ -80,7 +97,7 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
     }
 
     setRemovalTarget(null);
-  }, [removalTarget, removeEmailFromList]);
+  }, [deleteEmail, removalTarget]);
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [phoneMessage, setPhoneMessage] = useState("");
@@ -323,12 +340,14 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
                         variant="text"
                         type="button"
                         className="text-danger! hover:text-danger/80!"
-                        onClick={() =>
+                        onClick={() => {
+                          clearEmailDeletionError();
                           setRemovalTarget({
                             method: "email",
+                            id: item.id,
                             destination: item.email,
-                          })
-                        }
+                          });
+                        }}
                       >
                         Remove
                       </Button>
@@ -616,10 +635,17 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
             ? "Remove email address?"
             : "Remove phone number?"
         }
-        description={`${removalTarget?.destination ?? "This contact"} will be removed from this page preview.`}
+        description={
+          removalTarget?.method === "email"
+            ? `${removalTarget.destination} will be permanently removed from your account.`
+            : `${removalTarget?.destination ?? "This contact"} will be removed from this page preview.`
+        }
         confirmLabel="Remove"
+        pendingLabel="Removing..."
         variant="danger"
         icon={Trash2}
+        isPending={Boolean(deletingEmailId)}
+        error={removalTarget?.method === "email" ? emailDeletionError : null}
         onConfirm={handleConfirmRemoval}
         onCancel={handleCloseRemovalDialog}
       />

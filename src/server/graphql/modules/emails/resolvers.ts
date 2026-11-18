@@ -3,6 +3,7 @@ import { throwGraphQLError } from "@/server/graphql/shared/throw-graphql-error";
 
 import {
   addEmail,
+  deleteAccountEmail,
   EmailError,
   getAccountEmails,
   verifyEmail,
@@ -59,6 +60,22 @@ export const emailResolvers = {
         return await verifyEmail(user.id, args);
       } catch (error) {
         throwGraphQLError(error, "Unable to verify email.", [EmailError]);
+      }
+    },
+
+    deleteAccountEmail: async (
+      _parent: unknown,
+      args: { id: string },
+      context: GraphQLContext,
+    ): Promise<boolean> => {
+      const user = requireAuthenticatedUser(context);
+
+      try {
+        return await deleteAccountEmail(user.id, args.id);
+      } catch (error) {
+        throwGraphQLError(error, "Unable to delete email address.", [
+          EmailError,
+        ]);
       }
     },
   },

@@ -74,3 +74,19 @@ export async function verifyAccountEmail(
 
   return result.verifyEmail;
 }
+
+export async function deleteAccountEmail(id: string): Promise<boolean> {
+  const result = await graphqlRequest<
+    { deleteAccountEmail: boolean },
+    { id: string }
+  >(
+    `
+      mutation DeleteAccountEmail($id: ID!) {
+        deleteAccountEmail(id: $id)
+      }
+    `,
+    { id },
+  );
+
+  return result.deleteAccountEmail;
+}

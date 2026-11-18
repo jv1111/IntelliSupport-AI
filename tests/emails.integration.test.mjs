@@ -333,3 +333,200 @@ test("email verification lifecycle", async (t) => {
 
   assert.equal(expiredRecord.rowCount, 0);
 });
+
+test("authenticated users can delete their verified and pending email addresses", async (t) => {
+  assert.ok(username, "PRODUCT_TEST_USERNAME is required.");
+  assert.ok(password, "PRODUCT_TEST_PASSWORD is required.");
+  assert.ok(process.env.DATABASE_URL, "DATABASE_URL is required.");
+
+  const database = new Client({
+    connectionString: process.env.DATABASE_URL,
+  });
+
+  await database.connect();
+
+  const testEmails = [];
+  const testUserIds = [];
+  let cookie;
+
+  t.after(async () => {
+    try {
+      if (testEmails.length) {
+        await database.query(
+          'DELETE FROM "unverified_emails" WHERE email = ANY($1::varchar[])',
+          [testEmails],
+        );
+
+        await database.query(
+          'DELETE FROM "user_emails" WHERE email = ANY($1::varchar[])',
+          [testEmails],
+        );
+      }
+
+      if (testUserIds.length) {
+        await database.query('DELETE FROM "users" WHERE id = ANY($1::text[])', [
+          testUserIds,
+        ]);
+      }
+
+      if (cookie) {
+        const logout = await graphql(
+          `
+            mutation Logout {
+              logout
+            }
+          `,
+          {},
+          cookie,
+        );
+
+        assertSuccess(logout);
+      }
+    } finally {
+      await database.end();
+    }
+  });
+
+  const anonymousDelete = await graphql(
+    `
+      mutation DeleteAccountEmail($id: ID!) {
+        deleteAccountEmail(id: $id)
+      }
+    `,
+    { id: randomUUID() },
+  );
+
+  assertError(anonymousDelete, "UNAUTHENTICATED");
+
+  const login = await graphql(
+    `
+      mutation Login($input: LoginInput!) {
+        login(input: $input) {
+          id
+          username
+        }
+      }
+    `,
+    { input: { username, password } },
+  );
+
+  assertSuccess(login);
+  cookie = getSessionCookie(login.response);
+
+  const userId = login.payload.data.login.id;
+  const verifiedId = randomUUID();
+  const pendingId = randomUUID();
+  const foreignId = randomUUID();
+  const foreignUserId = randomUUID();
+
+  const verifiedEmail = `email-delete-verified-${randomUUID()}@example.com`;
+  const pendingEmail = `email-delete-pending-${randomUUID()}@example.com`;
+  const foreignEmail = `email-delete-foreign-${randomUUID()}@example.com`;
+
+  testEmails.push(verifiedEmail, pendingEmail, foreignEmail);
+  testUserIds.push(foreignUserId);
+
+  await database.query(
+    `
+      INSERT INTO "users" (
+        "id",
+        "username",
+        "passwordHash",
+        "createdAt",
+        "updatedAt"
+      )
+      VALUES ($1, $2, $3, NOW(), NOW())
+    `,
+    [
+      foreignUserId,
+      `email-delete-${randomUUID()}`,
+      "unused-integration-test-hash",
+    ],
+  );
+
+  await database.query(
+    `
+      INSERT INTO "user_emails" ("id", "email", "userId")
+      VALUES ($1, $2, $3), ($4, $5, $6)
+    `,
+    [verifiedId, verifiedEmail, userId, foreignId, foreignEmail, foreignUserId],
+  );
+
+  await database.query(
+    `
+      INSERT INTO "unverified_emails" (
+        "id",
+        "email",
+        "verificationCodeHash",
+        "expiresAt",
+        "userId"
+      )
+      VALUES ($1, $2, $3, $4, $5)
+    `,
+    [
+      pendingId,
+      pendingEmail,
+      "unused-integration-test-hash",
+      new Date(Date.now() + 15 * 60 * 1000),
+      userId,
+    ],
+  );
+
+  const foreignDelete = await graphql(
+    `
+      mutation DeleteAccountEmail($id: ID!) {
+        deleteAccountEmail(id: $id)
+      }
+    `,
+    { id: foreignId },
+    cookie,
+  );
+
+  assertError(foreignDelete, "EMAIL_NOT_FOUND");
+
+  const foreignRecord = await database.query(
+    'SELECT id FROM "user_emails" WHERE id = $1',
+    [foreignId],
+  );
+
+  assert.equal(foreignRecord.rowCount, 1);
+
+  for (const id of [verifiedId, pendingId]) {
+    const deleted = await graphql(
+      `
+        mutation DeleteAccountEmail($id: ID!) {
+          deleteAccountEmail(id: $id)
+        }
+      `,
+      { id },
+      cookie,
+    );
+
+    assertSuccess(deleted);
+    assert.equal(deleted.payload.data.deleteAccountEmail, true);
+  }
+
+  const remainingRecords = await database.query(
+    `
+      SELECT
+        (SELECT COUNT(*) FROM "user_emails" WHERE id = $1)::int AS verified_count,
+        (SELECT COUNT(*) FROM "unverified_emails" WHERE id = $2)::int AS pending_count
+    `,
+    [verifiedId, pendingId],
+  );
+
+  assert.equal(remainingRecords.rows[0].verified_count, 0);
+  assert.equal(remainingRecords.rows[0].pending_count, 0);
+
+  const deleteAgain = await graphql(
+    `
+      mutation DeleteAccountEmail($id: ID!) {
+        deleteAccountEmail(id: $id)
+      }
+    `,
+    { id: verifiedId },
+    cookie,
+  );
+
+  assertError(deleteAgain, "EMAIL_NOT_FOUND");
+});

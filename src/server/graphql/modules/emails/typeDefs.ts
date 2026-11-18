@@ -19,5 +19,6 @@ export const emailTypeDefs = `#graphql
   extend type Mutation {
     addEmail(email: String!): AccountEmail!
     verifyEmail(email: String!, code: String!): AccountEmail!
+    deleteAccountEmail(id: ID!): Boolean!
   }
 `;

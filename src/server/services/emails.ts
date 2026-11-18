@@ -170,6 +170,35 @@ export async function addEmail(userId: string, input: unknown) {
   };
 }
 
+export async function deleteAccountEmail(
+  userId: string,
+  emailId: string,
+): Promise<boolean> {
+  const deletedCount = await prisma.$transaction(async (transaction) => {
+    const verifiedEmail = await transaction.userEmail.deleteMany({
+      where: {
+        id: emailId,
+        userId,
+      },
+    });
+
+    const pendingEmail = await transaction.unverifiedEmail.deleteMany({
+      where: {
+        id: emailId,
+        userId,
+      },
+    });
+
+    return verifiedEmail.count + pendingEmail.count;
+  });
+
+  if (deletedCount === 0) {
+    throw new EmailError("EMAIL_NOT_FOUND", "Email address not found.");
+  }
+
+  return true;
+}
+
 export async function verifyEmail(userId: string, input: unknown) {
   const validationResult = verifyEmailSchema.safeParse(input);
 

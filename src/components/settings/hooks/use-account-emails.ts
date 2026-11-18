@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import {
   addAccountEmail,
+  deleteAccountEmail,
   fetchAccountEmails,
   verifyAccountEmail,
   type AccountEmail,
@@ -22,6 +23,10 @@ export function useAccountEmails() {
   const [emails, setEmails] = useState<AccountEmail[]>([]);
   const [isEmailsLoading, setIsEmailsLoading] = useState(true);
   const [emailMessage, setEmailMessage] = useState("");
+  const [deletingEmailId, setDeletingEmailId] = useState<string | null>(null);
+  const [emailDeletionError, setEmailDeletionError] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     let isActive = true;
@@ -69,8 +74,30 @@ export function useAccountEmails() {
     return verifiedEmail;
   }, []);
 
-  const removeEmailFromList = useCallback((email: string) => {
-    setEmails((current) => current.filter((item) => item.email !== email));
+  const deleteEmail = useCallback(async (emailId: string): Promise<boolean> => {
+    setDeletingEmailId(emailId);
+    setEmailDeletionError(null);
+
+    try {
+      await deleteAccountEmail(emailId);
+      setEmails((current) => current.filter((item) => item.id !== emailId));
+
+      return true;
+    } catch (error) {
+      setEmailDeletionError(
+        error instanceof Error
+          ? error.message
+          : "Unable to delete email address. Please try again.",
+      );
+
+      return false;
+    } finally {
+      setDeletingEmailId(null);
+    }
+  }, []);
+
+  const clearEmailDeletionError = useCallback(() => {
+    setEmailDeletionError(null);
   }, []);
 
   return {
@@ -80,6 +107,9 @@ export function useAccountEmails() {
     setEmailMessage,
     sendVerificationEmail,
     verifyEmail,
-    removeEmailFromList,
+    deleteEmail,
+    deletingEmailId,
+    emailDeletionError,
+    clearEmailDeletionError,
   };
 }
