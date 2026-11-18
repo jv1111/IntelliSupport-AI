@@ -120,7 +120,12 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
     setRemovalTarget(null);
   }, [deleteEmail, deletePhone, removalTarget]);
   const [email, setEmail] = useState("");
+  const [countryCode, setCountryCode] = useState("");
   const [phone, setPhone] = useState("");
+  const maxPhoneNumberLength = Math.max(
+    0,
+    15 - countryCode.replace(/\D/g, "").length,
+  );
 
   const initial = username.slice(0, 1).toUpperCase() || "U";
 
@@ -187,9 +192,10 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
     }
 
     const result = await sendVerificationPhone(verificationTarget.destination);
-    const currentPhone = phoneNumberSchema.safeParse(phone);
+    const currentPhone = phoneNumberSchema.safeParse(`${countryCode}${phone}`);
 
     if (currentPhone.success && currentPhone.data === result.phone) {
+      setCountryCode("");
       setPhone("");
     }
   }
@@ -197,7 +203,9 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
   function handleAddPhone(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const validationResult = phoneNumberSchema.safeParse(phone);
+    const validationResult = phoneNumberSchema.safeParse(
+      `${countryCode}${phone}`,
+    );
 
     if (!validationResult.success) {
       setPhoneMessage(
@@ -477,7 +485,9 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
                         <SuccessBadge label="Verified" />
                       ) : (
                         <>
-                          <InlineBadge variant="warning">Unverified</InlineBadge>
+                          <InlineBadge variant="warning">
+                            Unverified
+                          </InlineBadge>
                           <Button
                             variant="text"
                             type="button"
@@ -522,24 +532,68 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
 
             <form onSubmit={handleAddPhone} className="space-y-3">
               <div>
-                <FieldLabel htmlFor="account-phone" required>
-                  Add a phone number
-                </FieldLabel>
-                <Input
-                  id="account-phone"
-                  type="tel"
-                  autoComplete="tel"
-                  placeholder="+Country code and phone number"
-                  value={phone}
-                  onChange={(event) => {
-                    setPhone(event.target.value);
-                    setPhoneMessage("");
-                  }}
-                  required
-                  className="px-3.5 py-2.5"
-                />
+                <div className="grid grid-cols-[88px_minmax(0,1fr)] gap-3">
+                  <div>
+                    <FieldLabel htmlFor="account-phone-country-code" required>
+                      Code
+                    </FieldLabel>
+                    <Input
+                      id="account-phone-country-code"
+                      type="tel"
+                      inputMode="tel"
+                      autoComplete="tel-country-code"
+                      placeholder="+63"
+                      maxLength={4}
+                      value={countryCode}
+                      onChange={(event) => {
+                        const digits = event.target.value
+                          .replace(/\D/g, "")
+                          .slice(0, 3);
+                        const nextCountryCode = digits ? `+${digits}` : "";
+
+                        setCountryCode(nextCountryCode);
+                        setPhone((currentPhone) =>
+                          currentPhone.slice(
+                            0,
+                            Math.max(0, 15 - digits.length),
+                          ),
+                        );
+                        setPhoneMessage("");
+                      }}
+                      required
+                      className="w-full px-3 py-2.5"
+                    />
+                  </div>
+
+                  <div className="min-w-0">
+                    <FieldLabel htmlFor="account-phone-number" required>
+                      Phone number
+                    </FieldLabel>
+                    <Input
+                      id="account-phone-number"
+                      type="tel"
+                      inputMode="numeric"
+                      autoComplete="tel-national"
+                      placeholder="9171234567"
+                      maxLength={maxPhoneNumberLength}
+                      value={phone}
+                      onChange={(event) => {
+                        setPhone(
+                          event.target.value
+                            .replace(/\D/g, "")
+                            .slice(0, maxPhoneNumberLength),
+                        );
+                        setPhoneMessage("");
+                      }}
+                      required
+                      className="w-full px-3.5 py-2.5"
+                    />
+                  </div>
+                </div>
+
                 <p className="mt-1.5 text-xs text-muted-foreground">
-                  Include your country code.
+                  Enter your country calling code separately from your phone
+                  number.
                 </p>
               </div>
 
@@ -673,23 +727,21 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
         open={verificationTarget !== null}
         method={verificationTarget?.method ?? "email"}
         destination={verificationTarget?.destination ?? ""}
-        sendOnOpen={
-          shouldSendVerificationOnOpen
-        }
+        sendOnOpen={shouldSendVerificationOnOpen}
         onClose={handleCloseVerificationDialog}
         onVerify={
           verificationTarget?.method === "email"
-          ? handleVerifyEmail
-          : verificationTarget?.method === "phone"
-            ? handleVerifyPhone
-            : undefined
+            ? handleVerifyEmail
+            : verificationTarget?.method === "phone"
+              ? handleVerifyPhone
+              : undefined
         }
         onResend={
           verificationTarget?.method === "email"
-          ? handleResendEmail
-          : verificationTarget?.method === "phone"
-            ? handleResendPhone
-            : undefined
+            ? handleResendEmail
+            : verificationTarget?.method === "phone"
+              ? handleResendPhone
+              : undefined
         }
       />
 
