@@ -20,7 +20,7 @@ export interface PasswordChangeDialogState {
 type ChangePasswordResult =
   { success: true } | { success: false; code?: string };
 
-export function useAccountSettings() {
+export function useAccountPassword() {
   const router = useRouter();
 
   const [passwordDialog, setPasswordDialog] =

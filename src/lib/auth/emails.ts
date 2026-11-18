@@ -10,10 +10,6 @@ export interface AccountEmail {
   expiresAt: string | null;
 }
 
-export interface AddEmailResult extends AccountEmail {
-  verificationCode: string | null;
-}
-
 const ACCOUNT_EMAILS_QUERY = `
   query AccountEmails {
     accountEmails {
@@ -34,7 +30,6 @@ const ADD_EMAIL_MUTATION = `
       status
       verifiedAt
       expiresAt
-      verificationCode
     }
   }
 `;
@@ -59,9 +54,9 @@ export async function fetchAccountEmails(): Promise<AccountEmail[]> {
   return result.accountEmails;
 }
 
-export async function addAccountEmail(email: string): Promise<AddEmailResult> {
+export async function addAccountEmail(email: string): Promise<AccountEmail> {
   const result = await graphqlRequest<
-    { addEmail: AddEmailResult },
+    { addEmail: AccountEmail },
     { email: string }
   >(ADD_EMAIL_MUTATION, { email });
 

@@ -5,6 +5,7 @@ import { randomInt } from "node:crypto";
 import { addEmailSchema, verifyEmailSchema } from "@/lib/validations/email";
 import { formatValidationErrors } from "@/lib/validations/format-validation-errors";
 import { prisma } from "@/server/db/prisma";
+import { sendVerificationEmail } from "@/server/email/brevo";
 
 const VERIFICATION_CODE_DURATION_MS = 15 * 60 * 1000;
 
@@ -155,14 +156,17 @@ export async function addEmail(userId: string, input: unknown) {
     },
   );
 
+  await sendVerificationEmail({
+    recipientEmail: pendingEmail.email,
+    verificationCode,
+  });
+
   return {
     id: pendingEmail.id,
     email: pendingEmail.email,
     status: "UNVERIFIED" as const,
     verifiedAt: null,
     expiresAt: pendingEmail.expiresAt,
-    verificationCode:
-      process.env.NODE_ENV === "development" ? verificationCode : null,
   };
 }
 

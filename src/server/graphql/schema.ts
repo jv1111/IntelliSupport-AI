@@ -43,7 +43,6 @@ export const resolvers = {
 
   User: authResolvers.User,
   AccountEmail: emailResolvers.AccountEmail,
-  AddEmailResult: emailResolvers.AddEmailResult,
   Product: productResolvers.Product,
   KnowledgeBaseArticle: knowledgeBaseResolvers.KnowledgeBaseArticle,
 };

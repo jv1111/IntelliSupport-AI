@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useCallback, useState, type FormEvent } from "react";
 import { Form, Formik, type FormikHelpers } from "formik";
 import { KeyRound, Lock, Mail, Phone, ShieldCheck, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,15 +12,10 @@ import { InlineBadge } from "@/components/ui/inline-badge";
 import { Input } from "@/components/ui/input";
 import { SuccessBadge } from "@/components/ui/success-badge";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
-import { VerificationDialog } from "@/components/settings/verification-dialog";
+import { VerificationDialog } from "@/components/ui/verification-dialog";
 import { StatusDialog } from "@/components/ui/status-dialog";
-import { useAccountSettings } from "@/components/settings/hooks/use-account-settings";
-import {
-  addAccountEmail,
-  fetchAccountEmails,
-  verifyAccountEmail,
-  type AccountEmail,
-} from "@/lib/auth/emails";
+import { useAccountPassword } from "@/components/settings/hooks/use-account-password";
+import { useAccountEmails } from "@/components/settings/hooks/use-account-emails";
 import {
   validateChangePassword,
   type ChangePasswordFormValues,
@@ -44,17 +39,27 @@ interface AccountSettingsProps {
 
 export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
   const { passwordDialog, changePassword, closePasswordDialog } =
-    useAccountSettings();
+    useAccountPassword();
 
-  const [emails, setEmails] = useState<AccountEmail[]>([]);
-  const [isEmailsLoading, setIsEmailsLoading] = useState(true);
+  const {
+    emails,
+    isEmailsLoading,
+    emailMessage,
+    setEmailMessage,
+    sendVerificationEmail,
+    verifyEmail,
+    removeEmailFromList,
+  } = useAccountEmails();
   const [phones, setPhones] = useState<string[]>([]);
   const [verificationTarget, setVerificationTarget] =
     useState<ContactTarget>(null);
+  const [shouldSendVerificationOnOpen, setShouldSendVerificationOnOpen] =
+    useState(false);
   const [removalTarget, setRemovalTarget] = useState<ContactTarget>(null);
 
   const handleCloseVerificationDialog = useCallback(() => {
     setVerificationTarget(null);
+    setShouldSendVerificationOnOpen(false);
   }, []);
 
   const handleCloseRemovalDialog = useCallback(() => {
@@ -67,9 +72,7 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
     }
 
     if (removalTarget.method === "email") {
-      setEmails((current) =>
-        current.filter((item) => item.email !== removalTarget.destination),
-      );
+      removeEmailFromList(removalTarget.destination);
     } else {
       setPhones((current) =>
         current.filter((item) => item !== removalTarget.destination),
@@ -77,40 +80,10 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
     }
 
     setRemovalTarget(null);
-  }, [removalTarget]);
+  }, [removalTarget, removeEmailFromList]);
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [emailMessage, setEmailMessage] = useState("");
   const [phoneMessage, setPhoneMessage] = useState("");
-
-  useEffect(() => {
-    let isActive = true;
-
-    fetchAccountEmails()
-      .then((items) => {
-        if (isActive) {
-          setEmails(items);
-        }
-      })
-      .catch((error) => {
-        if (isActive) {
-          setEmailMessage(
-            error instanceof Error
-              ? error.message
-              : "Unable to load email addresses.",
-          );
-        }
-      })
-      .finally(() => {
-        if (isActive) {
-          setIsEmailsLoading(false);
-        }
-      });
-
-    return () => {
-      isActive = false;
-    };
-  }, []);
 
   const initial = username.slice(0, 1).toUpperCase() || "U";
 
@@ -131,37 +104,16 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
     },
   ];
 
-  async function handleAddEmail(
-    event: FormEvent<HTMLFormElement>,
-  ): Promise<void> {
+  function handleAddEmail(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
 
     const value = email.trim().toLowerCase();
     setEmailMessage("");
-
-    try {
-      const result = await addAccountEmail(value);
-
-      setEmails((current) => [
-        result,
-        ...current.filter((item) => item.email !== value),
-      ]);
-      setEmail("");
-      setEmailMessage("Verification code generated.");
-
-      if (result.verificationCode) {
-        console.log("Email verification code:", result.verificationCode);
-      }
-
-      setVerificationTarget({
-        method: "email",
-        destination: value,
-      });
-    } catch (error) {
-      setEmailMessage(
-        error instanceof Error ? error.message : "Unable to add email address.",
-      );
-    }
+    setShouldSendVerificationOnOpen(true);
+    setVerificationTarget({
+      method: "email",
+      destination: value,
+    });
   }
 
   async function handleVerifyEmail(code: string): Promise<void> {
@@ -169,16 +121,7 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
       return;
     }
 
-    const verifiedEmail = await verifyAccountEmail(
-      verificationTarget.destination,
-      code,
-    );
-
-    setEmails((current) => [
-      verifiedEmail,
-      ...current.filter((item) => item.email !== verifiedEmail.email),
-    ]);
-    setEmailMessage("Email address verified successfully.");
+    await verifyEmail(verificationTarget.destination, code);
   }
 
   async function handleResendEmail(): Promise<void> {
@@ -186,15 +129,10 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
       return;
     }
 
-    const result = await addAccountEmail(verificationTarget.destination);
+    const result = await sendVerificationEmail(verificationTarget.destination);
 
-    setEmails((current) => [
-      result,
-      ...current.filter((item) => item.email !== result.email),
-    ]);
-
-    if (result.verificationCode) {
-      console.log("Email verification code:", result.verificationCode);
+    if (email.trim().toLowerCase() === result.email) {
+      setEmail("");
     }
   }
 
@@ -369,12 +307,13 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
                           <Button
                             variant="text"
                             type="button"
-                            onClick={() =>
+                            onClick={() => {
+                              setShouldSendVerificationOnOpen(true);
                               setVerificationTarget({
                                 method: "email",
                                 destination: item.email,
-                              })
-                            }
+                              });
+                            }}
                           >
                             Verify
                           </Button>
@@ -383,7 +322,7 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
                       <Button
                         variant="text"
                         type="button"
-                        className="!text-danger hover:!text-danger/80"
+                        className="text-danger! hover:text-danger/80!"
                         onClick={() =>
                           setRemovalTarget({
                             method: "email",
@@ -483,7 +422,7 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
                       <Button
                         variant="text"
                         type="button"
-                        className="!text-danger hover:!text-danger/80"
+                        className="text-danger! hover:text-danger/80!"
                         onClick={() =>
                           setRemovalTarget({
                             method: "phone",
@@ -654,9 +593,13 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
       </main>
 
       <VerificationDialog
+        key={`${verificationTarget?.method ?? "none"}:${verificationTarget?.destination ?? ""}`}
         open={verificationTarget !== null}
         method={verificationTarget?.method ?? "email"}
         destination={verificationTarget?.destination ?? ""}
+        sendOnOpen={
+          shouldSendVerificationOnOpen && verificationTarget?.method === "email"
+        }
         onClose={handleCloseVerificationDialog}
         onVerify={
           verificationTarget?.method === "email" ? handleVerifyEmail : undefined

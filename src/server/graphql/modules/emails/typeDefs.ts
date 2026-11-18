@@ -12,21 +12,12 @@ export const emailTypeDefs = `#graphql
     expiresAt: String
   }
 
-  type AddEmailResult {
-    id: ID!
-    email: String!
-    status: AccountEmailStatus!
-    verifiedAt: String
-    expiresAt: String
-    verificationCode: String
-  }
-
   extend type Query {
     accountEmails: [AccountEmail!]!
   }
 
   extend type Mutation {
-    addEmail(email: String!): AddEmailResult!
+    addEmail(email: String!): AccountEmail!
     verifyEmail(email: String!, code: String!): AccountEmail!
   }
 `;

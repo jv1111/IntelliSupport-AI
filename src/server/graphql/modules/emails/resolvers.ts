@@ -12,8 +12,6 @@ import type { GraphQLContext } from "@/server/graphql/context";
 
 type AccountEmailResult = Awaited<ReturnType<typeof getAccountEmails>>[number];
 
-type AddEmailResult = Awaited<ReturnType<typeof addEmail>>;
-
 export const emailResolvers = {
   Query: {
     accountEmails: async (
@@ -38,13 +36,15 @@ export const emailResolvers = {
       _parent: unknown,
       args: { email: string },
       context: GraphQLContext,
-    ): Promise<AddEmailResult> => {
+    ): Promise<AccountEmailResult> => {
       const user = requireAuthenticatedUser(context);
 
       try {
         return await addEmail(user.id, args);
       } catch (error) {
-        throwGraphQLError(error, "Unable to add email.", [EmailError]);
+        throwGraphQLError(error, "Unable to send verification email.", [
+          EmailError,
+        ]);
       }
     },
 
@@ -67,12 +67,6 @@ export const emailResolvers = {
     verifiedAt: (parent: AccountEmailResult) =>
       parent.verifiedAt?.toISOString() ?? null,
     expiresAt: (parent: AccountEmailResult) =>
-      parent.expiresAt?.toISOString() ?? null,
-  },
-
-  AddEmailResult: {
-    verifiedAt: () => null,
-    expiresAt: (parent: AddEmailResult) =>
       parent.expiresAt?.toISOString() ?? null,
   },
 };
