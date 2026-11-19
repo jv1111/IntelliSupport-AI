@@ -1,5 +1,5 @@
-import { PagePlaceholder } from "@/components/layout/page-placeholder";
+import { BotManager } from "@/components/bot-manager/bot-manager";
 
 export default function BotManagerPage() {
-  return <PagePlaceholder title="Bot Manager" />;
+  return <BotManager />;
 }
