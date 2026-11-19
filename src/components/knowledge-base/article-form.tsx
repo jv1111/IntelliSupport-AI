@@ -1,11 +1,12 @@
 "use client";
 
 import { useRef, useState, type FormEvent } from "react";
-import { Archive, ArrowLeft } from "lucide-react";
+import { Archive } from "lucide-react";
 import type {
   ArticleCategoryTag,
   ArticleScope,
 } from "@/generated/prisma/enums";
+import { BackButton } from "@/components/ui/back-button";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { FieldLabel, fieldControlStyles } from "@/components/ui/field";
@@ -87,15 +88,11 @@ export function ArticleForm({
     >
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-4">
         <div className="flex min-w-0 items-center gap-3">
-          <Button
-            variant="text"
-            aria-label="Back to Knowledge Base"
+          <BackButton
             onClick={onCancel}
+            ariaLabel="Back to Knowledge Base"
             disabled={isSaving}
-            className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-border bg-surface text-muted-foreground no-underline hover:bg-surface-muted hover:no-underline"
-          >
-            <ArrowLeft className="size-4" aria-hidden="true" />
-          </Button>
+          />
 
           <div>
             <h1 className="text-base font-bold text-foreground">

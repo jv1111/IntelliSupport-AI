@@ -7,7 +7,8 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { Archive, ArrowLeft } from "lucide-react";
+import { Archive } from "lucide-react";
+import { BackButton } from "@/components/ui/back-button";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -220,14 +221,7 @@ export function ProductForm({
     <section className="w-full space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-4">
         <div className="flex min-w-0 items-center gap-3">
-          <Button
-            variant="text"
-            onClick={onCancel}
-            aria-label="Back to products"
-            className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-border bg-surface text-muted-foreground no-underline hover:bg-surface-muted hover:no-underline"
-          >
-            <ArrowLeft className="size-4" aria-hidden="true" />
-          </Button>
+          <BackButton onClick={onCancel} ariaLabel="Back to products" />
 
           <div>
             <h1 className="text-base font-bold text-foreground">

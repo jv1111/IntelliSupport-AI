@@ -1,5 +1,5 @@
 import { ArrowDown, ArrowUp, Layers, Plus, Trash2 } from "lucide-react";
-import { ViewBackButton } from "./view-back-button";
+import { BackButton } from "@/components/ui/back-button";
 import { AutoReplyQuestionCard } from "@/components/bot-manager/auto-reply-question-card";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -56,7 +56,7 @@ export function QuestionsView({
     <>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
         <div className="flex min-w-0 items-center gap-3">
-          <ViewBackButton onClick={onBack} ariaLabel="Back to products" />
+          <BackButton onClick={onBack} ariaLabel="Back to products" />
 
           <div className="min-w-0">
             <h2 className="text-base font-bold text-foreground">

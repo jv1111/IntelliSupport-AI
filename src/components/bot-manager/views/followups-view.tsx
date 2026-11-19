@@ -1,5 +1,5 @@
 import { Layers } from "lucide-react";
-import { ViewBackButton } from "./view-back-button";
+import { BackButton } from "@/components/ui/back-button";
 import { AutoReplyQuestionCard } from "@/components/bot-manager/auto-reply-question-card";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -42,7 +42,7 @@ export function FollowupsView({
     <>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
         <div className="flex min-w-0 items-center gap-3">
-          <ViewBackButton onClick={onBack} ariaLabel="Back to questions" />
+          <BackButton onClick={onBack} ariaLabel="Back to questions" />
 
           <div className="min-w-0">
             <p className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">

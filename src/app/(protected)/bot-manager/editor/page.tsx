@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { PageLoadingFallback } from "@/components/layout/page-loading-fallback";
-import { BotManager } from "@/components/bot-manager/bot-manager";
+import { ProductAutoReplies } from "@/components/bot-manager/product-auto-replies";
 import { initialBotProducts } from "@/components/bot-manager/data";
 
 interface BotManagerEditorPageProps {
@@ -20,7 +20,7 @@ async function BotManagerEditorContent({
     notFound();
   }
 
-  return <BotManager productId={productId} />;
+  return <ProductAutoReplies productId={productId} />;
 }
 
 export default function BotManagerEditorPage({

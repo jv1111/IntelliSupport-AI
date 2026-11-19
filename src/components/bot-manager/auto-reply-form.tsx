@@ -1,5 +1,6 @@
 import type { FormEvent } from "react";
-import { ArrowLeft, Save } from "lucide-react";
+import { Save } from "lucide-react";
+import { BackButton } from "@/components/ui/back-button";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { FieldLabel, fieldControlStyles } from "@/components/ui/field";
@@ -35,13 +36,7 @@ export function AutoReplyForm({
     <form onSubmit={onSubmit} className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-4">
         <div className="flex min-w-0 items-center gap-3">
-          <Button
-            variant="icon-surface"
-            aria-label="Go back"
-            onClick={onCancel}
-          >
-            <ArrowLeft className="size-4" aria-hidden="true" />
-          </Button>
+          <BackButton onClick={onCancel} ariaLabel="Go back" />
 
           <div>
             <h2 className="text-base font-bold text-foreground">{title}</h2>
