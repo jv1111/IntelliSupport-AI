@@ -2,9 +2,9 @@
 
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
-import { initialBotProducts } from "@/components/bot-manager/data";
 import { MAX_GROUP_QUESTIONS } from "@/components/bot-manager/constants";
 import { useBotManagerState } from "@/components/bot-manager/bot-manager-provider";
+import { useBotManagerProducts } from "@/components/bot-manager/hooks/use-bot-manager-products";
 import { useAutoReplyActions } from "@/components/bot-manager/hooks/use-auto-reply-actions";
 import { useAutoReplyForm } from "@/components/bot-manager/hooks/use-auto-reply-form";
 import type { AutoReply, BotManagerView } from "@/components/bot-manager/types";
@@ -12,6 +12,9 @@ import type { AutoReply, BotManagerView } from "@/components/bot-manager/types";
 export function useProductAutoReplies(productId: string) {
   const router = useRouter();
   const { groups, replies } = useBotManagerState();
+
+  const { products, productsLoading, productsError, refreshProducts } =
+    useBotManagerProducts();
 
   const [view, setView] = useState<BotManagerView>("questions");
   const [selectedProductId, setSelectedProductId] = useState<string | null>(
@@ -36,7 +39,7 @@ export function useProductAutoReplies(productId: string) {
     onSelectedParentDeleted: handleSelectedParentDeleted,
   });
 
-  const product = initialBotProducts.find((item) => item.id === productId);
+  const product = products.find((item) => item.id === productId);
 
   const productGroups = groups.filter((group) => group.productId === productId);
 
@@ -91,6 +94,9 @@ export function useProductAutoReplies(productId: string) {
   return {
     view,
     product,
+    productsLoading,
+    productsError,
+    retryProducts: refreshProducts,
     questions: {
       groups: questionsViewGroups,
       maxQuestions: MAX_GROUP_QUESTIONS,
@@ -110,7 +116,7 @@ export function useProductAutoReplies(productId: string) {
     form: {
       title: formTitle,
       values: form.formValues,
-      products: initialBotProducts,
+      products,
       groups: form.formGroups,
       isFollowUp: Boolean(form.formParentId),
       parentQuestion,

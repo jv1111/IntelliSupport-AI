@@ -2,8 +2,8 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { initialBotProducts } from "@/components/bot-manager/data";
 import { useBotManagerState } from "@/components/bot-manager/bot-manager-provider";
+import { useBotManagerProducts } from "@/components/bot-manager/hooks/use-bot-manager-products";
 
 export function useBotManagerCatalog() {
   const router = useRouter();
@@ -15,24 +15,31 @@ export function useBotManagerCatalog() {
     replies,
   } = useBotManagerState();
 
+  const {
+    products: catalogProducts,
+    productsLoading,
+    productsError,
+    refreshProducts,
+  } = useBotManagerProducts();
+
   const [search, setSearch] = useState("");
 
   const products = useMemo(() => {
     const query = search.trim().toLowerCase();
 
-    return initialBotProducts
+    return catalogProducts
       .filter(
         (product) =>
           !query ||
           product.name.toLowerCase().includes(query) ||
-          product.model.toLowerCase().includes(query),
+          product.sku.toLowerCase().includes(query),
       )
       .map((product) => ({
         product,
         questionCount: replies.filter((reply) => reply.productId === product.id)
           .length,
       }));
-  }, [replies, search]);
+  }, [catalogProducts, replies, search]);
 
   const openNewAutoReply = useCallback(() => {
     router.push("/bot-manager/new");
@@ -51,6 +58,9 @@ export function useBotManagerCatalog() {
     aiEnabled,
     autoRepliesEnabled,
     products,
+    productsLoading,
+    productsError,
+    retryProducts: refreshProducts,
     search,
     setSearch,
     setAiEnabled,

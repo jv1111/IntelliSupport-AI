@@ -2,12 +2,14 @@
 
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
-import { initialBotProducts } from "@/components/bot-manager/data";
+import { useBotManagerProducts } from "@/components/bot-manager/hooks/use-bot-manager-products";
 import { useAutoReplyForm } from "@/components/bot-manager/hooks/use-auto-reply-form";
 import type { BotManagerView } from "@/components/bot-manager/types";
 
 export function useAutoReplyEditor() {
   const router = useRouter();
+  const { products, productsLoading, productsError, refreshProducts } =
+    useBotManagerProducts();
 
   const [selectedProductId, setSelectedProductId] = useState<string | null>(
     null,
@@ -30,7 +32,10 @@ export function useAutoReplyEditor() {
   return {
     title: "Add Auto Reply",
     values: form.formValues,
-    products: initialBotProducts,
+    products,
+    productsLoading,
+    productsError,
+    retryProducts: refreshProducts,
     groups: form.formGroups,
     isFollowUp: false,
     parentQuestion: null,

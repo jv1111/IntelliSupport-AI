@@ -1,31 +1,4 @@
-import type { AutoReply, AutoReplyGroup, BotProduct } from "./types";
-
-export const initialBotProducts: BotProduct[] = [
-  {
-    id: "PROD-101",
-    name: "Smart Wi-Fi Router X200",
-    model: "WR-X200-PRO",
-    description:
-      "Dual-band Gigabit Smart Router featuring mesh coverage up to 2500 sq ft and AI-powered bandwidth optimization.",
-    visual: "router",
-  },
-  {
-    id: "PROD-102",
-    name: "Outdoor Security Cam 4K",
-    model: "CAM-4K-OUTDOOR",
-    description:
-      "Weatherproof 4K solar-assisted security camera with color night vision and two-way audio setup.",
-    visual: "camera",
-  },
-  {
-    id: "PROD-103",
-    name: "Smart Doorbell Pro",
-    model: "DOOR-BELL-PRO",
-    description:
-      "1080p HD Video Doorbell with customizable motion zones and quick chime pairing.",
-    visual: "doorbell",
-  },
-];
+import type { AutoReply, AutoReplyGroup } from "./types";
 
 export const initialAutoReplyGroups: AutoReplyGroup[] = [
   {

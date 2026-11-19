@@ -4,11 +4,8 @@ import { AutoReplyQuestionCard } from "@/components/bot-manager/auto-reply-quest
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
-import type {
-  AutoReply,
-  AutoReplyGroup,
-  BotProduct,
-} from "@/components/bot-manager/types";
+import type { AutoReply, AutoReplyGroup } from "@/components/bot-manager/types";
+import type { Product } from "@/lib/products/types";
 
 interface QuestionsViewReply {
   reply: AutoReply;
@@ -22,7 +19,7 @@ interface QuestionsViewGroup {
 }
 
 interface QuestionsViewProps {
-  product: BotProduct;
+  product: Product;
   groups: QuestionsViewGroup[];
   maxGroupQuestions: number;
   onBack: () => void;
@@ -63,7 +60,7 @@ export function QuestionsView({
               {product.name}
             </h2>
             <p className="mt-0.5 font-mono text-[10px] text-muted-foreground">
-              {product.model}
+              {product.sku}
             </p>
           </div>
         </div>

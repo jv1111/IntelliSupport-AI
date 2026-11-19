@@ -5,12 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { FieldLabel, fieldControlStyles } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import type { AutoReplyFormValues, AutoReplyGroup, BotProduct } from "./types";
+import type { AutoReplyFormValues, AutoReplyGroup } from "./types";
+import type { Product } from "@/lib/products/types";
 
 interface AutoReplyFormProps {
   title: string;
   values: AutoReplyFormValues;
-  products: BotProduct[];
+  products: Product[];
   groups: AutoReplyGroup[];
   isFollowUp: boolean;
   parentQuestion: string | null;
@@ -98,7 +99,7 @@ export function AutoReplyForm({
                 <option value="">Select a product</option>
                 {products.map((product) => (
                   <option key={product.id} value={product.id}>
-                    {product.name} ({product.model})
+                    {product.name} ({product.sku})
                   </option>
                 ))}
               </select>

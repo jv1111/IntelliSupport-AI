@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SearchInput } from "@/components/ui/search-input";
-import type { BotProduct } from "@/components/bot-manager/types";
+import type { Product } from "@/lib/products/types";
 
 interface ProductsViewItem {
-  product: BotProduct;
+  product: Product;
   questionCount: number;
 }
 
@@ -16,7 +16,10 @@ interface ProductsViewProps {
   aiEnabled: boolean;
   autoRepliesEnabled: boolean;
   products: ProductsViewItem[];
+  isLoading: boolean;
+  productsError: string | null;
   search: string;
+  onRetry: () => void;
   onAiEnabledChange: (enabled: boolean) => void;
   onAutoRepliesEnabledChange: (enabled: boolean) => void;
   onAddAutoReply: () => void;
@@ -28,7 +31,10 @@ export function ProductsView({
   aiEnabled,
   autoRepliesEnabled,
   products,
+  isLoading,
+  productsError,
   search,
+  onRetry,
   onAiEnabledChange,
   onAutoRepliesEnabledChange,
   onAddAutoReply,
@@ -135,7 +141,28 @@ export function ProductsView({
             autoRepliesEnabled ? "" : "opacity-50"
           }`}
         >
-          {products.length > 0 ? (
+          {productsError ? (
+            <div
+              role="alert"
+              className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-danger/20 bg-danger/5 p-4 text-xs text-danger"
+            >
+              <span>{productsError}</span>
+              <Button
+                variant="text"
+                onClick={onRetry}
+                className="text-danger hover:text-danger"
+              >
+                Try again
+              </Button>
+            </div>
+          ) : isLoading ? (
+            <div
+              className="flex min-h-48 items-center justify-center text-xs font-medium text-muted-foreground"
+              role="status"
+            >
+              Loading products...
+            </div>
+          ) : products.length > 0 ? (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {products.map(({ product, questionCount }) => (
                 <AutoReplyProductCard
@@ -150,16 +177,22 @@ export function ProductsView({
             <EmptyState
               variant="card"
               icon={Layers}
-              title="No products found"
-              description="Try another product name or model number."
+              title={search.trim() ? "No products found" : "No products yet"}
+              description={
+                search.trim()
+                  ? "Try another product name or SKU."
+                  : "Add a product to your catalog to configure automatic replies."
+              }
               action={
-                <Button
-                  variant="text"
-                  onClick={() => onSearchChange("")}
-                  className="mt-3"
-                >
-                  Clear Search
-                </Button>
+                search.trim() ? (
+                  <Button
+                    variant="text"
+                    onClick={() => onSearchChange("")}
+                    className="mt-3"
+                  >
+                    Clear Search
+                  </Button>
+                ) : undefined
               }
             />
           )}

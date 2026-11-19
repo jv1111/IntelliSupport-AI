@@ -1,11 +1,3 @@
-export interface BotProduct {
-  id: string;
-  name: string;
-  model: string;
-  description: string;
-  visual: "router" | "camera" | "doorbell";
-}
-
 export interface AutoReplyGroup {
   id: string;
   productId: string;

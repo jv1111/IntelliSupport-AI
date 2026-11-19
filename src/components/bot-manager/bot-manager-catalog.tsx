@@ -8,6 +8,9 @@ export function BotManagerCatalog() {
     aiEnabled,
     autoRepliesEnabled,
     products,
+    productsLoading,
+    productsError,
+    retryProducts,
     search,
     setSearch,
     setAiEnabled,
@@ -22,6 +25,9 @@ export function BotManagerCatalog() {
         aiEnabled={aiEnabled}
         autoRepliesEnabled={autoRepliesEnabled}
         products={products}
+        isLoading={productsLoading}
+        productsError={productsError}
+        onRetry={retryProducts}
         search={search}
         onAiEnabledChange={setAiEnabled}
         onAutoRepliesEnabledChange={setAutoRepliesEnabled}

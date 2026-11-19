@@ -1,26 +1,19 @@
-import { Camera, DoorOpen, Router } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import type { BotProduct } from "./types";
+import { ProductImage } from "@/components/products/product-image";
+import { ProductImagePlaceholder } from "@/components/products/product-image-placeholder";
+import type { Product } from "@/lib/products/types";
 
 interface AutoReplyProductCardProps {
-  product: BotProduct;
+  product: Product;
   questionCount: number;
   onSelect: () => void;
 }
-
-const productIcons = {
-  router: Router,
-  camera: Camera,
-  doorbell: DoorOpen,
-};
 
 export function AutoReplyProductCard({
   product,
   questionCount,
   onSelect,
 }: AutoReplyProductCardProps) {
-  const Icon = productIcons[product.visual];
-
   return (
     <Card variant="interactive" className="h-full">
       <button
@@ -28,10 +21,17 @@ export function AutoReplyProductCard({
         onClick={onSelect}
         className="block w-full text-left"
       >
-        <div className="flex h-36 items-center justify-center bg-linear-to-br from-primary/10 via-secondary/10 to-accent/10">
-          <div className="flex size-16 items-center justify-center rounded-2xl border border-white/70 bg-surface/80 text-primary shadow-sm">
-            <Icon className="size-8" aria-hidden="true" />
-          </div>
+        <div className="relative aspect-4/3 overflow-hidden bg-surface-muted">
+          {product.imageUrl ? (
+            <ProductImage
+              src={product.imageUrl}
+              alt={product.name}
+              sizes="(min-width: 1280px) 33vw, (min-width: 640px) 50vw, 100vw"
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+          ) : (
+            <ProductImagePlaceholder />
+          )}
         </div>
 
         <div className="flex items-center justify-between gap-3 p-4">
@@ -40,7 +40,10 @@ export function AutoReplyProductCard({
               {product.name}
             </h3>
             <p className="mt-1 font-mono text-[10px] text-muted-foreground">
-              {product.model}
+              {product.sku}
+            </p>
+            <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+              {product.description}
             </p>
           </div>
 
