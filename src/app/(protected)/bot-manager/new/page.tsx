@@ -1,5 +1,5 @@
-import { AutoReplyEditor } from "@/components/bot-manager/auto-reply-editor";
+import { QuestionEditor } from "@/components/bot-manager/question-editor";
 
 export default function NewAutoReplyPage() {
-  return <AutoReplyEditor />;
+  return <QuestionEditor />;
 }

@@ -1,5 +1,5 @@
-import { BotManagerCatalog } from "@/components/bot-manager/bot-manager-catalog";
+import { BotManager } from "@/components/bot-manager/bot-manager";
 
 export default function BotManagerPage() {
-  return <BotManagerCatalog />;
+  return <BotManager />;
 }

@@ -33,7 +33,7 @@ const pageHeaders: Record<string, PageHeaderContent> = {
   },
   "/bot-manager": {
     title: "Bot Manager",
-    description: "Enable AI support and set instant automatic replies.",
+    description: "",
   },
   "/playground": {
     title: "Playground",
@@ -82,9 +82,11 @@ export function AppHeader({ onMenuClick }: AppHeaderProps) {
           <p className="truncate text-sm font-bold tracking-tight text-foreground">
             {pageHeader.title}
           </p>
-          <p className="truncate text-xs text-muted-foreground">
-            {pageHeader.description}
-          </p>
+          {pageHeader.description ? (
+            <p className="truncate text-xs text-muted-foreground">
+              {pageHeader.description}
+            </p>
+          ) : null}
         </div>
       </div>
 

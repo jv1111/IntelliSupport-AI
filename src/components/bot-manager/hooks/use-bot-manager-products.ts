@@ -1,55 +1,35 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { DEFAULT_PAGE_SIZE } from "@/lib/pagination";
-import { fetchProducts } from "@/lib/products";
+import { fetchAllProducts } from "@/lib/products";
 import type { Product } from "@/lib/products/types";
 
-export function useBotManagerProducts() {
+export function useBotManagerProducts(enabled = true) {
   const [products, setProducts] = useState<Product[]>([]);
-  const [productsLoading, setProductsLoading] = useState(true);
-  const [productsError, setProductsError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(enabled);
+  const [error, setError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
-  const refreshProducts = useCallback(() => {
-    setRefreshKey((current) => current + 1);
-  }, []);
-
   useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+
     let cancelled = false;
 
     async function loadProducts() {
-      setProductsLoading(true);
-      setProductsError(null);
+      setIsLoading(true);
+      setError(null);
 
       try {
-        const allProducts: Product[] = [];
-        let page = 1;
-        let hasNextPage = true;
-
-        while (hasNextPage) {
-          const result = await fetchProducts({
-            page,
-            limit: DEFAULT_PAGE_SIZE,
-            search: null,
-            status: null,
-          });
-
-          if (cancelled) {
-            return;
-          }
-
-          allProducts.push(...result.items);
-          hasNextPage = result.hasNextPage;
-          page += 1;
-        }
+        const result = await fetchAllProducts();
 
         if (!cancelled) {
-          setProducts(allProducts);
+          setProducts(result);
         }
       } catch (error) {
         if (!cancelled) {
-          setProductsError(
+          setError(
             error instanceof Error
               ? error.message
               : "Unable to load products. Please try again.",
@@ -57,7 +37,7 @@ export function useBotManagerProducts() {
         }
       } finally {
         if (!cancelled) {
-          setProductsLoading(false);
+          setIsLoading(false);
         }
       }
     }
@@ -67,12 +47,16 @@ export function useBotManagerProducts() {
     return () => {
       cancelled = true;
     };
-  }, [refreshKey]);
+  }, [enabled, refreshKey]);
+
+  const retry = useCallback(() => {
+    setRefreshKey((current) => current + 1);
+  }, []);
 
   return {
     products,
-    productsLoading,
-    productsError,
-    refreshProducts,
+    isLoading,
+    error,
+    retry,
   };
 }

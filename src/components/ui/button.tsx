@@ -5,6 +5,7 @@ type ButtonVariant =
   | "secondary"
   | "danger"
   | "danger-subtle"
+  | "primary-subtle"
   | "icon-surface"
   | "text"
   | "icon"
@@ -33,6 +34,9 @@ const variantStyles: Record<ButtonVariant, string> = {
 
   "danger-subtle":
     "rounded-xl bg-danger/5 text-xs text-danger inset-ring-1 inset-ring-danger/30 hover:bg-danger/10",
+
+  "primary-subtle":
+    "rounded-xl bg-primary/5 text-xs text-primary inset-ring-1 inset-ring-primary/30 hover:bg-primary/10",
 
   text: "rounded-sm text-[11px] text-primary hover:text-primary-hover hover:underline",
 

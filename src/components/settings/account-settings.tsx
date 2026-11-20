@@ -431,7 +431,6 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
                     setEmailMessage("");
                   }}
                   required
-                  className="px-3.5 py-2.5"
                 />
               </div>
 
@@ -561,7 +560,7 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
                         setPhoneMessage("");
                       }}
                       required
-                      className="w-full px-3 py-2.5"
+                      className="w-full"
                     />
                   </div>
 
@@ -586,7 +585,7 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
                         setPhoneMessage("");
                       }}
                       required
-                      className="w-full px-3.5 py-2.5"
+                      className="w-full"
                     />
                   </div>
                 </div>

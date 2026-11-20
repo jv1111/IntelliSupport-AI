@@ -1,4 +1,5 @@
 import { graphqlRequest } from "@/lib/graphql/client";
+import { DEFAULT_PAGE_SIZE } from "@/lib/pagination";
 
 import type {
   Product,
@@ -76,6 +77,27 @@ export async function fetchProducts(
   );
 
   return data.products;
+}
+
+export async function fetchAllProducts(): Promise<Product[]> {
+  const products: Product[] = [];
+  let page = 1;
+  let hasNextPage = true;
+
+  while (hasNextPage) {
+    const result = await fetchProducts({
+      page,
+      limit: DEFAULT_PAGE_SIZE,
+      search: null,
+      status: null,
+    });
+
+    products.push(...result.items);
+    hasNextPage = result.hasNextPage;
+    page = result.currentPage + 1;
+  }
+
+  return products;
 }
 
 export async function createProduct(input: ProductInput): Promise<Product> {

@@ -194,14 +194,14 @@ export function VerificationDialog({
         setCode(Array(6).fill(""));
         setCooldown(cooldownDuration);
         setFeedback(
-            isInitialSend
-              ? method === "email"
-                ? "Verification email sent. Enter the code below."
-                : "Verification SMS sent. Enter the code below."
-              : method === "email"
-                ? "A new verification email has been sent."
-                : "A new verification SMS has been sent.",
-          );
+          isInitialSend
+            ? method === "email"
+              ? "Verification email sent. Enter the code below."
+              : "Verification SMS sent. Enter the code below."
+            : method === "email"
+              ? "A new verification email has been sent."
+              : "A new verification SMS has been sent.",
+        );
         setInitialSendFailed(false);
       } catch (error) {
         setError(
@@ -227,11 +227,7 @@ export function VerificationDialog({
   );
 
   useEffect(() => {
-    if (
-      !open ||
-      !sendOnOpen ||
-      initialSendStarted.current
-    ) {
+    if (!open || !sendOnOpen || initialSendStarted.current) {
       return;
     }
 
@@ -390,16 +386,18 @@ export function VerificationDialog({
               />
               <div className="min-w-0">
                 <p className="text-sm font-semibold text-foreground">
-                  {method === "email" ? "Email could not be sent" : "SMS could not be sent"}
+                  {method === "email"
+                    ? "Email could not be sent"
+                    : "SMS could not be sent"}
                 </p>
                 <p
                   role="alert"
                   className="mt-1 text-xs leading-relaxed text-danger"
                 >
                   {error ??
-                      (method === "email"
-                        ? "Unable to send the verification email."
-                        : "Unable to send the verification SMS.")}
+                    (method === "email"
+                      ? "Unable to send the verification email."
+                      : "Unable to send the verification SMS.")}
                 </p>
               </div>
             </div>
@@ -467,7 +465,7 @@ export function VerificationDialog({
                     aria-label={`Digit ${index + 1} of 6`}
                     aria-invalid={Boolean(error)}
                     aria-describedby={`${dialogId}-hint`}
-                    className="h-12 min-w-0 px-0 text-center text-lg font-semibold tracking-normal"
+                    className="h-12 min-w-0 px-0! text-center text-lg font-semibold tracking-normal"
                     required
                   />
                 ))}

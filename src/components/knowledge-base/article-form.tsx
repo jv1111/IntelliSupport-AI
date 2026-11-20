@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { FieldLabel, fieldControlStyles } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { SelectField } from "@/components/ui/select-field";
 import {
   articleCategoryLabels,
   articleScopeLabels,
@@ -208,8 +209,7 @@ export function ArticleForm({
             <FieldLabel htmlFor="kb-scope" required>
               Article Scope / Type
             </FieldLabel>
-
-            <select
+            <SelectField
               id="kb-scope"
               required
               disabled={isSaving}
@@ -217,22 +217,17 @@ export function ArticleForm({
               onChange={(event) =>
                 updateField("scope", event.target.value as ArticleScope)
               }
-              className={`${fieldControlStyles} px-3.5 py-2.5 font-semibold`}
-            >
-              {Object.entries(articleScopeLabels).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
+              options={Object.entries(articleScopeLabels).map(
+                ([value, label]) => ({ value, label }),
+              )}
+            />
           </div>
 
           <div>
             <FieldLabel htmlFor="kb-category" required>
               Category Tag
             </FieldLabel>
-
-            <select
+            <SelectField
               id="kb-category"
               required
               disabled={isSaving}
@@ -243,14 +238,10 @@ export function ArticleForm({
                   event.target.value as ArticleCategoryTag,
                 )
               }
-              className={`${fieldControlStyles} px-3.5 py-2.5 font-semibold`}
-            >
-              {Object.entries(articleCategoryLabels).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
+              options={Object.entries(articleCategoryLabels).map(
+                ([value, label]) => ({ value, label }),
+              )}
+            />
           </div>
         </div>
 
@@ -266,7 +257,7 @@ export function ArticleForm({
             placeholder="e.g. Wi-Fi Router Firmware Reset Guide"
             required
             disabled={isSaving}
-            className="bg-surface-muted px-3.5 py-2.5"
+            className="bg-surface-muted"
           />
         </div>
 

@@ -338,7 +338,7 @@ export function ProductForm({
                 value={values.name}
                 onChange={(event) => updateField("name", event.target.value)}
                 placeholder="e.g. Smart Doorbell Pro"
-                className="bg-surface-muted px-3.5 py-2.5"
+                className="bg-surface-muted"
                 disabled={isPending}
               />
             </div>
@@ -351,7 +351,7 @@ export function ProductForm({
                 value={values.sku}
                 onChange={(event) => updateField("sku", event.target.value)}
                 placeholder="e.g. DOOR-BELL-PRO"
-                className="bg-surface-muted px-3.5 py-2.5 font-mono"
+                className="bg-surface-muted font-mono"
                 disabled={isPending}
               />
             </div>
