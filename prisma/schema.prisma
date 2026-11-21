@@ -37,6 +37,7 @@ model User {
   unverifiedEmails      UnverifiedEmail[]
   phones                UserPhone[]
   unverifiedPhones      UnverifiedPhone[]
+  botSettings           BotSettings?
 
   @@map("users")
 }
@@ -65,6 +66,7 @@ model Product {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  autoReplies     AutoReply[]
 
   @@index([userId])
   @@map("products")
@@ -72,6 +74,38 @@ model Product {
 
 
 
+
+model BotSettings {
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  aiEnabled          Boolean  @default(true)
+  autoRepliesEnabled Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("bot_settings")
+}
+
+model AutoReply {
+  id        String   @id @default(cuid())
+  productId String
+  parentId  String?
+  question  String
+  answer    String
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  product   Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  parent    AutoReply? @relation("AutoReplyTree", fields: [productId, parentId], references: [productId, id], onDelete: Cascade)
+  followUps AutoReply[] @relation("AutoReplyTree")
+
+  @@unique([productId, id])
+  @@index([productId, parentId, position])
+  @@map("auto_replies")
+}
 
 model KnowledgeBaseArticle {
   id          String             @id @default(cuid())

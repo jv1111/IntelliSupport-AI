@@ -400,6 +400,8 @@ export const ModelName = {
   User: 'User',
   Session: 'Session',
   Product: 'Product',
+  BotSettings: 'BotSettings',
+  AutoReply: 'AutoReply',
   KnowledgeBaseArticle: 'KnowledgeBaseArticle',
   UserEmail: 'UserEmail',
   UnverifiedEmail: 'UnverifiedEmail',
@@ -420,7 +422,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "product" | "knowledgeBaseArticle" | "userEmail" | "unverifiedEmail" | "userPhone" | "unverifiedPhone"
+    modelProps: "user" | "session" | "product" | "botSettings" | "autoReply" | "knowledgeBaseArticle" | "userEmail" | "unverifiedEmail" | "userPhone" | "unverifiedPhone"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -643,6 +645,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ProductCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ProductCountAggregateOutputType> | number
+        }
+      }
+    }
+    BotSettings: {
+      payload: Prisma.$BotSettingsPayload<ExtArgs>
+      fields: Prisma.BotSettingsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BotSettingsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BotSettingsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BotSettingsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BotSettingsPayload>
+        }
+        findFirst: {
+          args: Prisma.BotSettingsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BotSettingsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BotSettingsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BotSettingsPayload>
+        }
+        findMany: {
+          args: Prisma.BotSettingsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BotSettingsPayload>[]
+        }
+        create: {
+          args: Prisma.BotSettingsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BotSettingsPayload>
+        }
+        createMany: {
+          args: Prisma.BotSettingsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BotSettingsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BotSettingsPayload>[]
+        }
+        delete: {
+          args: Prisma.BotSettingsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BotSettingsPayload>
+        }
+        update: {
+          args: Prisma.BotSettingsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BotSettingsPayload>
+        }
+        deleteMany: {
+          args: Prisma.BotSettingsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BotSettingsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BotSettingsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BotSettingsPayload>[]
+        }
+        upsert: {
+          args: Prisma.BotSettingsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BotSettingsPayload>
+        }
+        aggregate: {
+          args: Prisma.BotSettingsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBotSettings>
+        }
+        groupBy: {
+          args: Prisma.BotSettingsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BotSettingsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BotSettingsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BotSettingsCountAggregateOutputType> | number
+        }
+      }
+    }
+    AutoReply: {
+      payload: Prisma.$AutoReplyPayload<ExtArgs>
+      fields: Prisma.AutoReplyFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AutoReplyFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutoReplyPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AutoReplyFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutoReplyPayload>
+        }
+        findFirst: {
+          args: Prisma.AutoReplyFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutoReplyPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AutoReplyFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutoReplyPayload>
+        }
+        findMany: {
+          args: Prisma.AutoReplyFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutoReplyPayload>[]
+        }
+        create: {
+          args: Prisma.AutoReplyCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutoReplyPayload>
+        }
+        createMany: {
+          args: Prisma.AutoReplyCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AutoReplyCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutoReplyPayload>[]
+        }
+        delete: {
+          args: Prisma.AutoReplyDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutoReplyPayload>
+        }
+        update: {
+          args: Prisma.AutoReplyUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutoReplyPayload>
+        }
+        deleteMany: {
+          args: Prisma.AutoReplyDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AutoReplyUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AutoReplyUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutoReplyPayload>[]
+        }
+        upsert: {
+          args: Prisma.AutoReplyUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AutoReplyPayload>
+        }
+        aggregate: {
+          args: Prisma.AutoReplyAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAutoReply>
+        }
+        groupBy: {
+          args: Prisma.AutoReplyGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AutoReplyGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AutoReplyCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AutoReplyCountAggregateOutputType> | number
         }
       }
     }
@@ -1092,6 +1242,32 @@ export const ProductScalarFieldEnum = {
 export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
 
 
+export const BotSettingsScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  aiEnabled: 'aiEnabled',
+  autoRepliesEnabled: 'autoRepliesEnabled',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BotSettingsScalarFieldEnum = (typeof BotSettingsScalarFieldEnum)[keyof typeof BotSettingsScalarFieldEnum]
+
+
+export const AutoReplyScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  parentId: 'parentId',
+  question: 'question',
+  answer: 'answer',
+  position: 'position',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AutoReplyScalarFieldEnum = (typeof AutoReplyScalarFieldEnum)[keyof typeof AutoReplyScalarFieldEnum]
+
+
 export const KnowledgeBaseArticleScalarFieldEnum = {
   id: 'id',
   scope: 'scope',
@@ -1224,6 +1400,27 @@ export type ListEnumProductStatusFieldRefInput<$PrismaModel> = FieldRefInputType
 
 
 /**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
+ * Reference to a field of type 'Int'
+ */
+export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+/**
+ * Reference to a field of type 'Int[]'
+ */
+export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
  * Reference to a field of type 'ArticleScope'
  */
 export type EnumArticleScopeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ArticleScope'>
@@ -1252,16 +1449,16 @@ export type ListEnumArticleCategoryTagFieldRefInput<$PrismaModel> = FieldRefInpu
 
 
 /**
- * Reference to a field of type 'Int'
+ * Reference to a field of type 'Float'
  */
-export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
     
 
 
 /**
- * Reference to a field of type 'Int[]'
+ * Reference to a field of type 'Float[]'
  */
-export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
 
 /**
@@ -1418,6 +1615,8 @@ export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   session?: Prisma.SessionOmit
   product?: Prisma.ProductOmit
+  botSettings?: Prisma.BotSettingsOmit
+  autoReply?: Prisma.AutoReplyOmit
   knowledgeBaseArticle?: Prisma.KnowledgeBaseArticleOmit
   userEmail?: Prisma.UserEmailOmit
   unverifiedEmail?: Prisma.UnverifiedEmailOmit

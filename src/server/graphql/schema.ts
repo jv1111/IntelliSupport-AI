@@ -11,6 +11,10 @@ import {
   knowledgeBaseResolvers,
   knowledgeBaseTypeDefs,
 } from "@/server/graphql/modules/knowledge-base";
+import {
+  autoReplyResolvers,
+  autoReplyTypeDefs,
+} from "@/server/graphql/modules/auto-replies";
 
 const rootTypeDefs = `#graphql
   type Query {
@@ -25,6 +29,7 @@ export const typeDefs = [
   phoneTypeDefs,
   productTypeDefs,
   knowledgeBaseTypeDefs,
+  autoReplyTypeDefs,
 ];
 
 export const resolvers = {
@@ -35,6 +40,7 @@ export const resolvers = {
     ...phoneResolvers.Query,
     ...productResolvers.Query,
     ...knowledgeBaseResolvers.Query,
+    ...autoReplyResolvers.Query,
   },
 
   Mutation: {
@@ -43,6 +49,7 @@ export const resolvers = {
     ...phoneResolvers.Mutation,
     ...productResolvers.Mutation,
     ...knowledgeBaseResolvers.Mutation,
+    ...autoReplyResolvers.Mutation,
   },
 
   User: authResolvers.User,
@@ -50,4 +57,5 @@ export const resolvers = {
   AccountPhone: phoneResolvers.AccountPhone,
   Product: productResolvers.Product,
   KnowledgeBaseArticle: knowledgeBaseResolvers.KnowledgeBaseArticle,
+  AutoReply: autoReplyResolvers.AutoReply,
 };

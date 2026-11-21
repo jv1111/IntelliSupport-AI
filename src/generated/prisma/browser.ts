@@ -33,6 +33,16 @@ export type Session = Prisma.SessionModel
  */
 export type Product = Prisma.ProductModel
 /**
+ * Model BotSettings
+ * 
+ */
+export type BotSettings = Prisma.BotSettingsModel
+/**
+ * Model AutoReply
+ * 
+ */
+export type AutoReply = Prisma.AutoReplyModel
+/**
  * Model KnowledgeBaseArticle
  * 
  */

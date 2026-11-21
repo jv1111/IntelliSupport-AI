@@ -54,6 +54,8 @@ export const ModelName = {
   User: 'User',
   Session: 'Session',
   Product: 'Product',
+  BotSettings: 'BotSettings',
+  AutoReply: 'AutoReply',
   KnowledgeBaseArticle: 'KnowledgeBaseArticle',
   UserEmail: 'UserEmail',
   UnverifiedEmail: 'UnverifiedEmail',
@@ -112,6 +114,32 @@ export const ProductScalarFieldEnum = {
 } as const
 
 export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
+
+
+export const BotSettingsScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  aiEnabled: 'aiEnabled',
+  autoRepliesEnabled: 'autoRepliesEnabled',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BotSettingsScalarFieldEnum = (typeof BotSettingsScalarFieldEnum)[keyof typeof BotSettingsScalarFieldEnum]
+
+
+export const AutoReplyScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  parentId: 'parentId',
+  question: 'question',
+  answer: 'answer',
+  position: 'position',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AutoReplyScalarFieldEnum = (typeof AutoReplyScalarFieldEnum)[keyof typeof AutoReplyScalarFieldEnum]
 
 
 export const KnowledgeBaseArticleScalarFieldEnum = {

@@ -1,0 +1,1 @@
+export const MAX_AUTO_REPLIES_PER_LEVEL = 3;

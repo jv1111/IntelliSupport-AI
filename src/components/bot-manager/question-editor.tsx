@@ -1,18 +1,21 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { ArrowDown, ArrowUp, GitBranch, Pencil, Trash2 } from "lucide-react";
+import { GitBranch, Trash2 } from "lucide-react";
+import { useState, type FormEvent } from "react";
+import { useBotManagerAutoReplies } from "@/components/bot-manager/hooks/use-bot-manager-auto-replies";
 import { useBotManagerProduct } from "@/components/bot-manager/hooks/use-bot-manager-product";
 import { useBotManagerProducts } from "@/components/bot-manager/hooks/use-bot-manager-products";
-import { useBotManagerQuestions } from "@/components/bot-manager/hooks/use-bot-manager-questions";
 import { ProductImage } from "@/components/products/product-image";
 import { BackButton } from "@/components/ui/back-button";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { FieldLabel, fieldControlStyles } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { SelectField } from "@/components/ui/select-field";
+import { MAX_AUTO_REPLIES_PER_LEVEL } from "@/lib/auto-replies/constants";
+
 interface QuestionEditorProps {
   productId?: string;
 }
@@ -21,6 +24,16 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
   const isProductSelectionMode = productId === undefined;
   const router = useRouter();
   const [selectedProductId, setSelectedProductId] = useState(productId ?? "");
+  const [isAddingQuestion, setIsAddingQuestion] = useState(false);
+  const [editingQuestionId, setEditingQuestionId] = useState<string | null>(
+    null,
+  );
+  const [questionPendingDeletion, setQuestionPendingDeletion] = useState<{
+    id: string;
+    question: string;
+  } | null>(null);
+  const [questionDraft, setQuestionDraft] = useState("");
+  const [answerDraft, setAnswerDraft] = useState("");
 
   const {
     products: availableProducts,
@@ -34,56 +47,123 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
     error: productError,
   } = useBotManagerProduct(isProductSelectionMode ? undefined : productId);
 
-  const {
-    questions: questionsByProduct,
-    addQuestion,
-    removeQuestion,
-    moveQuestion,
-    updateQuestion,
-  } = useBotManagerQuestions();
-  const [editingQuestionId, setEditingQuestionId] = useState<string | null>(
-    null,
-  );
-  const [questionDraft, setQuestionDraft] = useState("");
-  const [answerDraft, setAnswerDraft] = useState("");
-  const [newQuestionId, setNewQuestionId] = useState<string | null>(null);
-
   const activeProductId = productId ?? selectedProductId;
   const product = isProductSelectionMode
     ? availableProducts.find((item) => item.id === activeProductId)
     : routeProduct;
-  const questions = questionsByProduct[activeProductId] ?? [];
-  const questionLimit = 3;
-  const followUpLimit = 3;
+
+  const {
+    autoReplies,
+    isLoading: isLoadingAutoReplies,
+    error: autoRepliesError,
+    isSaving,
+    isDeleting,
+    actionError,
+    deletionError,
+    saveAutoReply,
+    deleteAutoReply,
+    retry: retryAutoReplies,
+  } = useBotManagerAutoReplies(
+    activeProductId || undefined,
+    Boolean(activeProductId),
+  );
+
+  const questions = autoReplies.filter((item) => item.parentId === null);
 
   function handleBack() {
     router.push("/bot-manager");
   }
 
   function handleAddQuestion() {
-    if (!activeProductId) {
+    if (
+      !activeProductId ||
+      questions.length >= MAX_AUTO_REPLIES_PER_LEVEL ||
+      isSaving
+    ) {
       return;
-    }
-
-    const question = addQuestion(activeProductId);
-
-    if (!question) {
-      return;
-    }
-
-    setQuestionDraft("");
-    setAnswerDraft("");
-    setNewQuestionId(question.id);
-    setEditingQuestionId(question.id);
-  }
-
-  function handleCancelEdit(questionId: string) {
-    if (newQuestionId === questionId) {
-      removeQuestion(questionId);
     }
 
     setEditingQuestionId(null);
-    setNewQuestionId(null);
+    setQuestionDraft("");
+    setAnswerDraft("");
+    setIsAddingQuestion(true);
+  }
+
+  function handleEditQuestion(
+    questionId: string,
+    question: string,
+    answer: string,
+  ) {
+    if (isAddingQuestion || isSaving) {
+      return;
+    }
+
+    setEditingQuestionId(questionId);
+    setQuestionDraft(question);
+    setAnswerDraft(answer);
+    setIsAddingQuestion(true);
+  }
+
+  function handleCancelAddQuestion() {
+    if (isSaving) {
+      return;
+    }
+
+    setIsAddingQuestion(false);
+    setEditingQuestionId(null);
+    setQuestionDraft("");
+    setAnswerDraft("");
+  }
+
+  function handleOpenDeleteConfirmation(
+    questionId: string,
+    question: string,
+  ) {
+    setQuestionPendingDeletion({ id: questionId, question });
+  }
+
+  function handleCloseDeleteConfirmation() {
+    if (isDeleting) {
+      return;
+    }
+
+    setQuestionPendingDeletion(null);
+  }
+
+  async function handleConfirmDeleteQuestion() {
+    if (!questionPendingDeletion || isDeleting) {
+      return;
+    }
+
+    const deleted = await deleteAutoReply(questionPendingDeletion.id);
+
+    if (deleted) {
+      setQuestionPendingDeletion(null);
+    }
+  }
+
+  async function handleSaveQuestion(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!activeProductId || !questionDraft.trim() || !answerDraft.trim()) {
+      return;
+    }
+
+    const savedAutoReply = await saveAutoReply(
+      {
+        productId: activeProductId,
+        question: questionDraft.trim(),
+        answer: answerDraft.trim(),
+      },
+      editingQuestionId ?? undefined,
+    );
+
+    if (savedAutoReply) {
+      setIsAddingQuestion(false);
+      setEditingQuestionId(null);
+      setQuestionDraft("");
+      setAnswerDraft("");
+    }
   }
 
   return (
@@ -146,7 +226,7 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
               required
               value={selectedProductId}
               disabled={
-                editingQuestionId !== null ||
+                isAddingQuestion ||
                 isLoadingProducts ||
                 availableProducts.length === 0
               }
@@ -183,9 +263,7 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
                 Automatic Reply Questions
               </h2>
               <p className="max-w-3xl text-xs leading-relaxed text-muted-foreground">
-                Arrange questions in the order customers should see them. You
-                can add follow-up questions to provide more detailed answers to
-                common customer inquiries.
+                Add questions and answers for common customer inquiries.
               </p>
             </div>
 
@@ -195,7 +273,7 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
 
                 <div className="flex items-center gap-2">
                   <span className="rounded-full border border-primary/15 bg-primary/5 px-2.5 py-1 text-[10px] font-bold text-primary">
-                    {questions.length}/{questionLimit} questions
+                    {questions.length}/{MAX_AUTO_REPLIES_PER_LEVEL} questions
                   </span>
 
                   <Button
@@ -203,8 +281,10 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
                     fullWidth={false}
                     type="button"
                     disabled={
-                      questions.length >= questionLimit ||
-                      editingQuestionId !== null
+                      questions.length >= MAX_AUTO_REPLIES_PER_LEVEL ||
+                      isAddingQuestion ||
+                      isSaving ||
+                      isLoadingAutoReplies
                     }
                     className="gap-2 px-3 py-2"
                     onClick={handleAddQuestion}
@@ -214,7 +294,28 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
                 </div>
               </div>
 
-              {questions.length > 0 ? (
+              {isLoadingAutoReplies ? (
+                <p
+                  role="status"
+                  className="py-10 text-center text-xs text-muted-foreground"
+                >
+                  Loading automatic replies...
+                </p>
+              ) : autoRepliesError ? (
+                <div className="flex flex-col items-center gap-3 py-10">
+                  <p role="alert" className="text-center text-xs text-danger">
+                    {autoRepliesError}
+                  </p>
+                  <Button
+                    variant="secondary"
+                    fullWidth={false}
+                    type="button"
+                    onClick={retryAutoReplies}
+                  >
+                    Try again
+                  </Button>
+                </div>
+              ) : (
                 <ol className="divide-y divide-border/70">
                   {questions.map((question, index) => (
                     <li key={question.id} className="py-4 first:pt-0 last:pb-0">
@@ -224,139 +325,45 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
                         </span>
 
                         <div className="min-w-0 flex-1 space-y-3">
-                          <div className="flex flex-wrap items-start justify-between gap-3">
-                            {editingQuestionId === question.id ? (
-                              <div className="min-w-0 flex-1 space-y-2">
-                                <Input
-                                  autoFocus
-                                  value={questionDraft}
-                                  onChange={(event) =>
-                                    setQuestionDraft(event.target.value)
-                                  }
-                                  placeholder="Enter a question..."
-                                  aria-label="Edit question"
-                                />
+                          <div className="flex items-start justify-between gap-3">
+                            <p className="text-sm font-bold text-foreground">
+                              {question.question}
+                            </p>
 
-                                <textarea
-                                  rows={4}
-                                  value={answerDraft}
-                                  onChange={(event) =>
-                                    setAnswerDraft(event.target.value)
-                                  }
-                                  placeholder="Enter an answer..."
-                                  aria-label="Edit answer"
-                                  className={`${fieldControlStyles} resize-y px-3.5 py-3 leading-relaxed`}
-                                />
+                            <div className="flex shrink-0 items-center gap-2">
+                              <Button
+                                variant="secondary"
+                                fullWidth={false}
+                                type="button"
+                                className="px-3 py-2"
+                                disabled={isAddingQuestion || isSaving || isDeleting}
+                                onClick={() =>
+                                  handleEditQuestion(
+                                    question.id,
+                                    question.question,
+                                    question.answer,
+                                  )
+                                }
+                              >
+                                Edit
+                              </Button>
 
-                                <div className="flex justify-end gap-2">
-                                  <Button
-                                    variant="secondary"
-                                    fullWidth={false}
-                                    type="button"
-                                    className="px-3 py-2"
-                                    onClick={() =>
-                                      handleCancelEdit(question.id)
-                                    }
-                                  >
-                                    Cancel
-                                  </Button>
-
-                                  <Button
-                                    variant="primary"
-                                    fullWidth={false}
-                                    type="button"
-                                    className="px-3 py-2"
-                                    disabled={
-                                      !questionDraft.trim() ||
-                                      !answerDraft.trim()
-                                    }
-                                    onClick={() => {
-                                      updateQuestion(
-                                        question.id,
-                                        questionDraft.trim(),
-                                        answerDraft.trim(),
-                                      );
-                                      setEditingQuestionId(null);
-                                      setNewQuestionId(null);
-                                    }}
-                                  >
-                                    Save
-                                  </Button>
-                                </div>
-                              </div>
-                            ) : (
-                              <>
-                                <p className="text-sm font-bold text-foreground">
-                                  {question.question}
-                                </p>
-
-                                <div className="flex shrink-0 items-center gap-1">
-                                  <Button
-                                    variant="icon-surface"
-                                    type="button"
-                                    aria-label={`Move question ${index + 1} up`}
-                                    title="Move up"
-                                    disabled={index === 0}
-                                    onClick={() =>
-                                      moveQuestion(question.id, "up")
-                                    }
-                                  >
-                                    <ArrowUp
-                                      className="size-4"
-                                      aria-hidden="true"
-                                    />
-                                  </Button>
-
-                                  <Button
-                                    variant="icon-surface"
-                                    type="button"
-                                    aria-label={`Move question ${index + 1} down`}
-                                    title="Move down"
-                                    disabled={index === questions.length - 1}
-                                    onClick={() =>
-                                      moveQuestion(question.id, "down")
-                                    }
-                                  >
-                                    <ArrowDown
-                                      className="size-4"
-                                      aria-hidden="true"
-                                    />
-                                  </Button>
-
-                                  <Button
-                                    variant="icon-surface"
-                                    className="text-primary!"
-                                    type="button"
-                                    aria-label={`Edit question ${index + 1}`}
-                                    title="Edit question"
-                                    onClick={() => {
-                                      setQuestionDraft(question.question);
-                                      setAnswerDraft(question.answer);
-                                      setNewQuestionId(null);
-                                      setEditingQuestionId(question.id);
-                                    }}
-                                  >
-                                    <Pencil
-                                      className="size-4"
-                                      aria-hidden="true"
-                                    />
-                                  </Button>
-
-                                  <Button
-                                    variant="icon-surface"
-                                    className="text-danger!"
-                                    type="button"
-                                    aria-label={`Delete question ${index + 1}`}
-                                    title="Delete question"
-                                  >
-                                    <Trash2
-                                      className="size-4"
-                                      aria-hidden="true"
-                                    />
-                                  </Button>
-                                </div>
-                              </>
-                            )}
+                              <Button
+                                variant="secondary"
+                                fullWidth={false}
+                                type="button"
+                                className="px-3 py-2 text-danger"
+                                disabled={isAddingQuestion || isSaving || isDeleting}
+                                onClick={() =>
+                                  handleOpenDeleteConfirmation(
+                                    question.id,
+                                    question.question,
+                                  )
+                                }
+                              >
+                                Delete
+                              </Button>
+                            </div>
                           </div>
 
                           <div className="rounded-xl bg-surface-muted p-3">
@@ -365,43 +372,117 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
                             </p>
                           </div>
 
-                          <div className="flex items-center gap-2">
-                            <Button
-                              variant="primary-subtle"
-                              fullWidth={false}
-                              type="button"
-                              className="gap-2 px-3 py-2"
-                              onClick={() =>
-                                router.push(
-                                  `/bot-manager/${question.id}/follow-ups`,
-                                )
-                              }
-                            >
-                              <GitBranch
-                                className="size-3.5"
-                                aria-hidden="true"
-                              />
-                              Add Follow-ups{" "}
-                              <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[9px] font-bold">
-                                {question.followUps?.length ?? 0}/
-                                {followUpLimit}
-                              </span>
-                            </Button>
-                          </div>
+                          <Button
+                            variant="primary-subtle"
+                            fullWidth={false}
+                            type="button"
+                            className="gap-2 px-3 py-2"
+                            disabled={isAddingQuestion || isSaving || isDeleting}
+                            onClick={() =>
+                              router.push(
+                                `/bot-manager/${question.id}/follow-ups`,
+                              )
+                            }
+                          >
+                            <GitBranch
+                              className="size-3.5"
+                              aria-hidden="true"
+                            />
+                            Add Follow-ups
+                          </Button>
                         </div>
                       </div>
                     </li>
                   ))}
+
+                  {isAddingQuestion && (
+                    <li className="py-4">
+                      <form onSubmit={handleSaveQuestion} className="space-y-3">
+                        <h3 className="text-sm font-bold text-foreground">
+                          {editingQuestionId ? "Edit Question" : "New Question"}
+                        </h3>
+                        <div className="space-y-2">
+                          <Input
+                            autoFocus
+                            required
+                            maxLength={500}
+                            value={questionDraft}
+                            onChange={(event) =>
+                              setQuestionDraft(event.target.value)
+                            }
+                            placeholder="Enter a question..."
+                            aria-label="New auto reply question"
+                            disabled={isSaving}
+                          />
+
+                          <textarea
+                            rows={4}
+                            required
+                            value={answerDraft}
+                            onChange={(event) =>
+                              setAnswerDraft(event.target.value)
+                            }
+                            placeholder="Enter an answer..."
+                            aria-label="New auto reply answer"
+                            disabled={isSaving}
+                            className={`${fieldControlStyles} resize-y px-3.5 py-3 leading-relaxed`}
+                          />
+                        </div>
+
+                        {actionError && (
+                          <p role="alert" className="text-xs text-danger">
+                            {actionError}
+                          </p>
+                        )}
+
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="secondary"
+                            fullWidth={false}
+                            type="button"
+                            className="px-3 py-2"
+                            onClick={handleCancelAddQuestion}
+                            disabled={isSaving}
+                          >
+                            Cancel
+                          </Button>
+
+                          <Button
+                            variant="primary"
+                            fullWidth={false}
+                            type="submit"
+                            className="px-3 py-2"
+                            disabled={
+                              isSaving ||
+                              !questionDraft.trim() ||
+                              !answerDraft.trim()
+                            }
+                          >
+                            {isSaving
+                              ? "Saving..."
+                              : editingQuestionId
+                                ? "Save Changes"
+                                : "Save"}
+                          </Button>
+                        </div>
+                      </form>
+                    </li>
+                  )}
                 </ol>
-              ) : (
-                <p className="py-10 text-center text-xs font-medium text-muted-foreground">
-                  No questions have been added for this product yet.
-                </p>
               )}
 
-              {questions.length >= questionLimit && (
+              {!isLoadingAutoReplies &&
+                !autoRepliesError &&
+                questions.length === 0 &&
+                !isAddingQuestion && (
+                  <p className="py-10 text-center text-xs font-medium text-muted-foreground">
+                    No questions have been added for this product yet.
+                  </p>
+                )}
+
+              {questions.length >= MAX_AUTO_REPLIES_PER_LEVEL && (
                 <p className="border-t border-border/70 pt-3 text-[10px] text-muted-foreground">
-                  Maximum of {questionLimit} questions reached.
+                  Maximum of {MAX_AUTO_REPLIES_PER_LEVEL} questions reached.
                 </p>
               )}
             </Card>
@@ -414,6 +495,24 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
           </Card>
         ) : null}
       </section>
+
+      <ConfirmationDialog
+        open={Boolean(questionPendingDeletion)}
+        title="Delete question?"
+        description={
+          questionPendingDeletion
+            ? `Deleting "${questionPendingDeletion.question}" will also permanently delete all of its follow-up questions.`
+            : ""
+        }
+        confirmLabel="Delete Question"
+        pendingLabel="Deleting..."
+        variant="danger"
+        icon={Trash2}
+        isPending={isDeleting}
+        error={deletionError}
+        onConfirm={handleConfirmDeleteQuestion}
+        onCancel={handleCloseDeleteConfirmation}
+      />
     </main>
   );
 }

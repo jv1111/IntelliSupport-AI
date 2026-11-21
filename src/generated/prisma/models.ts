@@ -11,6 +11,8 @@
 export type * from './models/User'
 export type * from './models/Session'
 export type * from './models/Product'
+export type * from './models/BotSettings'
+export type * from './models/AutoReply'
 export type * from './models/KnowledgeBaseArticle'
 export type * from './models/UserEmail'
 export type * from './models/UnverifiedEmail'

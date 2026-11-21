@@ -11,7 +11,7 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { Toggle } from "@/components/ui/toggle";
 import { ProductImage } from "@/components/products/product-image";
 import { useBotManagerProducts } from "@/components/bot-manager/hooks/use-bot-manager-products";
-import { useBotManagerQuestions } from "@/components/bot-manager/hooks/use-bot-manager-questions";
+import { useBotManagerAutoReplies } from "@/components/bot-manager/hooks/use-bot-manager-auto-replies";
 
 export function BotManager() {
   const router = useRouter();
@@ -19,14 +19,31 @@ export function BotManager() {
   const [autoRepliesEnabled, setAutoRepliesEnabled] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { products, isLoading, error, retry } = useBotManagerProducts();
-  const { questions } = useBotManagerQuestions();
+  const {
+    products,
+    isLoading: isLoadingProducts,
+    error: productsError,
+    retry: retryProducts,
+  } = useBotManagerProducts();
+  const {
+    autoReplies,
+    isLoading: isLoadingAutoReplies,
+    error: autoRepliesError,
+    retry: retryAutoReplies,
+  } = useBotManagerAutoReplies();
+
+  const isLoading = isLoadingProducts || isLoadingAutoReplies;
+  const error = productsError ?? autoRepliesError;
+
+  function retry() {
+    retryProducts();
+    retryAutoReplies();
+  }
 
   const query = searchQuery.trim().toLowerCase();
   const filteredProducts = products.flatMap((product) => {
-    const productQuestions = questions[product.id] ?? [];
-    const questionCount = productQuestions.filter(
-      (item) => item.question.trim() && item.answer.trim(),
+    const questionCount = autoReplies.filter(
+      (item) => item.productId === product.id && item.parentId === null,
     ).length;
     const matchesSearch =
       !query || `${product.name} ${product.sku}`.toLowerCase().includes(query);
