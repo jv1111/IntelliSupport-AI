@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { GitBranch, Trash2 } from "lucide-react";
+import { AutoReplyItem } from "@/components/bot-manager/auto-reply-item";
+import { Trash2 } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { useBotManagerAutoReplies } from "@/components/bot-manager/hooks/use-bot-manager-auto-replies";
 import { useBotManagerProduct } from "@/components/bot-manager/hooks/use-bot-manager-product";
@@ -58,17 +59,22 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
     error: autoRepliesError,
     isSaving,
     isDeleting,
+    isReordering,
     actionError,
     deletionError,
+    reorderError,
     saveAutoReply,
     deleteAutoReply,
+    moveAutoReply,
     retry: retryAutoReplies,
   } = useBotManagerAutoReplies(
     activeProductId || undefined,
     Boolean(activeProductId),
   );
 
-  const questions = autoReplies.filter((item) => item.parentId === null);
+  const questions = autoReplies
+    .filter((item) => item.parentId === null)
+    .sort((a, b) => a.position - b.position || a.id.localeCompare(b.id));
 
   function handleBack() {
     router.push("/bot-manager");
@@ -78,7 +84,8 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
     if (
       !activeProductId ||
       questions.length >= MAX_AUTO_REPLIES_PER_LEVEL ||
-      isSaving
+      isSaving ||
+      isReordering
     ) {
       return;
     }
@@ -94,7 +101,7 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
     question: string,
     answer: string,
   ) {
-    if (isAddingQuestion || isSaving) {
+    if (isAddingQuestion || isSaving || isReordering) {
       return;
     }
 
@@ -115,10 +122,7 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
     setAnswerDraft("");
   }
 
-  function handleOpenDeleteConfirmation(
-    questionId: string,
-    question: string,
-  ) {
+  function handleOpenDeleteConfirmation(questionId: string, question: string) {
     setQuestionPendingDeletion({ id: questionId, question });
   }
 
@@ -317,81 +321,48 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
                 </div>
               ) : (
                 <ol className="divide-y divide-border/70">
+                  {reorderError && (
+                    <li className="py-2">
+                      <p role="alert" className="text-xs text-danger">
+                        {reorderError}
+                      </p>
+                    </li>
+                  )}
                   {questions.map((question, index) => (
                     <li key={question.id} className="py-4 first:pt-0 last:pb-0">
-                      <div className="flex items-start gap-3">
-                        <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[11px] font-bold text-primary">
-                          {index + 1}
-                        </span>
-
-                        <div className="min-w-0 flex-1 space-y-3">
-                          <div className="flex items-start justify-between gap-3">
-                            <p className="text-sm font-bold text-foreground">
-                              {question.question}
-                            </p>
-
-                            <div className="flex shrink-0 items-center gap-2">
-                              <Button
-                                variant="secondary"
-                                fullWidth={false}
-                                type="button"
-                                className="px-3 py-2"
-                                disabled={isAddingQuestion || isSaving || isDeleting}
-                                onClick={() =>
-                                  handleEditQuestion(
-                                    question.id,
-                                    question.question,
-                                    question.answer,
-                                  )
-                                }
-                              >
-                                Edit
-                              </Button>
-
-                              <Button
-                                variant="secondary"
-                                fullWidth={false}
-                                type="button"
-                                className="px-3 py-2 text-danger"
-                                disabled={isAddingQuestion || isSaving || isDeleting}
-                                onClick={() =>
-                                  handleOpenDeleteConfirmation(
-                                    question.id,
-                                    question.question,
-                                  )
-                                }
-                              >
-                                Delete
-                              </Button>
-                            </div>
-                          </div>
-
-                          <div className="rounded-xl bg-surface-muted p-3">
-                            <p className="text-xs leading-relaxed text-muted-foreground">
-                              {question.answer}
-                            </p>
-                          </div>
-
-                          <Button
-                            variant="primary-subtle"
-                            fullWidth={false}
-                            type="button"
-                            className="gap-2 px-3 py-2"
-                            disabled={isAddingQuestion || isSaving || isDeleting}
-                            onClick={() =>
-                              router.push(
-                                `/bot-manager/${question.id}/follow-ups`,
-                              )
-                            }
-                          >
-                            <GitBranch
-                              className="size-3.5"
-                              aria-hidden="true"
-                            />
-                            Add Follow-ups
-                          </Button>
-                        </div>
-                      </div>
+                      <AutoReplyItem
+                        reply={question}
+                        index={index}
+                        followUpCount={
+                          autoReplies.filter(
+                            (item) => item.parentId === question.id,
+                          ).length
+                        }
+                        isFirst={index === 0}
+                        isLast={index === questions.length - 1}
+                        isDisabled={
+                          isAddingQuestion ||
+                          isSaving ||
+                          isDeleting ||
+                          isReordering
+                        }
+                        onMove={(id, direction) =>
+                          void moveAutoReply(id, direction)
+                        }
+                        onEdit={(reply) =>
+                          handleEditQuestion(
+                            reply.id,
+                            reply.question,
+                            reply.answer,
+                          )
+                        }
+                        onDelete={(reply) =>
+                          handleOpenDeleteConfirmation(reply.id, reply.question)
+                        }
+                        onOpenFollowUps={(id) =>
+                          router.push(`/bot-manager/${id}/follow-ups`)
+                        }
+                      />
                     </li>
                   ))}
 

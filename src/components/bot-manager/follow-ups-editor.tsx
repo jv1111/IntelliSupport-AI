@@ -1,13 +1,15 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { AutoReplyItem } from "@/components/bot-manager/auto-reply-item";
 import { useState, type FormEvent } from "react";
-import { GitBranch } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useBotManagerAutoReplies } from "@/components/bot-manager/hooks/use-bot-manager-auto-replies";
 import { useBotManagerProduct } from "@/components/bot-manager/hooks/use-bot-manager-product";
 import { BackButton } from "@/components/ui/back-button";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { Input } from "@/components/ui/input";
 import { fieldControlStyles } from "@/components/ui/field";
 import { MAX_AUTO_REPLIES_PER_LEVEL } from "@/lib/auto-replies/constants";
@@ -22,14 +24,27 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
   const [isAddingFollowUp, setIsAddingFollowUp] = useState(false);
   const [followUpDraft, setFollowUpDraft] = useState("");
   const [answerDraft, setAnswerDraft] = useState("");
+  const [editingFollowUpId, setEditingFollowUpId] = useState<string | null>(
+    null,
+  );
+  const [followUpPendingDeletion, setFollowUpPendingDeletion] = useState<{
+    id: string;
+    question: string;
+  } | null>(null);
 
   const {
     autoReplies,
     isLoading: isLoadingAutoReplies,
     error: autoRepliesError,
     isSaving,
+    isDeleting,
+    isReordering,
     actionError,
-    addAutoReply,
+    deletionError,
+    reorderError,
+    saveAutoReply,
+    deleteAutoReply,
+    moveAutoReply,
     retry: retryAutoReplies,
   } = useBotManagerAutoReplies();
 
@@ -43,7 +58,7 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
 
   const followUps = autoReplies
     .filter((item) => item.parentId === questionId)
-    .sort((a, b) => a.position - b.position);
+    .sort((a, b) => a.position - b.position || a.id.localeCompare(b.id));
 
   function handleBack() {
     if (!parentReply) {
@@ -62,24 +77,67 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
     if (
       !parentReply ||
       followUps.length >= MAX_AUTO_REPLIES_PER_LEVEL ||
-      isSaving
+      isSaving ||
+      isDeleting ||
+      isReordering
     ) {
       return;
     }
 
+    setEditingFollowUpId(null);
     setFollowUpDraft("");
     setAnswerDraft("");
     setIsAddingFollowUp(true);
   }
 
+  function handleEditFollowUp(
+    followUpId: string,
+    question: string,
+    answer: string,
+  ) {
+    if (isAddingFollowUp || isSaving || isDeleting || isReordering) {
+      return;
+    }
+
+    setEditingFollowUpId(followUpId);
+    setFollowUpDraft(question);
+    setAnswerDraft(answer);
+    setIsAddingFollowUp(true);
+  }
+
   function handleCancelAddFollowUp() {
-    if (isSaving) {
+    if (isSaving || isDeleting) {
       return;
     }
 
     setIsAddingFollowUp(false);
+    setEditingFollowUpId(null);
     setFollowUpDraft("");
     setAnswerDraft("");
+  }
+
+  function handleOpenDeleteConfirmation(followUpId: string, question: string) {
+    setFollowUpPendingDeletion({ id: followUpId, question });
+  }
+
+  function handleCloseDeleteConfirmation() {
+    if (isDeleting) {
+      return;
+    }
+
+    setFollowUpPendingDeletion(null);
+  }
+
+  async function handleConfirmDeleteFollowUp() {
+    if (!followUpPendingDeletion || isDeleting) {
+      return;
+    }
+
+    const deleted = await deleteAutoReply(followUpPendingDeletion.id);
+
+    if (deleted) {
+      setFollowUpPendingDeletion(null);
+    }
   }
 
   async function handleSaveFollowUp(event: FormEvent<HTMLFormElement>) {
@@ -89,15 +147,19 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
       return;
     }
 
-    const createdAutoReply = await addAutoReply({
-      productId: parentReply.productId,
-      parentId: parentReply.id,
-      question: followUpDraft.trim(),
-      answer: answerDraft.trim(),
-    });
+    const savedAutoReply = await saveAutoReply(
+      {
+        productId: parentReply.productId,
+        parentId: parentReply.id,
+        question: followUpDraft.trim(),
+        answer: answerDraft.trim(),
+      },
+      editingFollowUpId ?? undefined,
+    );
 
-    if (createdAutoReply) {
+    if (savedAutoReply) {
       setIsAddingFollowUp(false);
+      setEditingFollowUpId(null);
       setFollowUpDraft("");
       setAnswerDraft("");
     }
@@ -234,7 +296,9 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
               disabled={
                 followUps.length >= MAX_AUTO_REPLIES_PER_LEVEL ||
                 isAddingFollowUp ||
-                isSaving
+                isSaving ||
+                isDeleting ||
+                isReordering
               }
               className="gap-2 px-3 py-2"
               onClick={handleAddFollowUp}
@@ -242,6 +306,12 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
               Add Follow-up
             </Button>
           </div>
+
+          {reorderError && (
+            <p role="alert" className="text-xs text-danger">
+              {reorderError}
+            </p>
+          )}
 
           {followUps.length > 0 || isAddingFollowUp ? (
             <ol className="space-y-3">
@@ -253,44 +323,35 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
                 return (
                   <li key={followUp.id}>
                     <Card className="space-y-4 p-4 sm:p-5">
-                      <div className="flex items-start gap-3">
-                        <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[11px] font-bold text-primary">
-                          {index + 1}
-                        </span>
-
-                        <div className="min-w-0 flex-1 space-y-3">
-                          <p className="text-sm font-bold text-foreground">
-                            {followUp.question}
-                          </p>
-
-                          <div className="rounded-xl bg-surface-muted p-3">
-                            <p className="text-xs leading-relaxed text-muted-foreground">
-                              {followUp.answer}
-                            </p>
-                          </div>
-
-                          <Button
-                            variant="primary-subtle"
-                            fullWidth={false}
-                            type="button"
-                            className="gap-2 px-3 py-2"
-                            onClick={() =>
-                              router.push(
-                                `/bot-manager/${followUp.id}/follow-ups`,
-                              )
-                            }
-                          >
-                            <GitBranch
-                              className="size-3.5"
-                              aria-hidden="true"
-                            />
-                            Add Follow-ups
-                            <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[9px] font-bold">
-                              {childCount}/{MAX_AUTO_REPLIES_PER_LEVEL}
-                            </span>
-                          </Button>
-                        </div>
-                      </div>
+                      <AutoReplyItem
+                        reply={followUp}
+                        index={index}
+                        followUpCount={childCount}
+                        isFirst={index === 0}
+                        isLast={index === followUps.length - 1}
+                        isDisabled={
+                          isAddingFollowUp ||
+                          isSaving ||
+                          isDeleting ||
+                          isReordering
+                        }
+                        onMove={(id, direction) =>
+                          void moveAutoReply(id, direction)
+                        }
+                        onEdit={(reply) =>
+                          handleEditFollowUp(
+                            reply.id,
+                            reply.question,
+                            reply.answer,
+                          )
+                        }
+                        onDelete={(reply) =>
+                          handleOpenDeleteConfirmation(reply.id, reply.question)
+                        }
+                        onOpenFollowUps={(id) =>
+                          router.push(`/bot-manager/${id}/follow-ups`)
+                        }
+                      />
                     </Card>
                   </li>
                 );
@@ -300,6 +361,10 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
                 <li>
                   <Card className="space-y-3 p-4 sm:p-5">
                     <form onSubmit={handleSaveFollowUp} className="space-y-3">
+                      <h3 className="text-sm font-bold text-foreground">
+                        {editingFollowUpId ? "Edit Follow-up" : "New Follow-up"}
+                      </h3>
+
                       <Input
                         autoFocus
                         required
@@ -337,7 +402,7 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
                           type="button"
                           className="px-3 py-2"
                           onClick={handleCancelAddFollowUp}
-                          disabled={isSaving}
+                          disabled={isSaving || isDeleting}
                         >
                           Cancel
                         </Button>
@@ -353,7 +418,11 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
                             !answerDraft.trim()
                           }
                         >
-                          {isSaving ? "Saving..." : "Save"}
+                          {isSaving
+                            ? editingFollowUpId
+                              ? "Updating..."
+                              : "Saving..."
+                            : "Save"}
                         </Button>
                       </div>
                     </form>
@@ -377,6 +446,24 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
           )}
         </section>
       </section>
+
+      <ConfirmationDialog
+        open={Boolean(followUpPendingDeletion)}
+        title="Delete follow-up question?"
+        description={
+          followUpPendingDeletion
+            ? `Deleting "${followUpPendingDeletion.question}" will also permanently delete all of its nested follow-up questions.`
+            : ""
+        }
+        confirmLabel="Delete Follow-up"
+        pendingLabel="Deleting..."
+        variant="danger"
+        icon={Trash2}
+        isPending={isDeleting}
+        error={deletionError}
+        onConfirm={handleConfirmDeleteFollowUp}
+        onCancel={handleCloseDeleteConfirmation}
+      />
     </main>
   );
 }

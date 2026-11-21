@@ -1,6 +1,7 @@
 import { graphqlRequest } from "@/lib/graphql/client";
 import type {
   AutoReply,
+  AutoReplyMoveDirection,
   CreateAutoReplyInput,
   UpdateAutoReplyInput,
 } from "@/lib/auto-replies/types";
@@ -77,6 +78,27 @@ export async function updateAutoReply(
   return data.updateAutoReply;
 }
 
+export async function moveAutoReply(
+  id: string,
+  direction: AutoReplyMoveDirection,
+): Promise<AutoReply> {
+  const data = await graphqlRequest<
+    { moveAutoReply: AutoReply },
+    { id: string; direction: AutoReplyMoveDirection }
+  >(
+    `
+      mutation MoveAutoReply($id: ID!, $direction: AutoReplyMoveDirection!) {
+        moveAutoReply(id: $id, direction: $direction) {
+          ${autoReplyFields}
+        }
+      }
+    `,
+    { id, direction },
+  );
+
+  return data.moveAutoReply;
+}
+
 export async function deleteAutoReply(id: string): Promise<boolean> {
   const data = await graphqlRequest<
     { deleteAutoReply: boolean },
@@ -92,4 +114,3 @@ export async function deleteAutoReply(id: string): Promise<boolean> {
 
   return data.deleteAutoReply;
 }
-

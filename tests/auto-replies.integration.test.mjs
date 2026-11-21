@@ -185,6 +185,15 @@ const deleteAutoReplyMutation = `
   }
 `;
 
+const moveAutoReplyMutation = `
+  mutation MoveAutoReply($id: ID!, $direction: AutoReplyMoveDirection!) {
+    moveAutoReply(id: $id, direction: $direction) {
+      id
+      position
+    }
+  }
+`;
+
 const autoRepliesQuery = `
   query AutoReplies($productId: ID) {
     autoReplies(productId: $productId) {
@@ -234,6 +243,13 @@ test("unauthenticated users cannot access or create Auto Replies", async () => {
   });
 
   assertError(deleteReply, "UNAUTHENTICATED");
+
+  const move = await graphql(moveAutoReplyMutation, {
+    id: "unauthorized-reply",
+    direction: "UP",
+  });
+
+  assertError(move, "UNAUTHENTICATED");
 });
 
 test("users can create and retrieve private product Auto Replies", async (t) => {
@@ -419,6 +435,42 @@ test("users can create and retrieve private product Auto Replies", async (t) => 
 
   assertError(fourthReply, "LIMIT_REACHED");
 
+  const movedDown = await graphql(
+    moveAutoReplyMutation,
+    { id: firstReply.id, direction: "DOWN" },
+    ownerCookie,
+  );
+
+  assertSuccess(movedDown);
+  assert.equal(movedDown.payload.data.moveAutoReply.position, 1);
+
+  const movedUp = await graphql(
+    moveAutoReplyMutation,
+    { id: firstReply.id, direction: "UP" },
+    ownerCookie,
+  );
+
+  assertSuccess(movedUp);
+  assert.equal(movedUp.payload.data.moveAutoReply.position, 0);
+
+  const movedAboveFirst = await graphql(
+    moveAutoReplyMutation,
+    { id: firstReply.id, direction: "UP" },
+    ownerCookie,
+  );
+
+  assertSuccess(movedAboveFirst);
+  assert.equal(movedAboveFirst.payload.data.moveAutoReply.position, 0);
+
+  const movedBelowLast = await graphql(
+    moveAutoReplyMutation,
+    { id: thirdReply.payload.data.createAutoReply.id, direction: "DOWN" },
+    ownerCookie,
+  );
+
+  assertSuccess(movedBelowLast);
+  assert.equal(movedBelowLast.payload.data.moveAutoReply.position, 2);
+
   const followUp = await graphql(
     createAutoReplyMutation,
     {
@@ -484,10 +536,7 @@ test("users can create and retrieve private product Auto Replies", async (t) => 
 
   assert.ok(savedUpdatedReply);
   assert.equal(savedUpdatedReply.question, "Updated reset question?");
-  assert.equal(
-    savedUpdatedReply.answer,
-    "Press and hold the power button.",
-  );
+  assert.equal(savedUpdatedReply.answer, "Press and hold the power button.");
 
   const unauthorizedRead = await graphql(
     autoRepliesQuery,
@@ -524,6 +573,14 @@ test("users can create and retrieve private product Auto Replies", async (t) => 
   );
 
   assertError(unauthorizedUpdate, "NOT_FOUND");
+
+  const unauthorizedMove = await graphql(
+    moveAutoReplyMutation,
+    { id: firstReply.id, direction: "DOWN" },
+    otherCookie,
+  );
+
+  assertError(unauthorizedMove, "NOT_FOUND");
 
   const unauthorizedDelete = await graphql(
     deleteAutoReplyMutation,

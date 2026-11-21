@@ -10,7 +10,10 @@ import {
 import { prisma } from "@/server/db/prisma";
 
 const productIdSchema = z.string().trim().min(1, "Product ID is required.");
-const autoReplyIdSchema = z.string().trim().min(1, "Auto Reply ID is required.");
+const autoReplyIdSchema = z
+  .string()
+  .trim()
+  .min(1, "Auto Reply ID is required.");
 
 const autoReplySelect = {
   id: true,
@@ -254,3 +257,90 @@ export async function deleteAutoReply(userId: string, id: string) {
   return true;
 }
 
+export async function moveAutoReply(
+  userId: string,
+  id: string,
+  direction: "UP" | "DOWN",
+) {
+  const idResult = autoReplyIdSchema.safeParse(id);
+
+  if (!idResult.success) {
+    throw new AutoReplyError(
+      "INVALID_INPUT",
+      formatValidationErrors(idResult.error),
+    );
+  }
+
+  const directionResult = z.enum(["UP", "DOWN"]).safeParse(direction);
+
+  if (!directionResult.success) {
+    throw new AutoReplyError(
+      "INVALID_INPUT",
+      formatValidationErrors(directionResult.error),
+    );
+  }
+
+  return prisma.$transaction(
+    async (transaction) => {
+      const target = await transaction.autoReply.findFirst({
+        where: {
+          id: idResult.data,
+          product: {
+            is: {
+              userId,
+            },
+          },
+        },
+        select: autoReplySelect,
+      });
+
+      if (!target) {
+        throw new AutoReplyError("NOT_FOUND", "Automatic reply not found.");
+      }
+
+      const siblings = await transaction.autoReply.findMany({
+        where: {
+          productId: target.productId,
+          parentId: target.parentId,
+        },
+        orderBy: [{ position: "asc" }, { id: "asc" }],
+        select: {
+          id: true,
+          position: true,
+        },
+      });
+
+      const currentIndex = siblings.findIndex((item) => item.id === target.id);
+
+      const nextIndex = currentIndex + (directionResult.data === "UP" ? -1 : 1);
+
+      if (nextIndex < 0 || nextIndex >= siblings.length) {
+        return target;
+      }
+
+      const reordered = [...siblings];
+
+      [reordered[currentIndex], reordered[nextIndex]] = [
+        reordered[nextIndex],
+        reordered[currentIndex],
+      ];
+
+      await Promise.all(
+        reordered.map((item, position) =>
+          transaction.autoReply.update({
+            where: { id: item.id },
+            data: { position },
+          }),
+        ),
+      );
+
+      return transaction.autoReply.findUniqueOrThrow({
+        where: { id: target.id },
+        select: autoReplySelect,
+      });
+    },
+    {
+      isolationLevel: "Serializable",
+    },
+  );
+}

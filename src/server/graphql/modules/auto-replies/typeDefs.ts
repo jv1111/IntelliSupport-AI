@@ -26,9 +26,15 @@ export const autoReplyTypeDefs = `#graphql
     autoReplies(productId: ID): [AutoReply!]!
   }
 
+  enum AutoReplyMoveDirection {
+    UP
+    DOWN
+  }
+
   extend type Mutation {
     createAutoReply(input: CreateAutoReplyInput!): AutoReply!
     updateAutoReply(id: ID!, input: UpdateAutoReplyInput!): AutoReply!
+    moveAutoReply(id: ID!, direction: AutoReplyMoveDirection!): AutoReply!
     deleteAutoReply(id: ID!): Boolean!
   }
 `;

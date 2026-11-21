@@ -1,3 +1,5 @@
+export type AutoReplyMoveDirection = "UP" | "DOWN";
+
 export interface AutoReply {
   id: string;
   productId: string;
@@ -20,4 +22,3 @@ export interface UpdateAutoReplyInput {
   question: string;
   answer: string;
 }
-

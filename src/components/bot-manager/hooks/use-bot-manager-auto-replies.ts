@@ -5,9 +5,14 @@ import {
   createAutoReply as createAutoReplyRequest,
   deleteAutoReply as deleteAutoReplyRequest,
   fetchAutoReplies,
+  moveAutoReply as moveAutoReplyRequest,
   updateAutoReply as updateAutoReplyRequest,
 } from "@/lib/auto-replies";
-import type { AutoReply, CreateAutoReplyInput } from "@/lib/auto-replies/types";
+import type {
+  AutoReply,
+  AutoReplyMoveDirection,
+  CreateAutoReplyInput,
+} from "@/lib/auto-replies/types";
 
 export function useBotManagerAutoReplies(productId?: string, enabled = true) {
   const [autoReplies, setAutoReplies] = useState<AutoReply[]>([]);
@@ -15,8 +20,10 @@ export function useBotManagerAutoReplies(productId?: string, enabled = true) {
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isReordering, setIsReordering] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
   const [deletionError, setDeletionError] = useState<string | null>(null);
+  const [reorderError, setReorderError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
@@ -151,6 +158,93 @@ export function useBotManagerAutoReplies(productId?: string, enabled = true) {
     [],
   );
 
+  const moveAutoReply = useCallback(
+    async (
+      autoReplyId: string,
+      direction: AutoReplyMoveDirection,
+    ): Promise<boolean> => {
+      const target = autoReplies.find((item) => item.id === autoReplyId);
+
+      if (!target) {
+        return false;
+      }
+
+      const siblings = autoReplies
+        .filter(
+          (item) =>
+            item.productId === target.productId &&
+            item.parentId === target.parentId,
+        )
+        .sort((a, b) => a.position - b.position || a.id.localeCompare(b.id));
+
+      const currentIndex = siblings.findIndex(
+        (item) => item.id === autoReplyId,
+      );
+      const nextIndex = currentIndex + (direction === "UP" ? -1 : 1);
+
+      if (currentIndex < 0) {
+        return false;
+      }
+
+      if (nextIndex < 0 || nextIndex >= siblings.length) {
+        return true;
+      }
+
+      setIsReordering(true);
+      setReorderError(null);
+
+      try {
+        const movedReply = await moveAutoReplyRequest(autoReplyId, direction);
+
+        setAutoReplies((current) => {
+          const currentSiblings = current
+            .filter(
+              (item) =>
+                item.productId === movedReply.productId &&
+                item.parentId === movedReply.parentId,
+            )
+            .sort(
+              (a, b) => a.position - b.position || a.id.localeCompare(b.id),
+            );
+
+          const reordered = currentSiblings.filter(
+            (item) => item.id !== movedReply.id,
+          );
+
+          const insertIndex = Math.max(
+            0,
+            Math.min(movedReply.position, reordered.length),
+          );
+
+          reordered.splice(insertIndex, 0, movedReply);
+
+          const positions = new Map(
+            reordered.map((item, index) => [item.id, index]),
+          );
+
+          return current.map((item) => {
+            const position = positions.get(item.id);
+
+            return position === undefined ? item : { ...item, position };
+          });
+        });
+
+        return true;
+      } catch (error) {
+        setReorderError(
+          error instanceof Error
+            ? error.message
+            : "Unable to reorder questions. Please try again.",
+        );
+
+        return false;
+      } finally {
+        setIsReordering(false);
+      }
+    },
+    [autoReplies],
+  );
+
   const retry = useCallback(() => {
     setRefreshKey((current) => current + 1);
   }, []);
@@ -161,11 +255,14 @@ export function useBotManagerAutoReplies(productId?: string, enabled = true) {
     error,
     isSaving,
     isDeleting,
+    isReordering,
     actionError,
     deletionError,
+    reorderError,
     addAutoReply,
     saveAutoReply,
     deleteAutoReply,
+    moveAutoReply,
     retry,
   };
 }

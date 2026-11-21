@@ -12,11 +12,10 @@ import { Toggle } from "@/components/ui/toggle";
 import { ProductImage } from "@/components/products/product-image";
 import { useBotManagerProducts } from "@/components/bot-manager/hooks/use-bot-manager-products";
 import { useBotManagerAutoReplies } from "@/components/bot-manager/hooks/use-bot-manager-auto-replies";
+import { useBotSettings } from "@/components/bot-manager/hooks/use-bot-settings";
 
 export function BotManager() {
   const router = useRouter();
-  const [aiEnabled, setAiEnabled] = useState(true);
-  const [autoRepliesEnabled, setAutoRepliesEnabled] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
   const {
@@ -31,7 +30,19 @@ export function BotManager() {
     error: autoRepliesError,
     retry: retryAutoReplies,
   } = useBotManagerAutoReplies();
+  const {
+    settings,
+    isLoading: isLoadingSettings,
+    isSavingSettings,
+    isSavingAiEnabled,
+    isSavingAutoRepliesEnabled,
+    error: settingsError,
+    updateSettings,
+    retry: retrySettings,
+  } = useBotSettings();
 
+  const aiEnabled = settings?.aiEnabled ?? true;
+  const autoRepliesEnabled = settings?.autoRepliesEnabled ?? true;
   const isLoading = isLoadingProducts || isLoadingAutoReplies;
   const error = productsError ?? autoRepliesError;
 
@@ -56,6 +67,24 @@ export function BotManager() {
   return (
     <main className="min-h-full p-5 sm:p-6">
       <div className="space-y-6">
+        {settingsError && (
+          <div
+            className="flex flex-wrap items-center justify-between gap-3"
+            role="alert"
+          >
+            <p className="text-xs text-danger">{settingsError}</p>
+            <Button
+              variant="secondary"
+              fullWidth={false}
+              type="button"
+              onClick={retrySettings}
+              disabled={isLoadingSettings || isSavingSettings}
+            >
+              Try again
+            </Button>
+          </div>
+        )}
+
         <section aria-labelledby="ai-support-assistant-heading">
           <Card className="flex flex-wrap items-center justify-between gap-4 p-5">
             <div className="flex items-center gap-4">
@@ -95,7 +124,10 @@ export function BotManager() {
 
             <Toggle
               checked={aiEnabled}
-              onCheckedChange={setAiEnabled}
+              onCheckedChange={(checked) =>
+                void updateSettings({ aiEnabled: checked })
+              }
+              disabled={isLoadingSettings || isSavingAiEnabled || !settings}
               label="Enable or disable AI"
             />
           </Card>
@@ -127,7 +159,12 @@ export function BotManager() {
 
               <Toggle
                 checked={autoRepliesEnabled}
-                onCheckedChange={setAutoRepliesEnabled}
+                onCheckedChange={(checked) =>
+                  void updateSettings({ autoRepliesEnabled: checked })
+                }
+                disabled={
+                  isLoadingSettings || isSavingAutoRepliesEnabled || !settings
+                }
                 label="Turn automatic chat replies on or off"
               />
             </div>

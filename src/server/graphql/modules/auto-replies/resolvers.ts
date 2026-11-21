@@ -7,6 +7,7 @@ import {
   createAutoReply,
   deleteAutoReply,
   getAutoReplies,
+  moveAutoReply,
   updateAutoReply,
 } from "@/server/services/auto-replies";
 import type { GraphQLContext } from "@/server/graphql/context";
@@ -71,6 +72,22 @@ export const autoReplyResolvers = {
         return await updateAutoReply(user.id, args.id, args.input);
       } catch (error) {
         throwGraphQLError(error, "Unable to update automatic reply.", [
+          AutoReplyError,
+        ]);
+      }
+    },
+
+    moveAutoReply: async (
+      _parent: unknown,
+      args: { id: string; direction: "UP" | "DOWN" },
+      context: GraphQLContext,
+    ): Promise<AutoReplyResult> => {
+      const user = requireAuthenticatedUser(context);
+
+      try {
+        return await moveAutoReply(user.id, args.id, args.direction);
+      } catch (error) {
+        throwGraphQLError(error, "Unable to reorder automatic replies.", [
           AutoReplyError,
         ]);
       }

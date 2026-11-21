@@ -15,6 +15,10 @@ import {
   autoReplyResolvers,
   autoReplyTypeDefs,
 } from "@/server/graphql/modules/auto-replies";
+import {
+  botSettingsResolvers,
+  botSettingsTypeDefs,
+} from "@/server/graphql/modules/bot-settings";
 
 const rootTypeDefs = `#graphql
   type Query {
@@ -30,6 +34,7 @@ export const typeDefs = [
   productTypeDefs,
   knowledgeBaseTypeDefs,
   autoReplyTypeDefs,
+  botSettingsTypeDefs,
 ];
 
 export const resolvers = {
@@ -41,6 +46,7 @@ export const resolvers = {
     ...productResolvers.Query,
     ...knowledgeBaseResolvers.Query,
     ...autoReplyResolvers.Query,
+    ...botSettingsResolvers.Query,
   },
 
   Mutation: {
@@ -50,6 +56,7 @@ export const resolvers = {
     ...productResolvers.Mutation,
     ...knowledgeBaseResolvers.Mutation,
     ...autoReplyResolvers.Mutation,
+    ...botSettingsResolvers.Mutation,
   },
 
   User: authResolvers.User,
