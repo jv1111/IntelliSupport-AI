@@ -31,16 +31,17 @@ export class BotSettingsError extends Error {
 }
 
 export async function getBotSettings(userId: string) {
-  return prisma.botSettings.upsert({
+  const settings = await prisma.botSettings.findUnique({
     where: { userId },
-    update: {},
-    create: {
-      user: {
-        connect: { id: userId },
-      },
-    },
     select: botSettingsSelect,
   });
+
+  return (
+    settings ?? {
+      aiEnabled: true,
+      autoRepliesEnabled: true,
+    }
+  );
 }
 
 export async function updateBotSettings(userId: string, input: unknown) {
