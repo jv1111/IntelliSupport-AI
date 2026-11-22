@@ -106,7 +106,7 @@ export function AutoReplyItem({
           variant="primary-subtle"
           fullWidth={false}
           type="button"
-          className="gap-2 px-3 py-2"
+          size="small"
           disabled={isDisabled}
           onClick={() => onOpenFollowUps(reply.id)}
         >

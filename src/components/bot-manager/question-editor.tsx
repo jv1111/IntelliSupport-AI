@@ -290,7 +290,7 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
                       isSaving ||
                       isLoadingAutoReplies
                     }
-                    className="gap-2 px-3 py-2"
+                    size="small"
                     onClick={handleAddQuestion}
                   >
                     Add Question
@@ -411,7 +411,7 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
                             variant="secondary"
                             fullWidth={false}
                             type="button"
-                            className="px-3 py-2"
+                            size="small"
                             onClick={handleCancelAddQuestion}
                             disabled={isSaving}
                           >
@@ -422,7 +422,7 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
                             variant="primary"
                             fullWidth={false}
                             type="submit"
-                            className="px-3 py-2"
+                            size="small"
                             disabled={
                               isSaving ||
                               !questionDraft.trim() ||

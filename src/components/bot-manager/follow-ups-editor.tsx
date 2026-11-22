@@ -300,7 +300,7 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
                 isDeleting ||
                 isReordering
               }
-              className="gap-2 px-3 py-2"
+              size="small"
               onClick={handleAddFollowUp}
             >
               Add Follow-up
@@ -400,7 +400,7 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
                           variant="secondary"
                           fullWidth={false}
                           type="button"
-                          className="px-3 py-2"
+                          size="small"
                           onClick={handleCancelAddFollowUp}
                           disabled={isSaving || isDeleting}
                         >
@@ -411,7 +411,7 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
                           variant="primary"
                           fullWidth={false}
                           type="submit"
-                          className="px-3 py-2"
+                          size="small"
                           disabled={
                             isSaving ||
                             !followUpDraft.trim() ||

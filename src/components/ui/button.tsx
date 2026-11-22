@@ -11,8 +11,11 @@ type ButtonVariant =
   | "icon"
   | "tab";
 
+type ButtonSize = "default" | "small";
+
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
+  size?: ButtonSize;
   fullWidth?: boolean;
   active?: boolean;
 }
@@ -50,6 +53,7 @@ const variantStyles: Record<ButtonVariant, string> = {
 
 export function Button({
   variant = "primary",
+  size = "default",
   fullWidth = variant === "primary" || variant === "secondary",
   active = false,
   type = "button",
@@ -64,7 +68,11 @@ export function Button({
       : "";
 
   const isIconVariant = variant === "icon" || variant === "icon-surface";
-  const paddingStyles = isIconVariant ? "p-0" : "p-3";
+  const paddingStyles = isIconVariant
+    ? "p-0"
+    : size === "small"
+      ? "px-3 py-2"
+      : "p-3";
   const widthStyles = isIconVariant ? "" : fullWidth ? "w-full" : "w-auto";
   const transitionStyles =
     variant === "tab" || variant === "icon-surface"
