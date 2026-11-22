@@ -1,5 +1,5 @@
-import { PagePlaceholder } from "@/components/layout/page-placeholder";
+import { Playground } from "@/components/playground/playground";
 
 export default function PlaygroundPage() {
-  return <PagePlaceholder title="Playground" />;
+  return <Playground />;
 }
