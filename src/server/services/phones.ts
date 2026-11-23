@@ -2,10 +2,7 @@ import "server-only";
 
 import argon2 from "argon2";
 import { randomInt } from "node:crypto";
-import {
-  addPhoneSchema,
-  verifyPhoneSchema,
-} from "@/lib/validations/phone";
+import { addPhoneSchema, verifyPhoneSchema } from "@/lib/validations/phone";
 import { formatValidationErrors } from "@/lib/validations/format-validation-errors";
 import { prisma } from "@/server/db/prisma";
 import { sendVerificationSms } from "@/server/sms/unisms";

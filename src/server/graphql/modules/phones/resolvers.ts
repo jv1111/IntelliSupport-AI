@@ -59,7 +59,9 @@ export const phoneResolvers = {
       try {
         return await verifyPhone(user.id, args);
       } catch (error) {
-        throwGraphQLError(error, "Unable to verify phone number.", [PhoneError]);
+        throwGraphQLError(error, "Unable to verify phone number.", [
+          PhoneError,
+        ]);
       }
     },
 

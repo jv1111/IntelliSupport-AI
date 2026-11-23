@@ -5,7 +5,7 @@ import { useState } from "react";
 import { ProductImagePlaceholder } from "@/components/products/product-image-placeholder";
 
 interface ProductImageProps {
-  src: string;
+  src: string | null | undefined;
   alt: string;
   sizes: string;
   className?: string;
@@ -21,7 +21,7 @@ export function ProductImage({
 }: ProductImageProps) {
   const [failedImageUrl, setFailedImageUrl] = useState<string | null>(null);
 
-  if (failedImageUrl === src) {
+  if (!src?.trim() || failedImageUrl === src) {
     return <ProductImagePlaceholder />;
   }
 

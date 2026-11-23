@@ -65,11 +65,11 @@ export function BotManager() {
   });
 
   return (
-    <main className="min-h-full p-5 sm:p-6">
-      <div className="space-y-6">
+    <main className="mx-auto flex h-full min-h-0 w-full flex-col overflow-hidden p-5 sm:p-6">
+      <div className="flex min-h-0 flex-1 flex-col gap-6">
         {settingsError && (
           <div
-            className="flex flex-wrap items-center justify-between gap-3"
+            className="flex shrink-0 flex-wrap items-center justify-between gap-3"
             role="alert"
           >
             <p className="text-xs text-danger">{settingsError}</p>
@@ -85,7 +85,10 @@ export function BotManager() {
           </div>
         )}
 
-        <section aria-labelledby="ai-support-assistant-heading">
+        <section
+          aria-labelledby="ai-support-assistant-heading"
+          className="shrink-0"
+        >
           <Card className="flex flex-wrap items-center justify-between gap-4 p-5">
             <div className="flex items-center gap-4">
               <div
@@ -133,7 +136,7 @@ export function BotManager() {
           </Card>
         </section>
 
-        <section className="flex flex-wrap items-center justify-between gap-4">
+        <section className="flex shrink-0 flex-wrap items-center justify-between gap-4">
           <div>
             <h2 className="text-base font-bold text-foreground">
               Automatic Chat Replies
@@ -179,9 +182,12 @@ export function BotManager() {
           </div>
         </section>
 
-        <section aria-labelledby="product-catalog-heading">
-          <Card className="p-4 sm:p-5">
-            <div className="mb-4">
+        <section
+          aria-labelledby="product-catalog-heading"
+          className="flex min-h-0 flex-1 flex-col"
+        >
+          <Card className="flex h-full min-h-0 flex-1 flex-col p-4 sm:p-5">
+            <div className="mb-4 shrink-0">
               <h2
                 id="product-catalog-heading"
                 className="text-sm font-bold text-foreground"
@@ -194,7 +200,7 @@ export function BotManager() {
               </p>
             </div>
 
-            <div className="mb-4 w-full max-w-md">
+            <div className="mb-4 w-full max-w-md shrink-0">
               <SearchInput
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
@@ -206,12 +212,12 @@ export function BotManager() {
             {isLoading ? (
               <p
                 role="status"
-                className="py-10 text-center text-xs text-muted-foreground"
+                className="flex min-h-0 flex-1 items-center justify-center py-10 text-center text-xs text-muted-foreground"
               >
                 Loading products...
               </p>
             ) : error ? (
-              <div className="flex flex-col items-center gap-3 py-10">
+              <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 py-10">
                 <p role="alert" className="text-center text-xs text-danger">
                   {error}
                 </p>
@@ -226,7 +232,7 @@ export function BotManager() {
               </div>
             ) : filteredProducts.length > 0 ? (
               <ul
-                className={`divide-y divide-border/70 transition-opacity ${
+                className={`min-h-0 flex-1 divide-y divide-border/70 overflow-y-auto transition-opacity ${
                   autoRepliesEnabled ? "" : "opacity-50"
                 }`}
               >
@@ -272,7 +278,7 @@ export function BotManager() {
             ) : (
               <p
                 role="status"
-                className="py-10 text-center text-xs font-medium text-muted-foreground"
+                className="flex min-h-0 flex-1 items-center justify-center py-10 text-center text-xs font-medium text-muted-foreground"
               >
                 No products with saved questions and answers found.
               </p>

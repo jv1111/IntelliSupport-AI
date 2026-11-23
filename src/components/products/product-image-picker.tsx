@@ -107,12 +107,12 @@ export function ProductImagePicker({
         <div className={previewCardStyles}>
           <div className="relative aspect-4/3 w-full shrink-0 overflow-hidden rounded-xl border border-border bg-surface sm:w-44">
             <ProductImage
-                src={previewUrl}
-                alt={productName || "Product image"}
-                sizes="(min-width: 640px) 11rem, 100vw"
-                onError={selectedImage ? reportPreviewFailure : undefined}
-                className="object-contain p-2"
-              />
+              src={previewUrl}
+              alt={productName || "Product image"}
+              sizes="(min-width: 640px) 11rem, 100vw"
+              onError={selectedImage ? reportPreviewFailure : undefined}
+              className="object-contain p-2"
+            />
           </div>
 
           <div className="min-w-0 flex-1 space-y-3">

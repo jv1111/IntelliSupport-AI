@@ -9,11 +9,7 @@ interface PageHeaderProps {
   };
 }
 
-export function PageHeader({
-  title,
-  description,
-  action,
-}: PageHeaderProps) {
+export function PageHeader({ title, description, action }: PageHeaderProps) {
   return (
     <div className="flex shrink-0 flex-wrap items-center justify-between gap-4">
       <div>

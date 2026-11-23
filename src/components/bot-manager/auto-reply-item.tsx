@@ -111,7 +111,7 @@ export function AutoReplyItem({
           onClick={() => onOpenFollowUps(reply.id)}
         >
           <GitBranch className="size-3.5" aria-hidden="true" />
-          Add Follow-ups
+          Edit Follow-ups
           <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[9px] font-bold">
             {followUpCount}/{MAX_AUTO_REPLIES_PER_LEVEL}
           </span>

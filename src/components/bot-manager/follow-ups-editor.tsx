@@ -251,9 +251,9 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
   }
 
   return (
-    <main className="min-h-full p-5 sm:p-6">
-      <section className="w-full space-y-6">
-        <div className="flex items-center gap-3">
+    <main className="mx-auto flex h-full min-h-0 w-full flex-col overflow-hidden p-5 sm:p-6">
+      <section className="flex min-h-0 w-full flex-1 flex-col gap-6">
+        <div className="flex shrink-0 items-center gap-3">
           <BackButton
             onClick={handleBack}
             ariaLabel="Back to previous questions"
@@ -269,9 +269,9 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
           </div>
         </div>
 
-        <div className="border-b border-border" />
+        <div className="shrink-0 border-b border-border" />
 
-        <section className="max-w-5xl space-y-2">
+        <section className="max-w-5xl shrink-0 space-y-2">
           <p className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
             Answer sent first
           </p>
@@ -282,8 +282,8 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
           </div>
         </section>
 
-        <section className="max-w-5xl space-y-4">
-          <div className="flex flex-wrap items-start justify-between gap-3">
+        <section className="flex min-h-0 max-w-5xl flex-1 flex-col gap-4">
+          <div className="flex shrink-0 flex-wrap items-start justify-between gap-3">
             <p className="flex-1 text-xs leading-relaxed text-muted-foreground">
               After this answer, customers can pick one of these follow-up
               questions ({followUps.length}/{MAX_AUTO_REPLIES_PER_LEVEL}).
@@ -308,13 +308,13 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
           </div>
 
           {reorderError && (
-            <p role="alert" className="text-xs text-danger">
+            <p role="alert" className="shrink-0 text-xs text-danger">
               {reorderError}
             </p>
           )}
 
           {followUps.length > 0 || isAddingFollowUp ? (
-            <ol className="space-y-3">
+            <ol className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain pr-2">
               {followUps.map((followUp, index) => {
                 const childCount = autoReplies.filter(
                   (item) => item.parentId === followUp.id,
@@ -431,7 +431,7 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
               )}
             </ol>
           ) : (
-            <Card className="py-10 text-center">
+            <Card className="flex min-h-0 flex-1 items-center justify-center py-10 text-center">
               <p className="text-xs font-medium text-muted-foreground">
                 No follow-up questions have been added yet.
               </p>
@@ -439,7 +439,7 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
           )}
 
           {followUps.length >= MAX_AUTO_REPLIES_PER_LEVEL && (
-            <p className="border-t border-border/70 pt-3 text-[10px] text-muted-foreground">
+            <p className="shrink-0 border-t border-border/70 pt-3 text-[10px] text-muted-foreground">
               Maximum of {MAX_AUTO_REPLIES_PER_LEVEL} follow-up questions
               reached.
             </p>

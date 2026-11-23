@@ -8,10 +8,7 @@ export const instant = false;
 function ProtectedLayoutFallback() {
   return (
     <div className="flex h-dvh items-center justify-center bg-background">
-      <p
-        role="status"
-        className="text-xs font-medium text-muted-foreground"
-      >
+      <p role="status" className="text-xs font-medium text-muted-foreground">
         Loading workspace...
       </p>
     </div>

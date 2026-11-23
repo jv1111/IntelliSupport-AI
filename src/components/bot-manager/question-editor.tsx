@@ -171,9 +171,9 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
   }
 
   return (
-    <main className="min-h-full p-5 sm:p-6">
-      <section className="w-full space-y-6">
-        <div className="flex items-center gap-3">
+    <main className="mx-auto flex h-full min-h-0 w-full flex-col overflow-hidden p-5 sm:p-6">
+      <section className="flex min-h-0 w-full flex-1 flex-col gap-6">
+        <div className="flex shrink-0 items-center gap-3">
           <BackButton onClick={handleBack} ariaLabel="Back to Bot Manager" />
 
           {isProductSelectionMode && !product ? (
@@ -221,7 +221,7 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
         </div>
 
         {isProductSelectionMode && (
-          <div className="max-w-5xl space-y-1">
+          <div className="max-w-5xl shrink-0 space-y-1">
             <FieldLabel htmlFor="auto-reply-product" required>
               Product
             </FieldLabel>
@@ -260,9 +260,9 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
 
         {product ? (
           <>
-            <div className="border-b border-border" />
+            <div className="shrink-0 border-b border-border" />
 
-            <div className="space-y-1">
+            <div className="shrink-0 space-y-1">
               <h2 className="text-sm font-bold text-foreground">
                 Automatic Reply Questions
               </h2>
@@ -271,8 +271,8 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
               </p>
             </div>
 
-            <Card className="max-w-5xl space-y-4 p-4 sm:p-5">
-              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/70 pb-3">
+            <Card className="flex min-h-0 w-full max-w-5xl flex-1 flex-col gap-4 p-4 sm:p-5">
+              <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-border/70 pb-3">
                 <h3 className="text-sm font-bold text-foreground">Questions</h3>
 
                 <div className="flex items-center gap-2">
@@ -301,12 +301,12 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
               {isLoadingAutoReplies ? (
                 <p
                   role="status"
-                  className="py-10 text-center text-xs text-muted-foreground"
+                  className="flex min-h-0 flex-1 items-center justify-center py-10 text-center text-xs text-muted-foreground"
                 >
                   Loading automatic replies...
                 </p>
               ) : autoRepliesError ? (
-                <div className="flex flex-col items-center gap-3 py-10">
+                <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 py-10">
                   <p role="alert" className="text-center text-xs text-danger">
                     {autoRepliesError}
                   </p>
@@ -320,12 +320,17 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
                   </Button>
                 </div>
               ) : (
-                <ol className="divide-y divide-border/70">
+                <ol className="flex min-h-0 flex-1 flex-col divide-y divide-border/70 overflow-y-auto overscroll-contain pr-2">
                   {reorderError && (
                     <li className="py-2">
                       <p role="alert" className="text-xs text-danger">
                         {reorderError}
                       </p>
+                    </li>
+                  )}
+                  {questions.length === 0 && !isAddingQuestion && (
+                    <li className="flex min-h-0 flex-1 items-center justify-center py-10 text-center text-xs font-medium text-muted-foreground">
+                      No questions have been added for this product yet.
                     </li>
                   )}
                   {questions.map((question, index) => (
@@ -442,24 +447,15 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
                 </ol>
               )}
 
-              {!isLoadingAutoReplies &&
-                !autoRepliesError &&
-                questions.length === 0 &&
-                !isAddingQuestion && (
-                  <p className="py-10 text-center text-xs font-medium text-muted-foreground">
-                    No questions have been added for this product yet.
-                  </p>
-                )}
-
               {questions.length >= MAX_AUTO_REPLIES_PER_LEVEL && (
-                <p className="border-t border-border/70 pt-3 text-[10px] text-muted-foreground">
+                <p className="shrink-0 border-t border-border/70 pt-3 text-[10px] text-muted-foreground">
                   Maximum of {MAX_AUTO_REPLIES_PER_LEVEL} questions reached.
                 </p>
               )}
             </Card>
           </>
         ) : isProductSelectionMode ? (
-          <Card className="max-w-5xl py-10 text-center">
+          <Card className="flex min-h-0 w-full max-w-5xl flex-1 items-center justify-center py-10 text-center">
             <p className="text-xs font-medium text-muted-foreground">
               Select a product to view and manage its automatic reply questions.
             </p>

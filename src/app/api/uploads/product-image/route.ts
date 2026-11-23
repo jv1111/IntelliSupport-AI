@@ -6,7 +6,6 @@ import {
   saveProductImage,
 } from "@/server/storage/google-cloud-storage";
 
-
 export async function POST(request: Request): Promise<Response> {
   try {
     const user = await getCurrentUser();

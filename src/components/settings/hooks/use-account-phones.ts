@@ -74,30 +74,27 @@ export function useAccountPhones() {
     return verifiedPhone;
   }, []);
 
-  const deletePhone = useCallback(
-    async (phoneId: string): Promise<boolean> => {
-      setDeletingPhoneId(phoneId);
-      setPhoneDeletionError(null);
+  const deletePhone = useCallback(async (phoneId: string): Promise<boolean> => {
+    setDeletingPhoneId(phoneId);
+    setPhoneDeletionError(null);
 
-      try {
-        await deleteAccountPhone(phoneId);
-        setPhones((current) => current.filter((item) => item.id !== phoneId));
+    try {
+      await deleteAccountPhone(phoneId);
+      setPhones((current) => current.filter((item) => item.id !== phoneId));
 
-        return true;
-      } catch (error) {
-        setPhoneDeletionError(
-          error instanceof Error
-            ? error.message
-            : "Unable to delete phone number. Please try again.",
-        );
+      return true;
+    } catch (error) {
+      setPhoneDeletionError(
+        error instanceof Error
+          ? error.message
+          : "Unable to delete phone number. Please try again.",
+      );
 
-        return false;
-      } finally {
-        setDeletingPhoneId(null);
-      }
-    },
-    [],
-  );
+      return false;
+    } finally {
+      setDeletingPhoneId(null);
+    }
+  }, []);
 
   const clearPhoneDeletionError = useCallback(() => {
     setPhoneDeletionError(null);
