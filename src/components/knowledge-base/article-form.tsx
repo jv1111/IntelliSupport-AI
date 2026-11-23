@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, type FormEvent } from "react";
-import { Archive } from "lucide-react";
+import { Archive, LockKeyhole } from "lucide-react";
 import type {
   ArticleCategoryTag,
   ArticleScope,
@@ -15,7 +15,9 @@ import { SelectField } from "@/components/ui/select-field";
 import {
   articleCategoryLabels,
   articleScopeLabels,
+  genericArticleCategoryLabel,
 } from "@/components/knowledge-base/data";
+import { knowledgeBaseSampleItems } from "../../../temp-sample-data/knowledge-base-items";
 import type {
   KnowledgeBaseArticle,
   KnowledgeBaseArticleInput,
@@ -43,6 +45,7 @@ export function ArticleForm({
   onPublish,
 }: ArticleFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
+  const [selectedItemId, setSelectedItemId] = useState("");
 
   const [values, setValues] = useState<KnowledgeBaseArticleInput>(() => ({
     scope: article?.scope ?? "generic",
@@ -227,22 +230,69 @@ export function ArticleForm({
             <FieldLabel htmlFor="kb-category" required>
               Category Tag
             </FieldLabel>
-            <SelectField
-              id="kb-category"
-              required
-              disabled={isSaving}
-              value={values.categoryTag}
-              onChange={(event) =>
-                updateField(
-                  "categoryTag",
-                  event.target.value as ArticleCategoryTag,
-                )
-              }
-              options={Object.entries(articleCategoryLabels).map(
-                ([value, label]) => ({ value, label }),
-              )}
-            />
+            {values.scope === "generic" ? (
+              <div className="relative">
+                <input
+                  id="kb-category"
+                  type="text"
+                  value={genericArticleCategoryLabel}
+                  disabled
+                  readOnly
+                  className={`${fieldControlStyles} cursor-not-allowed bg-surface-muted px-3.5 py-2.5`}
+                />
+                <LockKeyhole
+                  className="pointer-events-none absolute top-1/2 right-3 size-3.5 -translate-y-1/2 text-muted-foreground"
+                  aria-hidden="true"
+                />
+              </div>
+            ) : (
+              <SelectField
+                id="kb-category"
+                required
+                disabled={isSaving}
+                value={values.categoryTag}
+                onChange={(event) =>
+                  updateField(
+                    "categoryTag",
+                    event.target.value as ArticleCategoryTag,
+                  )
+                }
+                options={Object.entries(articleCategoryLabels).map(
+                  ([value, label]) => ({ value, label }),
+                )}
+              />
+            )}
           </div>
+
+          {values.scope !== "generic" && (
+            <div>
+              <FieldLabel htmlFor="kb-related-item" required>
+                Related Product
+              </FieldLabel>
+
+              <SelectField
+                id="kb-related-item"
+                required
+                disabled={isSaving}
+                value={selectedItemId}
+                onChange={(event) => setSelectedItemId(event.target.value)}
+                options={[
+                  {
+                    value: "",
+                    label: "Select an item...",
+                  },
+                  ...knowledgeBaseSampleItems.map((item) => ({
+                    value: item.id,
+                    label: item.name,
+                  })),
+                ]}
+              />
+
+              <p className="mt-1.5 text-[10px] leading-relaxed text-muted-foreground">
+                Item selection is a frontend preview and is not saved yet.
+              </p>
+            </div>
+          )}
         </div>
 
         <div>

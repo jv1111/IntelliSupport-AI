@@ -9,6 +9,8 @@ export const articleScopeLabels: Record<ArticleScope, string> = {
   specific: "Specific Guidance",
 };
 
+export const genericArticleCategoryLabel = "Generic";
+
 export const articleCategoryLabels: Record<ArticleCategoryTag, string> = {
   troubleshooting: "Troubleshooting",
   installation_setup: "Installation & Setup",
