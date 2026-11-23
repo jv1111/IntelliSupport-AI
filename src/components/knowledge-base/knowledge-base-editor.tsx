@@ -13,6 +13,9 @@ interface KnowledgeBaseEditorProps {
 export function KnowledgeBaseEditor({ articleId }: KnowledgeBaseEditorProps) {
   const {
     article,
+    products,
+    isLoadingProducts,
+    productsError,
     isLoading,
     loadError,
     isSaving,
@@ -58,6 +61,9 @@ export function KnowledgeBaseEditor({ articleId }: KnowledgeBaseEditorProps) {
       <ArticleForm
         key={article?.id ?? "new-article"}
         article={article}
+        products={products}
+        isLoadingProducts={isLoadingProducts}
+        productsError={productsError}
         isSaving={isSaving}
         error={actionError}
         onCancel={closeEditor}

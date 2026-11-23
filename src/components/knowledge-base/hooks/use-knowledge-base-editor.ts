@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { fetchAllProducts } from "@/lib/products";
+import type { Product } from "@/lib/products/types";
 import {
   createKnowledgeBaseArticle,
   fetchKnowledgeBaseArticle,
@@ -17,6 +19,9 @@ export function useKnowledgeBaseEditor(articleId?: string) {
   const router = useRouter();
 
   const [article, setArticle] = useState<KnowledgeBaseArticle | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true);
+  const [productsError, setProductsError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(Boolean(articleId));
   const [loadError, setLoadError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -55,6 +60,41 @@ export function useKnowledgeBaseEditor(articleId?: string) {
       cancelled = true;
     };
   }, [articleId]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadProducts() {
+      setIsLoadingProducts(true);
+      setProductsError(null);
+
+      try {
+        const result = await fetchAllProducts();
+
+        if (!cancelled) {
+          setProducts(result.filter((product) => product.status !== "draft"));
+        }
+      } catch (error: unknown) {
+        if (!cancelled) {
+          setProductsError(
+            error instanceof Error
+              ? error.message
+              : "Unable to load products. Please try again.",
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoadingProducts(false);
+        }
+      }
+    }
+
+    void loadProducts();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const closeEditor = useCallback(() => {
     router.push("/knowledge-base");
@@ -154,6 +194,9 @@ export function useKnowledgeBaseEditor(articleId?: string) {
 
   return {
     article,
+    products,
+    isLoadingProducts,
+    productsError,
     isLoading,
     loadError,
     isSaving,

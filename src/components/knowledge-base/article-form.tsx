@@ -17,7 +17,7 @@ import {
   articleScopeLabels,
   genericArticleCategoryLabel,
 } from "@/components/knowledge-base/data";
-import { knowledgeBaseSampleItems } from "../../../temp-sample-data/knowledge-base-items";
+import type { Product } from "@/lib/products/types";
 import type {
   KnowledgeBaseArticle,
   KnowledgeBaseArticleInput,
@@ -25,6 +25,9 @@ import type {
 
 interface ArticleFormProps {
   article: KnowledgeBaseArticle | null;
+  products: Product[];
+  isLoadingProducts: boolean;
+  productsError: string | null;
   isSaving: boolean;
   error: string | null;
   onCancel: () => void;
@@ -36,6 +39,9 @@ interface ArticleFormProps {
 
 export function ArticleForm({
   article,
+  products,
+  isLoadingProducts,
+  productsError,
   isSaving,
   error,
   onCancel,
@@ -273,23 +279,40 @@ export function ArticleForm({
               <SelectField
                 id="kb-related-item"
                 required
-                disabled={isSaving}
+                disabled={
+                  isSaving || isLoadingProducts || products.length === 0
+                }
                 value={selectedItemId}
                 onChange={(event) => setSelectedItemId(event.target.value)}
                 options={[
                   {
                     value: "",
-                    label: "Select an item...",
+                    label: isLoadingProducts
+                      ? "Loading products..."
+                      : products.length > 0
+                        ? "Select a product..."
+                        : productsError
+                          ? "Unable to load products"
+                          : "No available products",
                   },
-                  ...knowledgeBaseSampleItems.map((item) => ({
-                    value: item.id,
-                    label: item.name,
+                  ...products.map((product) => ({
+                    value: product.id,
+                    label: product.name,
                   })),
                 ]}
               />
 
-              <p className="mt-1.5 text-[10px] leading-relaxed text-muted-foreground">
-                Item selection is a frontend preview and is not saved yet.
+              <p
+                className="mt-1.5 text-[10px] leading-relaxed text-muted-foreground"
+                role={productsError ? "alert" : undefined}
+              >
+                {productsError
+                  ? productsError
+                  : isLoadingProducts
+                    ? "Loading products..."
+                    : products.length === 0
+                      ? "No published or archived products are available."
+                      : "Item selection is a frontend preview and is not saved yet."}
               </p>
             </div>
           )}
