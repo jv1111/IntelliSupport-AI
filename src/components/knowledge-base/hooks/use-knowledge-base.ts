@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { DEFAULT_PAGE_SIZE } from "@/lib/pagination";
 import {
   deleteKnowledgeBaseArticle as deleteArticleRequest,
@@ -24,7 +25,17 @@ const emptyPage: KnowledgeBaseArticlePage = {
 };
 
 export function useKnowledgeBase(initialStatus: KnowledgeBaseStatus) {
-  const [status, setStatus] = useState<KnowledgeBaseStatus>(initialStatus);
+  const { bfcacheId } = useRouter();
+
+  const [statusSelection, setStatusSelection] = useState({
+    bfcacheId,
+    status: initialStatus,
+  });
+
+  const status =
+    statusSelection.bfcacheId === bfcacheId
+      ? statusSelection.status
+      : initialStatus;
   const [scope, setScope] = useState<KnowledgeBaseFilter>("all");
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
@@ -98,7 +109,7 @@ export function useKnowledgeBase(initialStatus: KnowledgeBaseStatus) {
       cancelled = true;
       window.clearTimeout(timeout);
     };
-  }, [search, scope, status, refreshKey]);
+  }, [search, scope, status, refreshKey, bfcacheId]);
 
   const loadMore = useCallback(async () => {
     if (
@@ -161,10 +172,16 @@ export function useKnowledgeBase(initialStatus: KnowledgeBaseStatus) {
     setScope("all");
   }, []);
 
-  const changeStatus = useCallback((nextStatus: KnowledgeBaseStatus) => {
-    setActionError(null);
-    setStatus(nextStatus);
-  }, []);
+  const changeStatus = useCallback(
+    (nextStatus: KnowledgeBaseStatus) => {
+      setActionError(null);
+      setStatusSelection({
+        bfcacheId,
+        status: nextStatus,
+      });
+    },
+    [bfcacheId],
+  );
 
   const changeScope = useCallback((nextScope: KnowledgeBaseFilter) => {
     setScope(nextScope);

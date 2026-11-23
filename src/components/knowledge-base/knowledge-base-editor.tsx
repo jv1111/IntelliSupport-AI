@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { Archive } from "lucide-react";
 import { ArticleForm } from "@/components/knowledge-base/article-form";
 import { useKnowledgeBaseEditor } from "@/components/knowledge-base/hooks/use-knowledge-base-editor";
@@ -11,6 +12,17 @@ interface KnowledgeBaseEditorProps {
 }
 
 export function KnowledgeBaseEditor({ articleId }: KnowledgeBaseEditorProps) {
+  const { bfcacheId } = useRouter();
+
+  return (
+    <KnowledgeBaseEditorSession
+      key={`${articleId ?? "new-article"}:${bfcacheId}`}
+      articleId={articleId}
+    />
+  );
+}
+
+function KnowledgeBaseEditorSession({ articleId }: KnowledgeBaseEditorProps) {
   const {
     article,
     products,
