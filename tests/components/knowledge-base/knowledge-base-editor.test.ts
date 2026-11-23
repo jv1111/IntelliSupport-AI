@@ -8,7 +8,7 @@ import { KnowledgeBaseEditor } from "@/components/knowledge-base/knowledge-base-
 const { routerState, editorState, useKnowledgeBaseEditorMock } = vi.hoisted(
   () => {
     const editorState = {
-      article: null as { title: string } | null,
+      article: null as { id?: string; title: string } | null,
       products: [] as never[],
       isLoadingProducts: false,
       productsError: null as string | null,
@@ -46,20 +46,28 @@ vi.mock("@/components/knowledge-base/hooks/use-knowledge-base-editor", () => ({
 
 vi.mock("@/components/knowledge-base/article-form", async () => {
   const React = await import("react");
+  const { useFormDraft } = await import("@/hooks/use-form-draft");
 
-  function MockArticleForm({ article }: { article: { title: string } | null }) {
-    const [title, setTitle] = React.useState(article?.title ?? "");
+  function MockArticleForm({
+    article,
+  }: {
+    article: { id?: string; title: string } | null;
+  }) {
+    const { values, saveDraft } = useFormDraft({
+      formId: "knowledge-base",
+      entityId: article?.id,
+      initialValues: { title: article?.title ?? "" },
+    });
 
     return React.createElement("input", {
       "aria-label": "Article title",
-      value: title,
-      onChange: (event) => setTitle(event.currentTarget.value),
+      value: values.title,
+      onChange: (event: { currentTarget: HTMLInputElement }) =>
+        saveDraft({ title: event.currentTarget.value }),
     });
   }
 
-  return {
-    ArticleForm: MockArticleForm,
-  };
+  return { ArticleForm: MockArticleForm };
 });
 
 vi.mock("@/components/ui/confirmation-dialog", () => ({
@@ -72,6 +80,7 @@ afterEach(() => {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  window.sessionStorage.clear();
 
   routerState.bfcacheId = "initial-session";
   editorState.article = null;
@@ -80,7 +89,7 @@ beforeEach(() => {
 });
 
 describe("Knowledge Base Editor - Session Reset", () => {
-  it("clears a new article form on a fresh editor session", () => {
+  it("restores a new article draft on a fresh editor session", () => {
     const { rerender } = render(createElement(KnowledgeBaseEditor));
 
     const titleInput = screen.getByRole("textbox", {
@@ -101,12 +110,13 @@ describe("Knowledge Base Editor - Session Reset", () => {
       name: "Article title",
     }) as HTMLInputElement;
 
-    expect(resetInput.value).toBe("");
+    expect(resetInput.value).toBe("Unsaved article title");
     expect(useKnowledgeBaseEditorMock).toHaveBeenCalledTimes(2);
   });
 
   it("reinitializes an existing article with its saved data", () => {
     editorState.article = {
+      id: "article-1",
       title: "Saved article title",
     };
 
@@ -132,7 +142,7 @@ describe("Knowledge Base Editor - Session Reset", () => {
       name: "Article title",
     }) as HTMLInputElement;
 
-    expect(resetInput.value).toBe("Saved article title");
+    expect(resetInput.value).toBe("Unsaved changes");
     expect(useKnowledgeBaseEditorMock).toHaveBeenCalledTimes(2);
   });
 

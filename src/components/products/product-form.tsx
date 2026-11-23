@@ -1,19 +1,13 @@
 "use client";
 
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from "react";
+import { useMemo, useRef, useState } from "react";
 import { Archive } from "lucide-react";
 import { BackButton } from "@/components/ui/back-button";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { FieldLabel, fieldControlStyles } from "@/components/ui/field";
-import { getProductFormDraftStorageKey } from "@/components/products/product-form-draft";
+import { useFormDraft } from "@/hooks/use-form-draft";
 import { PRODUCT_FIELD_LIMITS } from "@/lib/products/constants";
 import { ProductImagePicker } from "@/components/products/product-image-picker";
 import type {
@@ -43,57 +37,6 @@ interface ProductFormValues {
   description: string;
 }
 
-const draftSubscriptions = new Map<string, Set<() => void>>();
-
-function subscribeToDraft(key: string, listener: () => void) {
-  const listeners = draftSubscriptions.get(key) ?? new Set();
-
-  listeners.add(listener);
-  draftSubscriptions.set(key, listeners);
-
-  return () => {
-    listeners.delete(listener);
-
-    if (listeners.size === 0) {
-      draftSubscriptions.delete(key);
-    }
-  };
-}
-
-function notifyDraftChange(key: string) {
-  draftSubscriptions.get(key)?.forEach((listener) => listener());
-}
-
-function getDraftSnapshot(key: string): string | null {
-  try {
-    return window.sessionStorage.getItem(key);
-  } catch {
-    return null;
-  }
-}
-
-function getServerDraftSnapshot(): null {
-  return null;
-}
-
-function persistDraft(key: string, values: ProductFormValues) {
-  try {
-    window.sessionStorage.setItem(key, JSON.stringify(values));
-    notifyDraftChange(key);
-  } catch {
-    return;
-  }
-}
-
-function clearDraft(key: string) {
-  try {
-    window.sessionStorage.removeItem(key);
-    notifyDraftChange(key);
-  } catch {
-    return;
-  }
-}
-
 function getInitialValues(product: Product | null): ProductFormValues {
   return {
     name: product?.name ?? "",
@@ -106,34 +49,22 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function restoreValues(
-  product: Product | null,
-  storedDraft: string | null,
+function restoreProductFormValues(
+  value: unknown,
+  initialValues: ProductFormValues,
 ): ProductFormValues {
-  const initialValues = getInitialValues(product);
-
-  if (!storedDraft) {
+  if (!isRecord(value)) {
     return initialValues;
   }
 
-  try {
-    const parsed: unknown = JSON.parse(storedDraft);
-
-    if (!isRecord(parsed)) {
-      return initialValues;
-    }
-
-    return {
-      name: typeof parsed.name === "string" ? parsed.name : initialValues.name,
-      sku: typeof parsed.sku === "string" ? parsed.sku : initialValues.sku,
-      description:
-        typeof parsed.description === "string"
-          ? parsed.description
-          : initialValues.description,
-    };
-  } catch {
-    return initialValues;
-  }
+  return {
+    name: typeof value.name === "string" ? value.name : initialValues.name,
+    sku: typeof value.sku === "string" ? value.sku : initialValues.sku,
+    description:
+      typeof value.description === "string"
+        ? value.description
+        : initialValues.description,
+  };
 }
 
 export function ProductForm({
@@ -150,34 +81,20 @@ export function ProductForm({
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
   const [removeProductImage, setRemoveProductImage] = useState(false);
 
-  const draftStorageKey = getProductFormDraftStorageKey(product?.id);
+  const initialValues = useMemo(() => getInitialValues(product), [product]);
 
-  const subscribe = useCallback(
-    (listener: () => void) => subscribeToDraft(draftStorageKey, listener),
-    [draftStorageKey],
-  );
-
-  const getSnapshot = useCallback(
-    () => getDraftSnapshot(draftStorageKey),
-    [draftStorageKey],
-  );
-
-  const storedDraft = useSyncExternalStore(
-    subscribe,
-    getSnapshot,
-    getServerDraftSnapshot,
-  );
-
-  const values = useMemo(
-    () => restoreValues(product, storedDraft),
-    [product, storedDraft],
-  );
+  const { values, saveDraft, clearDraft } = useFormDraft({
+    formId: "product",
+    entityId: product?.id,
+    initialValues,
+    deserialize: restoreProductFormValues,
+  });
 
   function updateField<K extends keyof ProductFormValues>(
     field: K,
     value: ProductFormValues[K],
   ) {
-    persistDraft(draftStorageKey, {
+    saveDraft({
       ...values,
       [field]: value,
     });
@@ -208,7 +125,7 @@ export function ProductForm({
     const saved = await onSave(input, selectedImageFile, removeProductImage);
 
     if (saved) {
-      clearDraft(draftStorageKey);
+      clearDraft();
     }
   }
 

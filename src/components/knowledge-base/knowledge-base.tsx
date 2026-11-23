@@ -148,7 +148,7 @@ export function KnowledgeBase({ initialStatus }: KnowledgeBaseProps) {
             ref={articleScrollRef}
             className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-2"
           >
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 2xl:grid-cols-5">
               {articles.map((article) => (
                 <ArticleCard
                   key={article.id}

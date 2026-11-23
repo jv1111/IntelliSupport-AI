@@ -8,7 +8,7 @@ import type {
   ProductInput,
   ProductStatus,
 } from "@/lib/products/types";
-import { clearProductFormDraft } from "@/components/products/product-form-draft";
+import { clearFormDraft } from "@/hooks/use-form-draft";
 import { uploadProductImage } from "@/lib/products/upload-product-image";
 
 export function useProductEditor(productId?: string) {
@@ -129,7 +129,7 @@ export function useProductEditor(productId?: string) {
         });
 
         if (status === "archived") {
-          clearProductFormDraft(product.id);
+          clearFormDraft("product", product.id);
           setIsArchiveOpen(false);
         }
 

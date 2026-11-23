@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { fetchAllProducts } from "@/lib/products";
 import type { Product } from "@/lib/products/types";
+import { clearFormDraft } from "@/hooks/use-form-draft";
 import {
   createKnowledgeBaseArticle,
   fetchKnowledgeBaseArticle,
@@ -163,6 +164,7 @@ export function useKnowledgeBaseEditor(articleId?: string) {
         });
 
         if (status === "archived") {
+          clearFormDraft("knowledge-base", article.id);
           setIsArchiveOpen(false);
         }
 

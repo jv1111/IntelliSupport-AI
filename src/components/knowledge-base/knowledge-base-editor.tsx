@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Archive } from "lucide-react";
 import { ArticleForm } from "@/components/knowledge-base/article-form";
 import { useKnowledgeBaseEditor } from "@/components/knowledge-base/hooks/use-knowledge-base-editor";
 import { Button } from "@/components/ui/button";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
+import { clearFormDraft } from "@/hooks/use-form-draft";
 
 interface KnowledgeBaseEditorProps {
   articleId?: string;
@@ -23,6 +25,8 @@ export function KnowledgeBaseEditor({ articleId }: KnowledgeBaseEditorProps) {
 }
 
 function KnowledgeBaseEditorSession({ articleId }: KnowledgeBaseEditorProps) {
+  const [isDiscardOpen, setIsDiscardOpen] = useState(false);
+
   const {
     article,
     products,
@@ -41,6 +45,21 @@ function KnowledgeBaseEditorSession({ articleId }: KnowledgeBaseEditorProps) {
     unarchiveArticle,
     publishArticle,
   } = useKnowledgeBaseEditor(articleId);
+
+  function handleCancel() {
+    if (articleId) {
+      closeEditor();
+      return;
+    }
+
+    setIsDiscardOpen(true);
+  }
+
+  function handleDiscard() {
+    clearFormDraft("knowledge-base");
+    setIsDiscardOpen(false);
+    closeEditor();
+  }
 
   if (isLoading) {
     return (
@@ -78,11 +97,21 @@ function KnowledgeBaseEditorSession({ articleId }: KnowledgeBaseEditorProps) {
         productsError={productsError}
         isSaving={isSaving}
         error={actionError}
-        onCancel={closeEditor}
+        onCancel={handleCancel}
         onSave={saveArticle}
         onArchive={openArchiveConfirmation}
         onUnarchive={unarchiveArticle}
         onPublish={publishArticle}
+      />
+
+      <ConfirmationDialog
+        open={isDiscardOpen}
+        title="Discard article changes?"
+        description="Your saved form draft will be permanently cleared. This action cannot be undone."
+        confirmLabel="Discard Changes"
+        variant="danger"
+        onConfirm={handleDiscard}
+        onCancel={() => setIsDiscardOpen(false)}
       />
 
       <ConfirmationDialog

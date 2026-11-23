@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type FormEvent } from "react";
+import { useMemo, useRef, type FormEvent } from "react";
 import { Archive, LockKeyhole } from "lucide-react";
 import type {
   ArticleCategoryTag,
@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { FieldLabel, fieldControlStyles } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { useFormDraft } from "@/hooks/use-form-draft";
 import { SelectField } from "@/components/ui/select-field";
 import {
   articleCategoryLabels,
@@ -37,6 +38,61 @@ interface ArticleFormProps {
   onPublish: () => void;
 }
 
+type ArticleFormValues = Pick<
+  KnowledgeBaseArticleInput,
+  "scope" | "categoryTag" | "title" | "context"
+> & {
+  selectedItemId: string;
+};
+
+function getInitialValues(
+  article: KnowledgeBaseArticle | null,
+): ArticleFormValues {
+  return {
+    scope: article?.scope ?? "generic",
+    categoryTag: article?.categoryTag ?? "troubleshooting",
+    title: article?.title ?? "",
+    context: article?.context ?? "",
+    selectedItemId: "",
+  };
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function restoreArticleFormValues(
+  value: unknown,
+  initialValues: ArticleFormValues,
+): ArticleFormValues {
+  if (!isRecord(value)) {
+    return initialValues;
+  }
+
+  return {
+    scope:
+      typeof value.scope === "string" &&
+      Object.prototype.hasOwnProperty.call(articleScopeLabels, value.scope)
+        ? (value.scope as ArticleScope)
+        : initialValues.scope,
+    categoryTag:
+      typeof value.categoryTag === "string" &&
+      Object.prototype.hasOwnProperty.call(
+        articleCategoryLabels,
+        value.categoryTag,
+      )
+        ? (value.categoryTag as ArticleCategoryTag)
+        : initialValues.categoryTag,
+    title: typeof value.title === "string" ? value.title : initialValues.title,
+    context:
+      typeof value.context === "string" ? value.context : initialValues.context,
+    selectedItemId:
+      typeof value.selectedItemId === "string"
+        ? value.selectedItemId
+        : initialValues.selectedItemId,
+  };
+}
+
 export function ArticleForm({
   article,
   products,
@@ -51,23 +107,24 @@ export function ArticleForm({
   onPublish,
 }: ArticleFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
-  const [selectedItemId, setSelectedItemId] = useState("");
 
-  const [values, setValues] = useState<KnowledgeBaseArticleInput>(() => ({
-    scope: article?.scope ?? "generic",
-    categoryTag: article?.categoryTag ?? "troubleshooting",
-    title: article?.title ?? "",
-    context: article?.context ?? "",
-  }));
+  const initialValues = useMemo(() => getInitialValues(article), [article]);
 
-  function updateField<K extends keyof KnowledgeBaseArticleInput>(
+  const { values, saveDraft, clearDraft } = useFormDraft({
+    formId: "knowledge-base",
+    entityId: article?.id,
+    initialValues,
+    deserialize: restoreArticleFormValues,
+  });
+
+  function updateField<K extends keyof ArticleFormValues>(
     field: K,
-    value: KnowledgeBaseArticleInput[K],
+    value: ArticleFormValues[K],
   ) {
-    setValues((current) => ({
-      ...current,
+    saveDraft({
+      ...values,
       [field]: value,
-    }));
+    });
   }
 
   async function handleSave(
@@ -77,12 +134,17 @@ export function ArticleForm({
       return;
     }
 
-    await onSave({
-      ...values,
+    const saved = await onSave({
+      scope: values.scope,
+      categoryTag: values.categoryTag,
       title: values.title.trim(),
       context: values.context.trim(),
       ...(status ? { status } : {}),
     });
+
+    if (saved) {
+      clearDraft();
+    }
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -282,8 +344,10 @@ export function ArticleForm({
                 disabled={
                   isSaving || isLoadingProducts || products.length === 0
                 }
-                value={selectedItemId}
-                onChange={(event) => setSelectedItemId(event.target.value)}
+                value={values.selectedItemId}
+                onChange={(event) =>
+                  updateField("selectedItemId", event.target.value)
+                }
                 options={[
                   {
                     value: "",

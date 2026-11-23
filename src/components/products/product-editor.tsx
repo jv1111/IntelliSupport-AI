@@ -1,16 +1,20 @@
 "use client";
 
+import { useState } from "react";
 import { Archive } from "lucide-react";
 import { useProductEditor } from "@/components/products/hooks/use-product-editor";
 import { ProductForm } from "@/components/products/product-form";
 import { Button } from "@/components/ui/button";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
+import { clearFormDraft } from "@/hooks/use-form-draft";
 
 interface ProductEditorProps {
   productId?: string;
 }
 
 export function ProductEditor({ productId }: ProductEditorProps) {
+  const [isDiscardOpen, setIsDiscardOpen] = useState(false);
+
   const {
     product,
     isLoading,
@@ -26,6 +30,21 @@ export function ProductEditor({ productId }: ProductEditorProps) {
     unarchiveProduct,
     publishProduct,
   } = useProductEditor(productId);
+
+  function handleCancel() {
+    if (productId) {
+      closeEditor();
+      return;
+    }
+
+    setIsDiscardOpen(true);
+  }
+
+  function handleDiscard() {
+    clearFormDraft("product");
+    setIsDiscardOpen(false);
+    closeEditor();
+  }
 
   if (isLoading) {
     return (
@@ -59,11 +78,21 @@ export function ProductEditor({ productId }: ProductEditorProps) {
         product={product}
         isPending={isSaving}
         error={actionError}
-        onCancel={closeEditor}
+        onCancel={handleCancel}
         onSave={saveProduct}
         onArchive={openArchiveConfirmation}
         onUnarchive={unarchiveProduct}
         onPublish={publishProduct}
+      />
+
+      <ConfirmationDialog
+        open={isDiscardOpen}
+        title="Discard product changes?"
+        description="Your saved form draft will be permanently cleared. This action cannot be undone."
+        confirmLabel="Discard Changes"
+        variant="danger"
+        onConfirm={handleDiscard}
+        onCancel={() => setIsDiscardOpen(false)}
       />
 
       <ConfirmationDialog
