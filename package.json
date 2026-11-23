@@ -8,7 +8,14 @@
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:login": "vitest run tests/server/auth/login-user.test.ts",
+    "test:register": "vitest run tests/server/auth/register-user.test.ts",
+    "test:products": "vitest run tests/server/products",
+    "test:knowledge-base": "vitest run tests/server/knowledge-base/knowledge-base.test.ts",
+    "test:bot-manager": "vitest run tests/server/bot-manager/bot-manager.test.ts",
+    "test:playground": "vitest run tests/components/playground/playground.test.ts"
   },
   "dependencies": {
     "@apollo/server": "5.5.1",
@@ -29,6 +36,7 @@
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "4.3.3",
+    "@testing-library/react": "^16.3.3",
     "@types/node": "^20",
     "@types/pg": "8.23.1",
     "@types/react": "^19",
@@ -36,10 +44,13 @@
     "dotenv": "17.4.2",
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
+    "jsdom": "^31.0.1",
     "prettier": "3.9.10",
     "prettier-plugin-tailwindcss": "0.8.1",
     "prisma": "7.10.1",
     "tailwindcss": "4.3.3",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite": "^6.4.6",
+    "vitest": "^4.1.10"
   }
 }

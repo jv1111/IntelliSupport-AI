@@ -1,0 +1,664 @@
+// @vitest-environment jsdom
+
+import { act, renderHook, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { usePlaygroundChat } from "@/components/playground/hooks/use-playground-chat";
+import { usePlaygroundProducts } from "@/components/playground/hooks/use-playground-products";
+import type { AutoReply } from "@/lib/auto-replies/types";
+import type { Product } from "@/lib/products/types";
+
+const { fetchAllProductsMock } = vi.hoisted(() => ({
+  fetchAllProductsMock: vi.fn(),
+}));
+
+vi.mock("@/lib/products", () => ({
+  fetchAllProducts: fetchAllProductsMock,
+}));
+
+const productA: Product = {
+  id: "product-a-id",
+  name: "Router X200",
+  sku: "SKU-X200",
+  status: "published",
+  imageUrl: null,
+  description: "Wireless router with mesh support.",
+  createdAt: "2026-01-01T00:00:00.000Z",
+  updatedAt: "2026-01-01T00:00:00.000Z",
+};
+
+const productB: Product = {
+  ...productA,
+  id: "product-b-id",
+  name: "Camera C100",
+  sku: "SKU-C100",
+};
+
+const rootReply: AutoReply = {
+  id: "reply-root",
+  productId: productA.id,
+  parentId: null,
+  question: "How do I reset the router?",
+  answer: "Hold the reset button for 10 seconds.",
+  position: 1,
+  createdAt: "2026-01-01T00:00:00.000Z",
+  updatedAt: "2026-01-01T00:00:00.000Z",
+};
+
+const secondRootReply: AutoReply = {
+  id: "reply-root-2",
+  productId: productA.id,
+  parentId: null,
+  question: "What is the Wi-Fi coverage range?",
+  answer: "The router covers up to 2500 square feet.",
+  position: 0,
+  createdAt: "2026-01-01T00:00:00.000Z",
+  updatedAt: "2026-01-01T00:00:00.000Z",
+};
+
+const followUpReply: AutoReply = {
+  id: "reply-follow-up",
+  productId: productA.id,
+  parentId: rootReply.id,
+  question: "What if the router does not restart?",
+  answer: "Disconnect the power adapter and reconnect it after 30 seconds.",
+  position: 0,
+  createdAt: "2026-01-01T00:00:00.000Z",
+  updatedAt: "2026-01-01T00:00:00.000Z",
+};
+
+const autoReplies = [rootReply, secondRootReply, followUpReply];
+
+beforeEach(() => {
+  vi.clearAllMocks();
+});
+
+describe("Playground Products - Loading", () => {
+  it("loads products successfully", async () => {
+    fetchAllProductsMock.mockResolvedValue([productA, productB]);
+
+    const { result } = renderHook(() => usePlaygroundProducts());
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
+
+    expect(result.current.products).toEqual([productA, productB]);
+    expect(result.current.error).toBeNull();
+    expect(fetchAllProductsMock).toHaveBeenCalledOnce();
+  });
+
+  it("starts with an empty product list", () => {
+    fetchAllProductsMock.mockReturnValue(new Promise(() => {}));
+
+    const { result } = renderHook(() => usePlaygroundProducts());
+
+    expect(result.current.products).toEqual([]);
+    expect(result.current.isLoading).toBe(true);
+    expect(result.current.error).toBeNull();
+  });
+
+  it("reports an error when product loading fails", async () => {
+    fetchAllProductsMock.mockRejectedValue(
+      new Error("Unable to load products."),
+    );
+
+    const { result } = renderHook(() => usePlaygroundProducts());
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
+
+    expect(result.current.products).toEqual([]);
+    expect(result.current.error).toBe("Unable to load products.");
+  });
+
+  it("uses the fallback error message for unexpected failures", async () => {
+    fetchAllProductsMock.mockRejectedValue("Unexpected failure");
+
+    const { result } = renderHook(() => usePlaygroundProducts());
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
+
+    expect(result.current.error).toBe(
+      "Unable to load products. Please try again.",
+    );
+  });
+
+  it("clears the previous error when retrying", async () => {
+    fetchAllProductsMock
+      .mockRejectedValueOnce(new Error("Network error"))
+      .mockResolvedValueOnce([productA]);
+
+    const { result } = renderHook(() => usePlaygroundProducts());
+
+    await waitFor(() => {
+      expect(result.current.error).toBe("Network error");
+    });
+
+    act(() => {
+      result.current.retry();
+    });
+
+    await waitFor(() => {
+      expect(result.current.products).toEqual([productA]);
+    });
+
+    expect(result.current.error).toBeNull();
+    expect(result.current.isLoading).toBe(false);
+    expect(fetchAllProductsMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("reloads products when retry is called", async () => {
+    fetchAllProductsMock
+      .mockResolvedValueOnce([productA])
+      .mockResolvedValueOnce([productB]);
+
+    const { result } = renderHook(() => usePlaygroundProducts());
+
+    await waitFor(() => {
+      expect(result.current.products).toEqual([productA]);
+    });
+
+    act(() => {
+      result.current.retry();
+    });
+
+    await waitFor(() => {
+      expect(result.current.products).toEqual([productB]);
+    });
+
+    expect(fetchAllProductsMock).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("Playground Chat - Initial State", () => {
+  it("displays a product-specific greeting", () => {
+    const { result } = renderHook(() =>
+      usePlaygroundChat(productA.name, autoReplies, true),
+    );
+
+    expect(result.current.messages).toEqual([
+      {
+        id: "playground-greeting",
+        role: "assistant",
+        content:
+          "Hello! I'm here to help you with Router X200. What would you like to know?",
+      },
+    ]);
+  });
+
+  it("displays root suggestions ordered by position", () => {
+    const { result } = renderHook(() =>
+      usePlaygroundChat(productA.name, autoReplies, true),
+    );
+
+    expect(result.current.suggestedReplies).toEqual([
+      secondRootReply,
+      rootReply,
+    ]);
+  });
+
+  it("reports when automatic replies are available", () => {
+    const { result } = renderHook(() =>
+      usePlaygroundChat(productA.name, autoReplies, true),
+    );
+
+    expect(result.current.hasAutoReplies).toBe(true);
+    expect(result.current.isInputDisabled).toBe(false);
+  });
+
+  it("reports when automatic replies are unavailable", () => {
+    const { result } = renderHook(() =>
+      usePlaygroundChat(productA.name, [], true),
+    );
+
+    expect(result.current.hasAutoReplies).toBe(false);
+    expect(result.current.suggestedReplies).toEqual([]);
+    expect(result.current.isInputDisabled).toBe(true);
+  });
+});
+
+describe("Playground Chat - Suggested Questions", () => {
+  it("adds user and assistant messages when selecting a suggested question", () => {
+    const { result } = renderHook(() =>
+      usePlaygroundChat(productA.name, autoReplies, true),
+    );
+
+    act(() => {
+      result.current.selectReply(rootReply);
+    });
+
+    expect(result.current.messages).toHaveLength(3);
+    expect(result.current.messages[1]).toMatchObject({
+      role: "user",
+      content: rootReply.question,
+    });
+    expect(result.current.messages[2]).toMatchObject({
+      role: "assistant",
+      content: rootReply.answer,
+    });
+  });
+
+  it("displays follow-up suggestions after selecting a parent question", () => {
+    const { result } = renderHook(() =>
+      usePlaygroundChat(productA.name, autoReplies, true),
+    );
+
+    act(() => {
+      result.current.selectReply(rootReply);
+    });
+
+    expect(result.current.suggestedReplies).toEqual([followUpReply]);
+    expect(result.current.showResolutionPrompt).toBe(false);
+  });
+
+  it("displays the resolution prompt after selecting a question without follow-ups", () => {
+    const { result } = renderHook(() =>
+      usePlaygroundChat(productA.name, autoReplies, true),
+    );
+
+    act(() => {
+      result.current.selectReply(secondRootReply);
+    });
+
+    expect(result.current.suggestedReplies).toEqual([]);
+    expect(result.current.showResolutionPrompt).toBe(true);
+  });
+
+  it("ignores a question that is not currently suggested", () => {
+    const { result } = renderHook(() =>
+      usePlaygroundChat(productA.name, autoReplies, true),
+    );
+
+    act(() => {
+      result.current.selectReply(followUpReply);
+    });
+
+    expect(result.current.messages).toHaveLength(1);
+    expect(result.current.suggestedReplies).toHaveLength(2);
+  });
+
+  it("completes a nested conversation through follow-up questions", () => {
+    const { result } = renderHook(() =>
+      usePlaygroundChat(productA.name, autoReplies, true),
+    );
+
+    act(() => {
+      result.current.selectReply(rootReply);
+    });
+
+    expect(result.current.suggestedReplies).toEqual([followUpReply]);
+
+    act(() => {
+      result.current.selectReply(followUpReply);
+    });
+
+    expect(result.current.messages).toHaveLength(5);
+    expect(result.current.messages[3]).toMatchObject({
+      role: "user",
+      content: followUpReply.question,
+    });
+    expect(result.current.messages[4]).toMatchObject({
+      role: "assistant",
+      content: followUpReply.answer,
+    });
+    expect(result.current.suggestedReplies).toEqual([]);
+    expect(result.current.showResolutionPrompt).toBe(true);
+  });
+});
+
+describe("Playground Chat - Typed Questions", () => {
+  it("matches questions regardless of letter casing", () => {
+    const { result } = renderHook(() =>
+      usePlaygroundChat(productA.name, autoReplies, true),
+    );
+
+    act(() => {
+      result.current.setMessageDraft("HOW DO I RESET THE ROUTER?");
+    });
+
+    act(() => {
+      result.current.sendMessage();
+    });
+
+    expect(result.current.messages[1]).toMatchObject({
+      role: "user",
+      content: "HOW DO I RESET THE ROUTER?",
+    });
+
+    expect(result.current.messages[2]).toMatchObject({
+      role: "assistant",
+      content: rootReply.answer,
+    });
+  });
+
+  it("matches questions with different whitespace", () => {
+    const { result } = renderHook(() =>
+      usePlaygroundChat(productA.name, autoReplies, true),
+    );
+
+    act(() => {
+      result.current.setMessageDraft("  How   do I   reset the router?  ");
+    });
+
+    act(() => {
+      result.current.sendMessage();
+    });
+
+    expect(result.current.messages[2]).toMatchObject({
+      role: "assistant",
+      content: rootReply.answer,
+    });
+  });
+
+  it("clears the message draft after sending a matched question", () => {
+    const { result } = renderHook(() =>
+      usePlaygroundChat(productA.name, autoReplies, true),
+    );
+
+    act(() => {
+      result.current.setMessageDraft(rootReply.question);
+    });
+
+    act(() => {
+      result.current.sendMessage();
+    });
+
+    expect(result.current.messageDraft).toBe("");
+  });
+
+  it("suppresses suggested question buttons after sending a typed message", () => {
+    const { result } = renderHook(() =>
+      usePlaygroundChat(productA.name, autoReplies, true),
+    );
+
+    act(() => {
+      result.current.setMessageDraft(rootReply.question);
+    });
+
+    act(() => {
+      result.current.sendMessage();
+    });
+
+    expect(result.current.suggestedReplies).toEqual([]);
+  });
+
+  it("adds an unmatched message without generating an assistant response", () => {
+    const { result } = renderHook(() =>
+      usePlaygroundChat(productA.name, autoReplies, true),
+    );
+
+    act(() => {
+      result.current.setMessageDraft("Where can I buy accessories?");
+    });
+
+    act(() => {
+      result.current.sendMessage();
+    });
+
+    expect(result.current.messages).toHaveLength(2);
+    expect(result.current.messages[1]).toMatchObject({
+      role: "user",
+      content: "Where can I buy accessories?",
+    });
+    expect(
+      result.current.messages.filter((message) => message.role === "assistant"),
+    ).toHaveLength(1);
+    expect(result.current.messageDraft).toBe("");
+  });
+
+  it("does not send an empty message", () => {
+    const { result } = renderHook(() =>
+      usePlaygroundChat(productA.name, autoReplies, true),
+    );
+
+    act(() => {
+      result.current.setMessageDraft("");
+    });
+
+    act(() => {
+      result.current.sendMessage();
+    });
+
+    expect(result.current.messages).toHaveLength(1);
+  });
+
+  it("does not send a whitespace-only message", () => {
+    const { result } = renderHook(() =>
+      usePlaygroundChat(productA.name, autoReplies, true),
+    );
+
+    act(() => {
+      result.current.setMessageDraft("   ");
+    });
+
+    act(() => {
+      result.current.sendMessage();
+    });
+
+    expect(result.current.messages).toHaveLength(1);
+    expect(result.current.messageDraft).toBe("   ");
+  });
+});
+
+describe("Playground Chat - Automatic Replies Disabled", () => {
+  it("hides suggested questions when automatic replies are disabled", () => {
+    const { result } = renderHook(() =>
+      usePlaygroundChat(productA.name, autoReplies, false),
+    );
+
+    expect(result.current.suggestedReplies).toEqual([]);
+  });
+
+  it("disables the message input when automatic replies are disabled", () => {
+    const { result } = renderHook(() =>
+      usePlaygroundChat(productA.name, autoReplies, false),
+    );
+
+    expect(result.current.isInputDisabled).toBe(true);
+  });
+
+  it("does not send a message when automatic replies are disabled", () => {
+    const { result } = renderHook(() =>
+      usePlaygroundChat(productA.name, autoReplies, false),
+    );
+
+    act(() => {
+      result.current.setMessageDraft("How do I reset the router?");
+    });
+
+    act(() => {
+      result.current.sendMessage();
+    });
+
+    expect(result.current.messages).toHaveLength(1);
+    expect(result.current.messageDraft).toBe("How do I reset the router?");
+  });
+
+  it("does not select a suggested question when automatic replies are disabled", () => {
+    const { result } = renderHook(() =>
+      usePlaygroundChat(productA.name, autoReplies, false),
+    );
+
+    act(() => {
+      result.current.selectReply(rootReply);
+    });
+
+    expect(result.current.messages).toHaveLength(1);
+    expect(result.current.showResolutionPrompt).toBe(false);
+  });
+
+  it("does not send a message when there are no automatic replies", () => {
+    const { result } = renderHook(() =>
+      usePlaygroundChat(productA.name, [], true),
+    );
+
+    act(() => {
+      result.current.setMessageDraft("How do I reset the router?");
+    });
+
+    act(() => {
+      result.current.sendMessage();
+    });
+
+    expect(result.current.messages).toHaveLength(1);
+    expect(result.current.messageDraft).toBe("How do I reset the router?");
+    expect(result.current.isInputDisabled).toBe(true);
+  });
+});
+
+describe("Playground Chat - Resolution Feedback", () => {
+  it("adds a positive resolution response", () => {
+    const { result } = renderHook(() =>
+      usePlaygroundChat(productA.name, autoReplies, true),
+    );
+
+    act(() => {
+      result.current.selectReply(secondRootReply);
+    });
+
+    act(() => {
+      result.current.answerResolution(true);
+    });
+
+    expect(result.current.messages.slice(-2)).toEqual([
+      expect.objectContaining({
+        role: "user",
+        content: "Yes",
+      }),
+      expect.objectContaining({
+        role: "assistant",
+        content:
+          "I'm glad I could help! You can still type another question anytime.",
+      }),
+    ]);
+
+    expect(result.current.showResolutionPrompt).toBe(false);
+  });
+
+  it("adds a negative resolution response", () => {
+    const { result } = renderHook(() =>
+      usePlaygroundChat(productA.name, autoReplies, true),
+    );
+
+    act(() => {
+      result.current.selectReply(secondRootReply);
+    });
+
+    act(() => {
+      result.current.answerResolution(false);
+    });
+
+    expect(result.current.messages.slice(-2)).toEqual([
+      expect.objectContaining({
+        role: "user",
+        content: "No",
+      }),
+      expect.objectContaining({
+        role: "assistant",
+        content:
+          "Thank you for letting us know. A support agent will review your concern and respond as soon as possible.",
+      }),
+    ]);
+
+    expect(result.current.showResolutionPrompt).toBe(false);
+  });
+
+  it("ignores resolution feedback when the prompt is not visible", () => {
+    const { result } = renderHook(() =>
+      usePlaygroundChat(productA.name, autoReplies, true),
+    );
+
+    act(() => {
+      result.current.answerResolution(true);
+    });
+
+    expect(result.current.messages).toHaveLength(1);
+  });
+});
+
+describe("Playground Chat - Restart Conversation", () => {
+  it("resets messages and restores the initial greeting", () => {
+    const { result } = renderHook(() =>
+      usePlaygroundChat(productA.name, autoReplies, true),
+    );
+
+    act(() => {
+      result.current.selectReply(rootReply);
+    });
+
+    act(() => {
+      result.current.restart();
+    });
+
+    expect(result.current.messages).toEqual([
+      {
+        id: "playground-greeting",
+        role: "assistant",
+        content:
+          "Hello! I'm here to help you with Router X200. What would you like to know?",
+      },
+    ]);
+  });
+
+  it("restores the root suggested questions after restarting", () => {
+    const { result } = renderHook(() =>
+      usePlaygroundChat(productA.name, autoReplies, true),
+    );
+
+    act(() => {
+      result.current.setMessageDraft("Unknown question");
+    });
+
+    act(() => {
+      result.current.sendMessage();
+    });
+
+    expect(result.current.suggestedReplies).toEqual([]);
+
+    act(() => {
+      result.current.restart();
+    });
+
+    expect(result.current.suggestedReplies).toEqual([
+      secondRootReply,
+      rootReply,
+    ]);
+  });
+
+  it("clears the message draft after restarting", () => {
+    const { result } = renderHook(() =>
+      usePlaygroundChat(productA.name, autoReplies, true),
+    );
+
+    act(() => {
+      result.current.setMessageDraft("Pending message");
+    });
+
+    act(() => {
+      result.current.restart();
+    });
+
+    expect(result.current.messageDraft).toBe("");
+  });
+
+  it("clears the resolution prompt after restarting", () => {
+    const { result } = renderHook(() =>
+      usePlaygroundChat(productA.name, autoReplies, true),
+    );
+
+    act(() => {
+      result.current.selectReply(secondRootReply);
+    });
+
+    expect(result.current.showResolutionPrompt).toBe(true);
+
+    act(() => {
+      result.current.restart();
+    });
+
+    expect(result.current.showResolutionPrompt).toBe(false);
+  });
+});
