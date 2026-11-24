@@ -1,9 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import { BookOpen, Trash2 } from "lucide-react";
-import { ArticleCard } from "@/components/knowledge-base/article-card";
+import { ArticleGroupList } from "@/components/knowledge-base/article-group-list";
+import { groupArticles } from "@/components/knowledge-base/group-articles";
+import { useProductNames } from "@/components/knowledge-base/hooks/use-product-names";
 import { ArticleScopeFilter } from "@/components/knowledge-base/article-scope-filter";
 import { useKnowledgeBase } from "@/components/knowledge-base/hooks/use-knowledge-base";
 import { knowledgeBaseStatusLabels } from "@/components/knowledge-base/data";
@@ -55,6 +57,13 @@ export function KnowledgeBase({ initialStatus }: KnowledgeBaseProps) {
     retry,
   } = useKnowledgeBase(initialStatus);
 
+  const { productNames, isLoadingProducts } = useProductNames();
+
+  const articleGroups = useMemo(
+    () => groupArticles(articles, productNames),
+    [articles, productNames],
+  );
+
   const articleScrollRef = useRef<HTMLDivElement>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
@@ -97,25 +106,6 @@ export function KnowledgeBase({ initialStatus }: KnowledgeBaseProps) {
           })}
         </div>
 
-        <div className="flex shrink-0 flex-wrap items-center justify-between gap-4">
-          <div className="w-full max-w-md">
-            <SearchInput
-              value={searchInput}
-              onChange={(event) => setSearchInput(event.target.value)}
-              placeholder="Search article titles..."
-              aria-label="Search Knowledge Base articles"
-            />
-          </div>
-
-          <div className="flex flex-wrap items-center gap-4">
-            <ArticleScopeFilter value={scope} onChange={changeScope} />
-
-            <p className="text-xs text-muted-foreground">
-              {totalCount} {totalCount === 1 ? "article" : "articles"}
-            </p>
-          </div>
-        </div>
-
         {(fetchError || (actionError && !articlePendingDeletion)) && (
           <div
             role="alert"
@@ -136,81 +126,103 @@ export function KnowledgeBase({ initialStatus }: KnowledgeBaseProps) {
           </div>
         )}
 
-        {isLoading ? (
-          <div
-            className="flex min-h-64 flex-1 items-center justify-center text-xs font-medium text-muted-foreground"
-            role="status"
-          >
-            Loading Knowledge Base articles...
-          </div>
-        ) : articles.length > 0 ? (
-          <div
-            ref={articleScrollRef}
-            className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-2"
-          >
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 2xl:grid-cols-4">
-              {articles.map((article) => (
-                <ArticleCard
-                  key={article.id}
-                  article={article}
-                  onUnarchive={unarchiveArticle}
-                  isUnarchiving={unarchivingArticleId === article.id}
-                  onDelete={openDeleteConfirmation}
-                  isDeleting={deletingArticleId === article.id}
-                />
-              ))}
-            </div>
-
-            {hasNextPage && (
-              <div
-                ref={loadMoreRef}
-                className="flex min-h-16 items-center justify-center py-4"
-              >
-                {isLoadingMore && (
-                  <p
-                    className="text-xs font-medium text-muted-foreground"
-                    role="status"
-                  >
-                    Loading more articles...
-                  </p>
-                )}
-              </div>
-            )}
-          </div>
-        ) : (
+        {!isLoading &&
+        !isLoadingProducts &&
+        articles.length === 0 &&
+        !hasActiveFilters ? (
           <EmptyState
             variant="card"
             icon={BookOpen}
-            title={
-              hasActiveFilters
-                ? "No articles found"
-                : "Your Knowledge Base is empty"
-            }
-            description={
-              hasActiveFilters
-                ? "Try another search term or select a different article scope."
-                : "Create your first article to start building your AI support resources."
-            }
+            title="Your Knowledge Base is empty"
+            description="Create your first article to start building your AI support resources."
             action={
-              hasActiveFilters ? (
-                <Button
-                  variant="text"
-                  fullWidth={false}
-                  onClick={clearFilters}
-                  className="mt-3 px-2 py-2"
-                >
-                  Clear Filters
-                </Button>
-              ) : (
-                <PrimaryActionLink
-                  href="/knowledge-base/new"
-                  className="mt-4 px-4"
-                >
-                  Add KB Article
-                </PrimaryActionLink>
-              )
+              <PrimaryActionLink href="/knowledge-base/new" className="mt-4 px-4">
+                Add KB Article
+              </PrimaryActionLink>
             }
           />
+        ) : (
+          <div className="flex min-h-0 flex-1 flex-col gap-4 rounded-xl border border-border bg-surface p-4">
+            <div className="flex shrink-0 flex-wrap items-center justify-between gap-4">
+              <div className="w-full max-w-md">
+                <SearchInput
+                  value={searchInput}
+                  onChange={(event) => setSearchInput(event.target.value)}
+                  placeholder="Search article titles or product names, or type Generic..."
+                  aria-label="Search Knowledge Base articles"
+                />
+              </div>
+
+              <div className="flex flex-wrap items-center gap-4">
+                <ArticleScopeFilter value={scope} onChange={changeScope} />
+
+                <p className="text-xs text-muted-foreground">
+                  {totalCount} {totalCount === 1 ? "article" : "articles"}
+                </p>
+              </div>
+            </div>
+
+            {isLoading || isLoadingProducts ? (
+              <div
+                className="flex min-h-64 flex-1 items-center justify-center text-xs font-medium text-muted-foreground"
+                role="status"
+              >
+                Loading Knowledge Base articles...
+              </div>
+            ) : articles.length > 0 ? (
+              <>
+                <p className="text-xs leading-relaxed text-muted-foreground">
+                  Articles are grouped under Generic and each product. Select a
+                  group to show its articles.
+                </p>
+                <div
+                  ref={articleScrollRef}
+                  className="min-h-0 flex-1 overflow-y-auto overscroll-contain"
+                >
+                  <ArticleGroupList
+                    groups={articleGroups}
+                    onUnarchive={unarchiveArticle}
+                    unarchivingArticleId={unarchivingArticleId}
+                    onDelete={openDeleteConfirmation}
+                    deletingArticleId={deletingArticleId}
+                  />
+
+                  {hasNextPage && (
+                    <div
+                      ref={loadMoreRef}
+                      className="flex min-h-16 items-center justify-center py-4"
+                    >
+                      {isLoadingMore && (
+                        <p
+                          className="text-xs font-medium text-muted-foreground"
+                          role="status"
+                        >
+                          Loading more articles...
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </>
+            ) : (
+              <EmptyState
+                variant="card"
+                icon={BookOpen}
+                title="No articles found"
+                description="Try another search term or select a different article scope."
+                action={
+                  <Button
+                    variant="text"
+                    fullWidth={false}
+                    onClick={clearFilters}
+                    className="mt-3 px-2 py-2"
+                  >
+                    Clear Filters
+                  </Button>
+                }
+              />
+            )}
+          </div>
         )}
       </section>
 

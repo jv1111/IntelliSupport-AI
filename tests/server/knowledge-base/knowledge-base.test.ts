@@ -154,10 +154,91 @@ describe("Knowledge Base Service - Read Articles", () => {
           scope: "generic",
           categoryTag: "troubleshooting",
           status: "published",
-          title: {
-            contains: "Router",
-            mode: "insensitive",
-          },
+          OR: [
+            {
+              title: {
+                contains: "Router",
+                mode: "insensitive",
+              },
+            },
+            {
+              product: {
+                is: {
+                  name: {
+                    contains: "Router",
+                    mode: "insensitive",
+                  },
+                  userId: userAId,
+                },
+              },
+            },
+          ],
+        },
+      }),
+    );
+  });
+
+  it("returns all generic articles when searching for generic", async () => {
+    transactionMock.mockResolvedValue([[articleA, articleB], 2]);
+
+    const result = await getKnowledgeBaseArticles(userAId, {
+      page: 1,
+      limit: 10,
+      search: " Generic ",
+    });
+
+    expect(findManyMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          userId: userAId,
+          scope: "generic",
+        },
+      }),
+    );
+
+    expect(countMock).toHaveBeenCalledWith({
+      where: {
+        userId: userAId,
+        scope: "generic",
+      },
+    });
+
+    expect(result.items).toEqual([articleA, articleB]);
+    expect(result.totalCount).toBe(2);
+  });
+
+  it("matches articles by their related product name", async () => {
+    transactionMock.mockResolvedValue([[articleA], 1]);
+
+    await getKnowledgeBaseArticles(userAId, {
+      page: 1,
+      limit: 10,
+      search: "Atlas Router",
+    });
+
+    expect(findManyMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          userId: userAId,
+          OR: [
+            {
+              title: {
+                contains: "Atlas Router",
+                mode: "insensitive",
+              },
+            },
+            {
+              product: {
+                is: {
+                  name: {
+                    contains: "Atlas Router",
+                    mode: "insensitive",
+                  },
+                  userId: userAId,
+                },
+              },
+            },
+          ],
         },
       }),
     );
@@ -282,12 +363,43 @@ describe("Knowledge Base Service - Create Article", () => {
     expect(result).toEqual(linkedArticle);
   });
 
+  it("rejects creating a specific article without a product ID", async () => {
+    await expect(
+      createKnowledgeBaseArticle(userAId, {
+        ...createInput,
+        scope: "specific",
+      }),
+    ).rejects.toMatchObject({
+      code: "INVALID_INPUT",
+      message: "Specific articles must be linked to a product.",
+    });
+
+    expect(productFindFirstMock).not.toHaveBeenCalled();
+    expect(createMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects linking a product to a generic article", async () => {
+    await expect(
+      createKnowledgeBaseArticle(userAId, {
+        ...createInput,
+        productId: "product-a-id",
+      }),
+    ).rejects.toMatchObject({
+      code: "INVALID_INPUT",
+      message: "Generic articles cannot be linked to a product.",
+    });
+
+    expect(productFindFirstMock).not.toHaveBeenCalled();
+    expect(createMock).not.toHaveBeenCalled();
+  });
+
   it("rejects a product that does not belong to the authenticated user", async () => {
     productFindFirstMock.mockResolvedValue(null);
 
     await expect(
       createKnowledgeBaseArticle(userAId, {
         ...createInput,
+        scope: "specific",
         productId: "foreign-product-id",
       }),
     ).rejects.toMatchObject({

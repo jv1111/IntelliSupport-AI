@@ -82,17 +82,34 @@ export async function getKnowledgeBaseArticles(userId: string, input: unknown) {
   const { page, limit, search, scope, categoryTag, status } =
     validationResult.data;
 
+  const isGenericSearch = search?.toLowerCase() === "generic";
+
   const where = {
     userId,
-    ...(scope ? { scope } : {}),
+    ...(isGenericSearch ? { scope: "generic" as const } : scope ? { scope } : {}),
     ...(categoryTag ? { categoryTag } : {}),
     ...(status ? { status } : {}),
-    ...(search
+    ...(!isGenericSearch && search
       ? {
-          title: {
-            contains: search,
-            mode: "insensitive" as const,
-          },
+          OR: [
+            {
+              title: {
+                contains: search,
+                mode: "insensitive" as const,
+              },
+            },
+            {
+              product: {
+                is: {
+                  name: {
+                    contains: search,
+                    mode: "insensitive" as const,
+                  },
+                  userId,
+                },
+              },
+            },
+          ],
         }
       : {}),
   };
@@ -153,11 +170,29 @@ export async function createKnowledgeBaseArticle(
 
   const { productId, ...articleData } = validationResult.data;
 
-  if (productId) {
-    const id = validateKnowledgeBaseProductId(productId);
+  if (articleData.scope === "generic" && productId !== undefined) {
+    throw new KnowledgeBaseArticleError(
+      "INVALID_INPUT",
+      "Generic articles cannot be linked to a product.",
+    );
+  }
+
+  if (articleData.scope === "specific" && productId === undefined) {
+    throw new KnowledgeBaseArticleError(
+      "INVALID_INPUT",
+      "Specific articles must be linked to a product.",
+    );
+  }
+
+  const validatedProductId =
+    productId === undefined
+      ? undefined
+      : validateKnowledgeBaseProductId(productId);
+
+  if (validatedProductId) {
     const product = await prisma.product.findFirst({
       where: {
-        id,
+        id: validatedProductId,
         userId,
         status: { not: "draft" },
       },
@@ -175,7 +210,9 @@ export async function createKnowledgeBaseArticle(
   return prisma.knowledgeBaseArticle.create({
     data: {
       ...articleData,
-      ...(productId ? { product: { connect: { id: productId } } } : {}),
+      ...(validatedProductId
+        ? { product: { connect: { id: validatedProductId } } }
+        : {}),
       user: {
         connect: {
           id: userId,
