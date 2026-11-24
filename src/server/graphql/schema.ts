@@ -19,6 +19,10 @@ import {
   botSettingsResolvers,
   botSettingsTypeDefs,
 } from "@/server/graphql/modules/bot-settings";
+import {
+  geminiResolvers,
+  geminiTypeDefs,
+} from "@/server/graphql/modules/gemini";
 
 const rootTypeDefs = `#graphql
   type Query {
@@ -35,6 +39,7 @@ export const typeDefs = [
   knowledgeBaseTypeDefs,
   autoReplyTypeDefs,
   botSettingsTypeDefs,
+  geminiTypeDefs,
 ];
 
 export const resolvers = {
@@ -57,6 +62,7 @@ export const resolvers = {
     ...knowledgeBaseResolvers.Mutation,
     ...autoReplyResolvers.Mutation,
     ...botSettingsResolvers.Mutation,
+    ...geminiResolvers.Mutation,
   },
 
   User: authResolvers.User,

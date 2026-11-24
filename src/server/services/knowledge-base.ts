@@ -86,7 +86,11 @@ export async function getKnowledgeBaseArticles(userId: string, input: unknown) {
 
   const where = {
     userId,
-    ...(isGenericSearch ? { scope: "generic" as const } : scope ? { scope } : {}),
+    ...(isGenericSearch
+      ? { scope: "generic" as const }
+      : scope
+        ? { scope }
+        : {}),
     ...(categoryTag ? { categoryTag } : {}),
     ...(status ? { status } : {}),
     ...(!isGenericSearch && search

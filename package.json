@@ -15,12 +15,14 @@
     "test:products": "vitest run tests/server/products",
     "test:knowledge-base": "vitest run tests/server/knowledge-base/knowledge-base.test.ts",
     "test:bot-manager": "vitest run tests/server/bot-manager/bot-manager.test.ts",
-    "test:playground": "vitest run tests/components/playground/playground.test.ts"
+    "test:playground": "vitest run tests/components/playground/playground.test.ts",
+    "test:gemini": "RUN_GEMINI_LIVE_TEST=1 vitest run tests/server/gemini/gemini.test.ts"
   },
   "dependencies": {
     "@apollo/server": "5.5.1",
     "@as-integrations/next": "4.1.0",
     "@google-cloud/storage": "^9.0.0",
+    "@google/genai": "^3.6.1",
     "@prisma/adapter-pg": "7.10.1",
     "@prisma/client": "7.10.1",
     "argon2": "0.45.2",

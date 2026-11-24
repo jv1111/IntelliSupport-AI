@@ -136,7 +136,10 @@ export function KnowledgeBase({ initialStatus }: KnowledgeBaseProps) {
             title="Your Knowledge Base is empty"
             description="Create your first article to start building your AI support resources."
             action={
-              <PrimaryActionLink href="/knowledge-base/new" className="mt-4 px-4">
+              <PrimaryActionLink
+                href="/knowledge-base/new"
+                className="mt-4 px-4"
+              >
                 Add KB Article
               </PrimaryActionLink>
             }
