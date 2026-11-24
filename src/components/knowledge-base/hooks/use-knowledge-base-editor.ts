@@ -160,6 +160,9 @@ export function useKnowledgeBaseEditor(articleId?: string) {
           scope: article.scope,
           categoryTag: article.categoryTag,
           context: article.context,
+          ...(article.scope === "specific" && article.productId
+            ? { productId: article.productId }
+            : {}),
           status,
         });
 

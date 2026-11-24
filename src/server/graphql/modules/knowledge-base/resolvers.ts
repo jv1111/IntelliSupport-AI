@@ -22,6 +22,7 @@ interface CreateKnowledgeBaseArticleInput {
   categoryTag: ArticleCategoryTagValue;
   title: string;
   context: string;
+  productId?: string;
   status?: ProductStatusValue;
 }
 
@@ -30,6 +31,7 @@ interface UpdateKnowledgeBaseArticleInput {
   categoryTag?: ArticleCategoryTagValue;
   title?: string;
   context?: string;
+  productId?: string;
   status?: ProductStatusValue;
 }
 

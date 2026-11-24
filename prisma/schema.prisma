@@ -56,24 +56,22 @@ model Session {
 }
 
 model Product {
-  id          String        @id @default(cuid())
-  name        String
-  sku         String        @default("Not specified")
-  status      ProductStatus @default(draft)
-  imageUrl    String?
-  description String        @default("No description provided.")
-  userId      String
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  autoReplies     AutoReply[]
+  id                    String                 @id @default(cuid())
+  name                  String
+  sku                   String                 @default("Not specified")
+  status                ProductStatus          @default(draft)
+  imageUrl              String?
+  description           String                 @default("No description provided.")
+  userId                String
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  user                  User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  autoReplies           AutoReply[]
+  knowledgeBaseArticles KnowledgeBaseArticle[]
 
   @@index([userId])
   @@map("products")
 }
-
-
-
 
 model BotSettings {
   id                 String   @id @default(cuid())
@@ -98,8 +96,8 @@ model AutoReply {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  product   Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
-  parent    AutoReply? @relation("AutoReplyTree", fields: [productId, parentId], references: [productId, id], onDelete: Cascade)
+  product   Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  parent    AutoReply?  @relation("AutoReplyTree", fields: [productId, parentId], references: [productId, id], onDelete: Cascade)
   followUps AutoReply[] @relation("AutoReplyTree")
 
   @@unique([productId, id])
@@ -114,12 +112,15 @@ model KnowledgeBaseArticle {
   status      ProductStatus      @default(draft)
   title       String
   context     String
+  productId   String?
   userId      String
   createdAt   DateTime           @default(now())
   updatedAt   DateTime           @updatedAt
   user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product     Product?           @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
+  @@index([productId])
   @@map("knowledge_base_articles")
 }
 

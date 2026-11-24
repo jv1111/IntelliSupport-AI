@@ -17,6 +17,7 @@ export const knowledgeBaseTypeDefs = `#graphql
     status: ProductStatus!
     title: String!
     context: String!
+    productId: ID
     createdAt: String!
     updatedAt: String!
   }
@@ -26,6 +27,7 @@ export const knowledgeBaseTypeDefs = `#graphql
     categoryTag: ArticleCategoryTag!
     title: String!
     context: String!
+    productId: ID
     status: ProductStatus
   }
 
@@ -34,6 +36,7 @@ export const knowledgeBaseTypeDefs = `#graphql
     categoryTag: ArticleCategoryTag
     title: String
     context: String
+    productId: ID
     status: ProductStatus
   }
 

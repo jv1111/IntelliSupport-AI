@@ -16,6 +16,7 @@ const {
   findFirstMock,
   findManyMock,
   updateManyAndReturnMock,
+  productFindFirstMock,
 } = vi.hoisted(() => ({
   transactionMock: vi.fn(),
   countMock: vi.fn(),
@@ -24,6 +25,7 @@ const {
   findFirstMock: vi.fn(),
   findManyMock: vi.fn(),
   updateManyAndReturnMock: vi.fn(),
+  productFindFirstMock: vi.fn(),
 }));
 
 vi.mock("server-only", () => ({}));
@@ -39,6 +41,9 @@ vi.mock("@/server/db/prisma", () => ({
       findMany: findManyMock,
       updateManyAndReturn: updateManyAndReturnMock,
     },
+    product: {
+      findFirst: productFindFirstMock,
+    },
   },
 }));
 
@@ -51,6 +56,7 @@ const articleA = {
   status: "published" as const,
   title: "Router Setup",
   context: "Instructions for setting up the router.",
+  productId: null,
   createdAt: new Date("2026-01-01T00:00:00.000Z"),
   updatedAt: new Date("2026-01-01T00:00:00.000Z"),
 };
@@ -245,6 +251,53 @@ describe("Knowledge Base Service - Create Article", () => {
     expect(result).toEqual(articleA);
   });
 
+  it("creates an article with a product when productId is provided", async () => {
+    const productId = "product-a-id";
+    const linkedArticle = { ...articleA, productId };
+    productFindFirstMock.mockResolvedValue({ id: productId });
+    createMock.mockResolvedValue(linkedArticle);
+
+    const result = await createKnowledgeBaseArticle(userAId, {
+      ...createInput,
+      scope: "specific",
+      productId,
+    });
+
+    expect(productFindFirstMock).toHaveBeenCalledWith({
+      where: {
+        id: productId,
+        userId: userAId,
+        status: { not: "draft" },
+      },
+      select: { id: true },
+    });
+
+    expect(createMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          product: { connect: { id: productId } },
+        }),
+      }),
+    );
+    expect(result).toEqual(linkedArticle);
+  });
+
+  it("rejects a product that does not belong to the authenticated user", async () => {
+    productFindFirstMock.mockResolvedValue(null);
+
+    await expect(
+      createKnowledgeBaseArticle(userAId, {
+        ...createInput,
+        productId: "foreign-product-id",
+      }),
+    ).rejects.toMatchObject({
+      code: "INVALID_INPUT",
+      message: "Selected product is unavailable.",
+    });
+
+    expect(createMock).not.toHaveBeenCalled();
+  });
+
   it("rejects an empty article title", async () => {
     await expect(
       createKnowledgeBaseArticle(userAId, {
@@ -325,7 +378,137 @@ describe("Knowledge Base Service - Create Article", () => {
 });
 
 describe("Knowledge Base Service - Update Article", () => {
+  it("updates the product relationship when productId is provided", async () => {
+    const productId = "product-a-id";
+    const updatedArticle = {
+      ...articleA,
+      scope: "specific" as const,
+      productId,
+    };
+    productFindFirstMock.mockResolvedValue({ id: productId });
+    updateManyAndReturnMock.mockResolvedValue([updatedArticle]);
+
+    const result = await updateKnowledgeBaseArticle(userAId, articleA.id, {
+      scope: "specific",
+      productId,
+    });
+
+    expect(productFindFirstMock).toHaveBeenCalledWith({
+      where: {
+        id: productId,
+        userId: userAId,
+        status: { not: "draft" },
+      },
+      select: { id: true },
+    });
+
+    expect(updateManyAndReturnMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          id: articleA.id,
+          userId: userAId,
+        },
+        data: {
+          scope: "specific",
+          productId,
+        },
+      }),
+    );
+    expect(result).toEqual(updatedArticle);
+  });
+
+  it("rejects updating a specific article without a product ID", async () => {
+    await expect(
+      updateKnowledgeBaseArticle(userAId, articleA.id, {
+        scope: "specific",
+        title: "Updated Router Setup",
+      }),
+    ).rejects.toMatchObject({
+      code: "INVALID_INPUT",
+      message: "Specific articles must be linked to a product.",
+    });
+
+    expect(productFindFirstMock).not.toHaveBeenCalled();
+    expect(updateManyAndReturnMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects updating an existing specific article without a product ID", async () => {
+    findFirstMock.mockResolvedValue({
+      scope: "specific",
+      status: "published",
+    });
+
+    await expect(
+      updateKnowledgeBaseArticle(userAId, articleA.id, {
+        title: "Updated Router Setup",
+      }),
+    ).rejects.toMatchObject({
+      code: "INVALID_INPUT",
+      message: "Specific articles must be linked to a product.",
+    });
+
+    expect(findFirstMock).toHaveBeenCalledOnce();
+    expect(productFindFirstMock).not.toHaveBeenCalled();
+    expect(updateManyAndReturnMock).not.toHaveBeenCalled();
+  });
+
+  it("disconnects the product when scope changes to generic", async () => {
+    const updatedArticle = {
+      ...articleA,
+      scope: "generic" as const,
+      productId: null,
+    };
+    updateManyAndReturnMock.mockResolvedValue([updatedArticle]);
+
+    const result = await updateKnowledgeBaseArticle(userAId, articleA.id, {
+      scope: "generic",
+    });
+
+    expect(updateManyAndReturnMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: {
+          scope: "generic",
+          productId: null,
+        },
+      }),
+    );
+    expect(result).toEqual(updatedArticle);
+  });
+
+  it("rejects a product that does not belong to the authenticated user", async () => {
+    productFindFirstMock.mockResolvedValue(null);
+
+    await expect(
+      updateKnowledgeBaseArticle(userAId, articleA.id, {
+        scope: "specific",
+        productId: "foreign-product-id",
+      }),
+    ).rejects.toMatchObject({
+      code: "INVALID_INPUT",
+      message: "Selected product is unavailable.",
+    });
+
+    expect(updateManyAndReturnMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects linking a generic article to a product", async () => {
+    findFirstMock.mockResolvedValue({ scope: "generic" });
+
+    await expect(
+      updateKnowledgeBaseArticle(userAId, articleA.id, {
+        productId: "product-a-id",
+      }),
+    ).rejects.toMatchObject({ code: "INVALID_INPUT" });
+
+    expect(updateManyAndReturnMock).not.toHaveBeenCalled();
+  });
+
   it("updates an article belonging to the authenticated user", async () => {
+    findFirstMock.mockResolvedValue({
+      scope: "generic",
+      status: "published",
+    });
+
     const updatedArticle = {
       ...articleA,
       title: "Updated Router Setup",
@@ -350,6 +533,7 @@ describe("Knowledge Base Service - Update Article", () => {
     );
 
     expect(result).toEqual(updatedArticle);
+    expect(productFindFirstMock).not.toHaveBeenCalled();
   });
 
   it("rejects an update with no article fields", async () => {

@@ -15,6 +15,11 @@ const knowledgeBaseArticleIdSchema = z
   .trim()
   .min(1, "Knowledge Base article ID is required.");
 
+const knowledgeBaseProductIdSchema = z
+  .string()
+  .trim()
+  .min(1, "Product ID is required.");
+
 const knowledgeBaseArticleSelect = {
   id: true,
   scope: true,
@@ -22,6 +27,7 @@ const knowledgeBaseArticleSelect = {
   status: true,
   title: true,
   context: true,
+  productId: true,
   createdAt: true,
   updatedAt: true,
 } as const;
@@ -39,6 +45,19 @@ export class KnowledgeBaseArticleError extends Error {
 
 function validateKnowledgeBaseArticleId(articleId: string): string {
   const result = knowledgeBaseArticleIdSchema.safeParse(articleId);
+
+  if (!result.success) {
+    throw new KnowledgeBaseArticleError(
+      "INVALID_INPUT",
+      formatValidationErrors(result.error),
+    );
+  }
+
+  return result.data;
+}
+
+function validateKnowledgeBaseProductId(productId: string): string {
+  const result = knowledgeBaseProductIdSchema.safeParse(productId);
 
   if (!result.success) {
     throw new KnowledgeBaseArticleError(
@@ -132,9 +151,31 @@ export async function createKnowledgeBaseArticle(
     );
   }
 
+  const { productId, ...articleData } = validationResult.data;
+
+  if (productId) {
+    const id = validateKnowledgeBaseProductId(productId);
+    const product = await prisma.product.findFirst({
+      where: {
+        id,
+        userId,
+        status: { not: "draft" },
+      },
+      select: { id: true },
+    });
+
+    if (!product) {
+      throw new KnowledgeBaseArticleError(
+        "INVALID_INPUT",
+        "Selected product is unavailable.",
+      );
+    }
+  }
+
   return prisma.knowledgeBaseArticle.create({
     data: {
-      ...validationResult.data,
+      ...articleData,
+      ...(productId ? { product: { connect: { id: productId } } } : {}),
       user: {
         connect: {
           id: userId,
@@ -160,6 +201,61 @@ export async function updateKnowledgeBaseArticle(
     );
   }
 
+  const { productId, ...articleData } = validationResult.data;
+  const relationshipData: { productId?: string | null } = {};
+  const existingArticle =
+    articleData.scope === undefined
+      ? await prisma.knowledgeBaseArticle.findFirst({
+          where: { id, userId },
+          select: { scope: true, status: true },
+        })
+      : null;
+  const articleScope = articleData.scope ?? existingArticle?.scope;
+
+  if (articleScope === "generic") {
+    if (productId !== undefined) {
+      throw new KnowledgeBaseArticleError(
+        "INVALID_INPUT",
+        "Generic articles cannot be linked to a product.",
+      );
+    }
+
+    if (articleData.scope === "generic") {
+      relationshipData.productId = null;
+    }
+  } else if (articleScope === "specific") {
+    if (productId === undefined) {
+      throw new KnowledgeBaseArticleError(
+        "INVALID_INPUT",
+        "Specific articles must be linked to a product.",
+      );
+    }
+
+    const validatedProductId = validateKnowledgeBaseProductId(productId);
+    const product = await prisma.product.findFirst({
+      where: {
+        id: validatedProductId,
+        userId,
+        status: { not: "draft" },
+      },
+      select: { id: true },
+    });
+
+    if (!product) {
+      throw new KnowledgeBaseArticleError(
+        "INVALID_INPUT",
+        "Selected product is unavailable.",
+      );
+    }
+
+    relationshipData.productId = validatedProductId;
+  } else if (productId !== undefined) {
+    throw new KnowledgeBaseArticleError(
+      "NOT_FOUND",
+      "Knowledge Base article not found.",
+    );
+  }
+
   const [article] = await prisma.knowledgeBaseArticle.updateManyAndReturn({
     where: {
       id,
@@ -168,18 +264,26 @@ export async function updateKnowledgeBaseArticle(
         ? { status: "published" as const }
         : {}),
     },
-    data: validationResult.data,
+    data: {
+      ...articleData,
+      ...relationshipData,
+    },
     select: knowledgeBaseArticleSelect,
   });
 
   if (!article) {
     if (validationResult.data.status === "archived") {
-      const existingArticle = await prisma.knowledgeBaseArticle.findFirst({
-        where: { id, userId },
-        select: { status: true },
-      });
+      const existingArticleStatus =
+        articleData.scope === undefined
+          ? existingArticle?.status
+          : (
+              await prisma.knowledgeBaseArticle.findFirst({
+                where: { id, userId },
+                select: { status: true },
+              })
+            )?.status;
 
-      if (existingArticle) {
+      if (existingArticleStatus) {
         throw new KnowledgeBaseArticleError(
           "INVALID_STATUS_TRANSITION",
           "Only published articles can be archived.",

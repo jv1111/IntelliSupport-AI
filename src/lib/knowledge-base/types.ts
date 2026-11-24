@@ -11,6 +11,7 @@ export interface KnowledgeBaseArticle {
   categoryTag: ArticleCategoryTag;
   status: ProductStatus;
   context: string;
+  productId: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -20,6 +21,7 @@ export type KnowledgeBaseArticleInput = Pick<
   "title" | "scope" | "categoryTag" | "context"
 > & {
   status?: ProductStatus;
+  productId?: string;
 };
 
 export type KnowledgeBaseFilter = "all" | ArticleScope;

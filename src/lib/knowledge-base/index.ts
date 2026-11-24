@@ -26,6 +26,7 @@ const articleFields = `
   categoryTag
   status
   context
+  productId
   createdAt
   updatedAt
 `;

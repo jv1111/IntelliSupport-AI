@@ -216,6 +216,7 @@ export type ProductWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   autoReplies?: Prisma.AutoReplyListRelationFilter
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleListRelationFilter
 }
 
 export type ProductOrderByWithRelationInput = {
@@ -230,6 +231,7 @@ export type ProductOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   autoReplies?: Prisma.AutoReplyOrderByRelationAggregateInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleOrderByRelationAggregateInput
 }
 
 export type ProductWhereUniqueInput = Prisma.AtLeast<{
@@ -247,6 +249,7 @@ export type ProductWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   autoReplies?: Prisma.AutoReplyListRelationFilter
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleListRelationFilter
 }, "id">
 
 export type ProductOrderByWithAggregationInput = {
@@ -290,6 +293,7 @@ export type ProductCreateInput = {
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProductsInput
   autoReplies?: Prisma.AutoReplyCreateNestedManyWithoutProductInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateInput = {
@@ -303,6 +307,7 @@ export type ProductUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   autoReplies?: Prisma.AutoReplyUncheckedCreateNestedManyWithoutProductInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductUpdateInput = {
@@ -316,6 +321,7 @@ export type ProductUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProductsNestedInput
   autoReplies?: Prisma.AutoReplyUpdateManyWithoutProductNestedInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateInput = {
@@ -329,6 +335,7 @@ export type ProductUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   autoReplies?: Prisma.AutoReplyUncheckedUpdateManyWithoutProductNestedInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateManyInput = {
@@ -417,6 +424,11 @@ export type ProductScalarRelationFilter = {
   isNot?: Prisma.ProductWhereInput
 }
 
+export type ProductNullableScalarRelationFilter = {
+  is?: Prisma.ProductWhereInput | null
+  isNot?: Prisma.ProductWhereInput | null
+}
+
 export type ProductCreateNestedManyWithoutUserInput = {
   create?: Prisma.XOR<Prisma.ProductCreateWithoutUserInput, Prisma.ProductUncheckedCreateWithoutUserInput> | Prisma.ProductCreateWithoutUserInput[] | Prisma.ProductUncheckedCreateWithoutUserInput[]
   connectOrCreate?: Prisma.ProductCreateOrConnectWithoutUserInput | Prisma.ProductCreateOrConnectWithoutUserInput[]
@@ -481,6 +493,22 @@ export type ProductUpdateOneRequiredWithoutAutoRepliesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ProductUpdateToOneWithWhereWithoutAutoRepliesInput, Prisma.ProductUpdateWithoutAutoRepliesInput>, Prisma.ProductUncheckedUpdateWithoutAutoRepliesInput>
 }
 
+export type ProductCreateNestedOneWithoutKnowledgeBaseArticlesInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutKnowledgeBaseArticlesInput, Prisma.ProductUncheckedCreateWithoutKnowledgeBaseArticlesInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutKnowledgeBaseArticlesInput
+  connect?: Prisma.ProductWhereUniqueInput
+}
+
+export type ProductUpdateOneWithoutKnowledgeBaseArticlesNestedInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutKnowledgeBaseArticlesInput, Prisma.ProductUncheckedCreateWithoutKnowledgeBaseArticlesInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutKnowledgeBaseArticlesInput
+  upsert?: Prisma.ProductUpsertWithoutKnowledgeBaseArticlesInput
+  disconnect?: Prisma.ProductWhereInput | boolean
+  delete?: Prisma.ProductWhereInput | boolean
+  connect?: Prisma.ProductWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProductUpdateToOneWithWhereWithoutKnowledgeBaseArticlesInput, Prisma.ProductUpdateWithoutKnowledgeBaseArticlesInput>, Prisma.ProductUncheckedUpdateWithoutKnowledgeBaseArticlesInput>
+}
+
 export type ProductCreateWithoutUserInput = {
   id?: string
   name: string
@@ -491,6 +519,7 @@ export type ProductCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   autoReplies?: Prisma.AutoReplyCreateNestedManyWithoutProductInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutUserInput = {
@@ -503,6 +532,7 @@ export type ProductUncheckedCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   autoReplies?: Prisma.AutoReplyUncheckedCreateNestedManyWithoutProductInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutUserInput = {
@@ -556,6 +586,7 @@ export type ProductCreateWithoutAutoRepliesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProductsInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutAutoRepliesInput = {
@@ -568,6 +599,7 @@ export type ProductUncheckedCreateWithoutAutoRepliesInput = {
   userId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutAutoRepliesInput = {
@@ -596,6 +628,7 @@ export type ProductUpdateWithoutAutoRepliesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProductsNestedInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutAutoRepliesInput = {
@@ -608,6 +641,75 @@ export type ProductUncheckedUpdateWithoutAutoRepliesInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUncheckedUpdateManyWithoutProductNestedInput
+}
+
+export type ProductCreateWithoutKnowledgeBaseArticlesInput = {
+  id?: string
+  name: string
+  sku?: string
+  status?: $Enums.ProductStatus
+  imageUrl?: string | null
+  description?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutProductsInput
+  autoReplies?: Prisma.AutoReplyCreateNestedManyWithoutProductInput
+}
+
+export type ProductUncheckedCreateWithoutKnowledgeBaseArticlesInput = {
+  id?: string
+  name: string
+  sku?: string
+  status?: $Enums.ProductStatus
+  imageUrl?: string | null
+  description?: string
+  userId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  autoReplies?: Prisma.AutoReplyUncheckedCreateNestedManyWithoutProductInput
+}
+
+export type ProductCreateOrConnectWithoutKnowledgeBaseArticlesInput = {
+  where: Prisma.ProductWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProductCreateWithoutKnowledgeBaseArticlesInput, Prisma.ProductUncheckedCreateWithoutKnowledgeBaseArticlesInput>
+}
+
+export type ProductUpsertWithoutKnowledgeBaseArticlesInput = {
+  update: Prisma.XOR<Prisma.ProductUpdateWithoutKnowledgeBaseArticlesInput, Prisma.ProductUncheckedUpdateWithoutKnowledgeBaseArticlesInput>
+  create: Prisma.XOR<Prisma.ProductCreateWithoutKnowledgeBaseArticlesInput, Prisma.ProductUncheckedCreateWithoutKnowledgeBaseArticlesInput>
+  where?: Prisma.ProductWhereInput
+}
+
+export type ProductUpdateToOneWithWhereWithoutKnowledgeBaseArticlesInput = {
+  where?: Prisma.ProductWhereInput
+  data: Prisma.XOR<Prisma.ProductUpdateWithoutKnowledgeBaseArticlesInput, Prisma.ProductUncheckedUpdateWithoutKnowledgeBaseArticlesInput>
+}
+
+export type ProductUpdateWithoutKnowledgeBaseArticlesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutProductsNestedInput
+  autoReplies?: Prisma.AutoReplyUpdateManyWithoutProductNestedInput
+}
+
+export type ProductUncheckedUpdateWithoutKnowledgeBaseArticlesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  autoReplies?: Prisma.AutoReplyUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateManyUserInput = {
@@ -631,6 +733,7 @@ export type ProductUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   autoReplies?: Prisma.AutoReplyUpdateManyWithoutProductNestedInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutUserInput = {
@@ -643,6 +746,7 @@ export type ProductUncheckedUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   autoReplies?: Prisma.AutoReplyUncheckedUpdateManyWithoutProductNestedInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateManyWithoutUserInput = {
@@ -663,10 +767,12 @@ export type ProductUncheckedUpdateManyWithoutUserInput = {
 
 export type ProductCountOutputType = {
   autoReplies: number
+  knowledgeBaseArticles: number
 }
 
 export type ProductCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   autoReplies?: boolean | ProductCountOutputTypeCountAutoRepliesArgs
+  knowledgeBaseArticles?: boolean | ProductCountOutputTypeCountKnowledgeBaseArticlesArgs
 }
 
 /**
@@ -686,6 +792,13 @@ export type ProductCountOutputTypeCountAutoRepliesArgs<ExtArgs extends runtime.T
   where?: Prisma.AutoReplyWhereInput
 }
 
+/**
+ * ProductCountOutputType without action
+ */
+export type ProductCountOutputTypeCountKnowledgeBaseArticlesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.KnowledgeBaseArticleWhereInput
+}
+
 
 export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -699,6 +812,7 @@ export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   autoReplies?: boolean | Prisma.Product$autoRepliesArgs<ExtArgs>
+  knowledgeBaseArticles?: boolean | Prisma.Product$knowledgeBaseArticlesArgs<ExtArgs>
   _count?: boolean | Prisma.ProductCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["product"]>
 
@@ -744,6 +858,7 @@ export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
 export type ProductInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   autoReplies?: boolean | Prisma.Product$autoRepliesArgs<ExtArgs>
+  knowledgeBaseArticles?: boolean | Prisma.Product$knowledgeBaseArticlesArgs<ExtArgs>
   _count?: boolean | Prisma.ProductCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ProductIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -758,6 +873,7 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
     autoReplies: Prisma.$AutoReplyPayload<ExtArgs>[]
+    knowledgeBaseArticles: Prisma.$KnowledgeBaseArticlePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1165,6 +1281,7 @@ export interface Prisma__ProductClient<T, Null = never, ExtArgs extends runtime.
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   autoReplies<T extends Prisma.Product$autoRepliesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$autoRepliesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AutoReplyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  knowledgeBaseArticles<T extends Prisma.Product$knowledgeBaseArticlesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$knowledgeBaseArticlesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$KnowledgeBaseArticlePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1625,6 +1742,30 @@ export type Product$autoRepliesArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.AutoReplyScalarFieldEnum | Prisma.AutoReplyScalarFieldEnum[]
+}
+
+/**
+ * Product.knowledgeBaseArticles
+ */
+export type Product$knowledgeBaseArticlesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the KnowledgeBaseArticle
+   */
+  select?: Prisma.KnowledgeBaseArticleSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the KnowledgeBaseArticle
+   */
+  omit?: Prisma.KnowledgeBaseArticleOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.KnowledgeBaseArticleInclude<ExtArgs> | null
+  where?: Prisma.KnowledgeBaseArticleWhereInput
+  orderBy?: Prisma.KnowledgeBaseArticleOrderByWithRelationInput | Prisma.KnowledgeBaseArticleOrderByWithRelationInput[]
+  cursor?: Prisma.KnowledgeBaseArticleWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.KnowledgeBaseArticleScalarFieldEnum | Prisma.KnowledgeBaseArticleScalarFieldEnum[]
 }
 
 /**

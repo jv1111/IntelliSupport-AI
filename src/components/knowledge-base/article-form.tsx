@@ -42,7 +42,7 @@ type ArticleFormValues = Pick<
   KnowledgeBaseArticleInput,
   "scope" | "categoryTag" | "title" | "context"
 > & {
-  selectedItemId: string;
+  productId: string;
 };
 
 function getInitialValues(
@@ -53,7 +53,7 @@ function getInitialValues(
     categoryTag: article?.categoryTag ?? "troubleshooting",
     title: article?.title ?? "",
     context: article?.context ?? "",
-    selectedItemId: "",
+    productId: article?.productId ?? "",
   };
 }
 
@@ -86,10 +86,12 @@ function restoreArticleFormValues(
     title: typeof value.title === "string" ? value.title : initialValues.title,
     context:
       typeof value.context === "string" ? value.context : initialValues.context,
-    selectedItemId:
-      typeof value.selectedItemId === "string"
-        ? value.selectedItemId
-        : initialValues.selectedItemId,
+    productId:
+      typeof value.productId === "string"
+        ? value.productId
+        : typeof value.selectedItemId === "string"
+          ? value.selectedItemId
+          : initialValues.productId,
   };
 }
 
@@ -139,6 +141,9 @@ export function ArticleForm({
       categoryTag: values.categoryTag,
       title: values.title.trim(),
       context: values.context.trim(),
+      ...(values.scope === "specific" && values.productId
+        ? { productId: values.productId }
+        : {}),
       ...(status ? { status } : {}),
     });
 
@@ -334,19 +339,19 @@ export function ArticleForm({
 
           {values.scope !== "generic" && (
             <div>
-              <FieldLabel htmlFor="kb-related-item" required>
+              <FieldLabel htmlFor="kb-related-product" required>
                 Related Product
               </FieldLabel>
 
               <SelectField
-                id="kb-related-item"
+                id="kb-related-product"
                 required
                 disabled={
                   isSaving || isLoadingProducts || products.length === 0
                 }
-                value={values.selectedItemId}
+                value={values.productId}
                 onChange={(event) =>
-                  updateField("selectedItemId", event.target.value)
+                  updateField("productId", event.target.value)
                 }
                 options={[
                   {
@@ -376,7 +381,7 @@ export function ArticleForm({
                     ? "Loading products..."
                     : products.length === 0
                       ? "No published or archived products are available."
-                      : "Item selection is a frontend preview and is not saved yet."}
+                      : "The selected product will be linked when you save the article."}
               </p>
             </div>
           )}

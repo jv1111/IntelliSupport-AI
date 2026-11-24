@@ -31,6 +31,7 @@ export type KnowledgeBaseArticleMinAggregateOutputType = {
   status: $Enums.ProductStatus | null
   title: string | null
   context: string | null
+  productId: string | null
   userId: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -43,6 +44,7 @@ export type KnowledgeBaseArticleMaxAggregateOutputType = {
   status: $Enums.ProductStatus | null
   title: string | null
   context: string | null
+  productId: string | null
   userId: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -55,6 +57,7 @@ export type KnowledgeBaseArticleCountAggregateOutputType = {
   status: number
   title: number
   context: number
+  productId: number
   userId: number
   createdAt: number
   updatedAt: number
@@ -69,6 +72,7 @@ export type KnowledgeBaseArticleMinAggregateInputType = {
   status?: true
   title?: true
   context?: true
+  productId?: true
   userId?: true
   createdAt?: true
   updatedAt?: true
@@ -81,6 +85,7 @@ export type KnowledgeBaseArticleMaxAggregateInputType = {
   status?: true
   title?: true
   context?: true
+  productId?: true
   userId?: true
   createdAt?: true
   updatedAt?: true
@@ -93,6 +98,7 @@ export type KnowledgeBaseArticleCountAggregateInputType = {
   status?: true
   title?: true
   context?: true
+  productId?: true
   userId?: true
   createdAt?: true
   updatedAt?: true
@@ -178,6 +184,7 @@ export type KnowledgeBaseArticleGroupByOutputType = {
   status: $Enums.ProductStatus
   title: string
   context: string
+  productId: string | null
   userId: string
   createdAt: Date
   updatedAt: Date
@@ -211,10 +218,12 @@ export type KnowledgeBaseArticleWhereInput = {
   status?: Prisma.EnumProductStatusFilter<"KnowledgeBaseArticle"> | $Enums.ProductStatus
   title?: Prisma.StringFilter<"KnowledgeBaseArticle"> | string
   context?: Prisma.StringFilter<"KnowledgeBaseArticle"> | string
+  productId?: Prisma.StringNullableFilter<"KnowledgeBaseArticle"> | string | null
   userId?: Prisma.StringFilter<"KnowledgeBaseArticle"> | string
   createdAt?: Prisma.DateTimeFilter<"KnowledgeBaseArticle"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"KnowledgeBaseArticle"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  product?: Prisma.XOR<Prisma.ProductNullableScalarRelationFilter, Prisma.ProductWhereInput> | null
 }
 
 export type KnowledgeBaseArticleOrderByWithRelationInput = {
@@ -224,10 +233,12 @@ export type KnowledgeBaseArticleOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   title?: Prisma.SortOrder
   context?: Prisma.SortOrder
+  productId?: Prisma.SortOrderInput | Prisma.SortOrder
   userId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
+  product?: Prisma.ProductOrderByWithRelationInput
 }
 
 export type KnowledgeBaseArticleWhereUniqueInput = Prisma.AtLeast<{
@@ -240,10 +251,12 @@ export type KnowledgeBaseArticleWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.EnumProductStatusFilter<"KnowledgeBaseArticle"> | $Enums.ProductStatus
   title?: Prisma.StringFilter<"KnowledgeBaseArticle"> | string
   context?: Prisma.StringFilter<"KnowledgeBaseArticle"> | string
+  productId?: Prisma.StringNullableFilter<"KnowledgeBaseArticle"> | string | null
   userId?: Prisma.StringFilter<"KnowledgeBaseArticle"> | string
   createdAt?: Prisma.DateTimeFilter<"KnowledgeBaseArticle"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"KnowledgeBaseArticle"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  product?: Prisma.XOR<Prisma.ProductNullableScalarRelationFilter, Prisma.ProductWhereInput> | null
 }, "id">
 
 export type KnowledgeBaseArticleOrderByWithAggregationInput = {
@@ -253,6 +266,7 @@ export type KnowledgeBaseArticleOrderByWithAggregationInput = {
   status?: Prisma.SortOrder
   title?: Prisma.SortOrder
   context?: Prisma.SortOrder
+  productId?: Prisma.SortOrderInput | Prisma.SortOrder
   userId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -271,6 +285,7 @@ export type KnowledgeBaseArticleScalarWhereWithAggregatesInput = {
   status?: Prisma.EnumProductStatusWithAggregatesFilter<"KnowledgeBaseArticle"> | $Enums.ProductStatus
   title?: Prisma.StringWithAggregatesFilter<"KnowledgeBaseArticle"> | string
   context?: Prisma.StringWithAggregatesFilter<"KnowledgeBaseArticle"> | string
+  productId?: Prisma.StringNullableWithAggregatesFilter<"KnowledgeBaseArticle"> | string | null
   userId?: Prisma.StringWithAggregatesFilter<"KnowledgeBaseArticle"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"KnowledgeBaseArticle"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"KnowledgeBaseArticle"> | Date | string
@@ -286,6 +301,7 @@ export type KnowledgeBaseArticleCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutKnowledgeBaseArticlesInput
+  product?: Prisma.ProductCreateNestedOneWithoutKnowledgeBaseArticlesInput
 }
 
 export type KnowledgeBaseArticleUncheckedCreateInput = {
@@ -295,6 +311,7 @@ export type KnowledgeBaseArticleUncheckedCreateInput = {
   status?: $Enums.ProductStatus
   title: string
   context: string
+  productId?: string | null
   userId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -310,6 +327,7 @@ export type KnowledgeBaseArticleUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutKnowledgeBaseArticlesNestedInput
+  product?: Prisma.ProductUpdateOneWithoutKnowledgeBaseArticlesNestedInput
 }
 
 export type KnowledgeBaseArticleUncheckedUpdateInput = {
@@ -319,6 +337,7 @@ export type KnowledgeBaseArticleUncheckedUpdateInput = {
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
   title?: Prisma.StringFieldUpdateOperationsInput | string
   context?: Prisma.StringFieldUpdateOperationsInput | string
+  productId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -331,6 +350,7 @@ export type KnowledgeBaseArticleCreateManyInput = {
   status?: $Enums.ProductStatus
   title: string
   context: string
+  productId?: string | null
   userId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -354,6 +374,7 @@ export type KnowledgeBaseArticleUncheckedUpdateManyInput = {
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
   title?: Prisma.StringFieldUpdateOperationsInput | string
   context?: Prisma.StringFieldUpdateOperationsInput | string
+  productId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -376,6 +397,7 @@ export type KnowledgeBaseArticleCountOrderByAggregateInput = {
   status?: Prisma.SortOrder
   title?: Prisma.SortOrder
   context?: Prisma.SortOrder
+  productId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -388,6 +410,7 @@ export type KnowledgeBaseArticleMaxOrderByAggregateInput = {
   status?: Prisma.SortOrder
   title?: Prisma.SortOrder
   context?: Prisma.SortOrder
+  productId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -400,6 +423,7 @@ export type KnowledgeBaseArticleMinOrderByAggregateInput = {
   status?: Prisma.SortOrder
   title?: Prisma.SortOrder
   context?: Prisma.SortOrder
+  productId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -447,6 +471,48 @@ export type KnowledgeBaseArticleUncheckedUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.KnowledgeBaseArticleScalarWhereInput | Prisma.KnowledgeBaseArticleScalarWhereInput[]
 }
 
+export type KnowledgeBaseArticleCreateNestedManyWithoutProductInput = {
+  create?: Prisma.XOR<Prisma.KnowledgeBaseArticleCreateWithoutProductInput, Prisma.KnowledgeBaseArticleUncheckedCreateWithoutProductInput> | Prisma.KnowledgeBaseArticleCreateWithoutProductInput[] | Prisma.KnowledgeBaseArticleUncheckedCreateWithoutProductInput[]
+  connectOrCreate?: Prisma.KnowledgeBaseArticleCreateOrConnectWithoutProductInput | Prisma.KnowledgeBaseArticleCreateOrConnectWithoutProductInput[]
+  createMany?: Prisma.KnowledgeBaseArticleCreateManyProductInputEnvelope
+  connect?: Prisma.KnowledgeBaseArticleWhereUniqueInput | Prisma.KnowledgeBaseArticleWhereUniqueInput[]
+}
+
+export type KnowledgeBaseArticleUncheckedCreateNestedManyWithoutProductInput = {
+  create?: Prisma.XOR<Prisma.KnowledgeBaseArticleCreateWithoutProductInput, Prisma.KnowledgeBaseArticleUncheckedCreateWithoutProductInput> | Prisma.KnowledgeBaseArticleCreateWithoutProductInput[] | Prisma.KnowledgeBaseArticleUncheckedCreateWithoutProductInput[]
+  connectOrCreate?: Prisma.KnowledgeBaseArticleCreateOrConnectWithoutProductInput | Prisma.KnowledgeBaseArticleCreateOrConnectWithoutProductInput[]
+  createMany?: Prisma.KnowledgeBaseArticleCreateManyProductInputEnvelope
+  connect?: Prisma.KnowledgeBaseArticleWhereUniqueInput | Prisma.KnowledgeBaseArticleWhereUniqueInput[]
+}
+
+export type KnowledgeBaseArticleUpdateManyWithoutProductNestedInput = {
+  create?: Prisma.XOR<Prisma.KnowledgeBaseArticleCreateWithoutProductInput, Prisma.KnowledgeBaseArticleUncheckedCreateWithoutProductInput> | Prisma.KnowledgeBaseArticleCreateWithoutProductInput[] | Prisma.KnowledgeBaseArticleUncheckedCreateWithoutProductInput[]
+  connectOrCreate?: Prisma.KnowledgeBaseArticleCreateOrConnectWithoutProductInput | Prisma.KnowledgeBaseArticleCreateOrConnectWithoutProductInput[]
+  upsert?: Prisma.KnowledgeBaseArticleUpsertWithWhereUniqueWithoutProductInput | Prisma.KnowledgeBaseArticleUpsertWithWhereUniqueWithoutProductInput[]
+  createMany?: Prisma.KnowledgeBaseArticleCreateManyProductInputEnvelope
+  set?: Prisma.KnowledgeBaseArticleWhereUniqueInput | Prisma.KnowledgeBaseArticleWhereUniqueInput[]
+  disconnect?: Prisma.KnowledgeBaseArticleWhereUniqueInput | Prisma.KnowledgeBaseArticleWhereUniqueInput[]
+  delete?: Prisma.KnowledgeBaseArticleWhereUniqueInput | Prisma.KnowledgeBaseArticleWhereUniqueInput[]
+  connect?: Prisma.KnowledgeBaseArticleWhereUniqueInput | Prisma.KnowledgeBaseArticleWhereUniqueInput[]
+  update?: Prisma.KnowledgeBaseArticleUpdateWithWhereUniqueWithoutProductInput | Prisma.KnowledgeBaseArticleUpdateWithWhereUniqueWithoutProductInput[]
+  updateMany?: Prisma.KnowledgeBaseArticleUpdateManyWithWhereWithoutProductInput | Prisma.KnowledgeBaseArticleUpdateManyWithWhereWithoutProductInput[]
+  deleteMany?: Prisma.KnowledgeBaseArticleScalarWhereInput | Prisma.KnowledgeBaseArticleScalarWhereInput[]
+}
+
+export type KnowledgeBaseArticleUncheckedUpdateManyWithoutProductNestedInput = {
+  create?: Prisma.XOR<Prisma.KnowledgeBaseArticleCreateWithoutProductInput, Prisma.KnowledgeBaseArticleUncheckedCreateWithoutProductInput> | Prisma.KnowledgeBaseArticleCreateWithoutProductInput[] | Prisma.KnowledgeBaseArticleUncheckedCreateWithoutProductInput[]
+  connectOrCreate?: Prisma.KnowledgeBaseArticleCreateOrConnectWithoutProductInput | Prisma.KnowledgeBaseArticleCreateOrConnectWithoutProductInput[]
+  upsert?: Prisma.KnowledgeBaseArticleUpsertWithWhereUniqueWithoutProductInput | Prisma.KnowledgeBaseArticleUpsertWithWhereUniqueWithoutProductInput[]
+  createMany?: Prisma.KnowledgeBaseArticleCreateManyProductInputEnvelope
+  set?: Prisma.KnowledgeBaseArticleWhereUniqueInput | Prisma.KnowledgeBaseArticleWhereUniqueInput[]
+  disconnect?: Prisma.KnowledgeBaseArticleWhereUniqueInput | Prisma.KnowledgeBaseArticleWhereUniqueInput[]
+  delete?: Prisma.KnowledgeBaseArticleWhereUniqueInput | Prisma.KnowledgeBaseArticleWhereUniqueInput[]
+  connect?: Prisma.KnowledgeBaseArticleWhereUniqueInput | Prisma.KnowledgeBaseArticleWhereUniqueInput[]
+  update?: Prisma.KnowledgeBaseArticleUpdateWithWhereUniqueWithoutProductInput | Prisma.KnowledgeBaseArticleUpdateWithWhereUniqueWithoutProductInput[]
+  updateMany?: Prisma.KnowledgeBaseArticleUpdateManyWithWhereWithoutProductInput | Prisma.KnowledgeBaseArticleUpdateManyWithWhereWithoutProductInput[]
+  deleteMany?: Prisma.KnowledgeBaseArticleScalarWhereInput | Prisma.KnowledgeBaseArticleScalarWhereInput[]
+}
+
 export type EnumArticleScopeFieldUpdateOperationsInput = {
   set?: $Enums.ArticleScope
 }
@@ -464,6 +530,7 @@ export type KnowledgeBaseArticleCreateWithoutUserInput = {
   context: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  product?: Prisma.ProductCreateNestedOneWithoutKnowledgeBaseArticlesInput
 }
 
 export type KnowledgeBaseArticleUncheckedCreateWithoutUserInput = {
@@ -473,6 +540,7 @@ export type KnowledgeBaseArticleUncheckedCreateWithoutUserInput = {
   status?: $Enums.ProductStatus
   title: string
   context: string
+  productId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -513,9 +581,60 @@ export type KnowledgeBaseArticleScalarWhereInput = {
   status?: Prisma.EnumProductStatusFilter<"KnowledgeBaseArticle"> | $Enums.ProductStatus
   title?: Prisma.StringFilter<"KnowledgeBaseArticle"> | string
   context?: Prisma.StringFilter<"KnowledgeBaseArticle"> | string
+  productId?: Prisma.StringNullableFilter<"KnowledgeBaseArticle"> | string | null
   userId?: Prisma.StringFilter<"KnowledgeBaseArticle"> | string
   createdAt?: Prisma.DateTimeFilter<"KnowledgeBaseArticle"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"KnowledgeBaseArticle"> | Date | string
+}
+
+export type KnowledgeBaseArticleCreateWithoutProductInput = {
+  id?: string
+  scope: $Enums.ArticleScope
+  categoryTag: $Enums.ArticleCategoryTag
+  status?: $Enums.ProductStatus
+  title: string
+  context: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutKnowledgeBaseArticlesInput
+}
+
+export type KnowledgeBaseArticleUncheckedCreateWithoutProductInput = {
+  id?: string
+  scope: $Enums.ArticleScope
+  categoryTag: $Enums.ArticleCategoryTag
+  status?: $Enums.ProductStatus
+  title: string
+  context: string
+  userId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type KnowledgeBaseArticleCreateOrConnectWithoutProductInput = {
+  where: Prisma.KnowledgeBaseArticleWhereUniqueInput
+  create: Prisma.XOR<Prisma.KnowledgeBaseArticleCreateWithoutProductInput, Prisma.KnowledgeBaseArticleUncheckedCreateWithoutProductInput>
+}
+
+export type KnowledgeBaseArticleCreateManyProductInputEnvelope = {
+  data: Prisma.KnowledgeBaseArticleCreateManyProductInput | Prisma.KnowledgeBaseArticleCreateManyProductInput[]
+  skipDuplicates?: boolean
+}
+
+export type KnowledgeBaseArticleUpsertWithWhereUniqueWithoutProductInput = {
+  where: Prisma.KnowledgeBaseArticleWhereUniqueInput
+  update: Prisma.XOR<Prisma.KnowledgeBaseArticleUpdateWithoutProductInput, Prisma.KnowledgeBaseArticleUncheckedUpdateWithoutProductInput>
+  create: Prisma.XOR<Prisma.KnowledgeBaseArticleCreateWithoutProductInput, Prisma.KnowledgeBaseArticleUncheckedCreateWithoutProductInput>
+}
+
+export type KnowledgeBaseArticleUpdateWithWhereUniqueWithoutProductInput = {
+  where: Prisma.KnowledgeBaseArticleWhereUniqueInput
+  data: Prisma.XOR<Prisma.KnowledgeBaseArticleUpdateWithoutProductInput, Prisma.KnowledgeBaseArticleUncheckedUpdateWithoutProductInput>
+}
+
+export type KnowledgeBaseArticleUpdateManyWithWhereWithoutProductInput = {
+  where: Prisma.KnowledgeBaseArticleScalarWhereInput
+  data: Prisma.XOR<Prisma.KnowledgeBaseArticleUpdateManyMutationInput, Prisma.KnowledgeBaseArticleUncheckedUpdateManyWithoutProductInput>
 }
 
 export type KnowledgeBaseArticleCreateManyUserInput = {
@@ -525,6 +644,7 @@ export type KnowledgeBaseArticleCreateManyUserInput = {
   status?: $Enums.ProductStatus
   title: string
   context: string
+  productId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -538,6 +658,7 @@ export type KnowledgeBaseArticleUpdateWithoutUserInput = {
   context?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  product?: Prisma.ProductUpdateOneWithoutKnowledgeBaseArticlesNestedInput
 }
 
 export type KnowledgeBaseArticleUncheckedUpdateWithoutUserInput = {
@@ -547,6 +668,7 @@ export type KnowledgeBaseArticleUncheckedUpdateWithoutUserInput = {
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
   title?: Prisma.StringFieldUpdateOperationsInput | string
   context?: Prisma.StringFieldUpdateOperationsInput | string
+  productId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -558,6 +680,55 @@ export type KnowledgeBaseArticleUncheckedUpdateManyWithoutUserInput = {
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
   title?: Prisma.StringFieldUpdateOperationsInput | string
   context?: Prisma.StringFieldUpdateOperationsInput | string
+  productId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type KnowledgeBaseArticleCreateManyProductInput = {
+  id?: string
+  scope: $Enums.ArticleScope
+  categoryTag: $Enums.ArticleCategoryTag
+  status?: $Enums.ProductStatus
+  title: string
+  context: string
+  userId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type KnowledgeBaseArticleUpdateWithoutProductInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  scope?: Prisma.EnumArticleScopeFieldUpdateOperationsInput | $Enums.ArticleScope
+  categoryTag?: Prisma.EnumArticleCategoryTagFieldUpdateOperationsInput | $Enums.ArticleCategoryTag
+  status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  context?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutKnowledgeBaseArticlesNestedInput
+}
+
+export type KnowledgeBaseArticleUncheckedUpdateWithoutProductInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  scope?: Prisma.EnumArticleScopeFieldUpdateOperationsInput | $Enums.ArticleScope
+  categoryTag?: Prisma.EnumArticleCategoryTagFieldUpdateOperationsInput | $Enums.ArticleCategoryTag
+  status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  context?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type KnowledgeBaseArticleUncheckedUpdateManyWithoutProductInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  scope?: Prisma.EnumArticleScopeFieldUpdateOperationsInput | $Enums.ArticleScope
+  categoryTag?: Prisma.EnumArticleCategoryTagFieldUpdateOperationsInput | $Enums.ArticleCategoryTag
+  status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  context?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -571,10 +742,12 @@ export type KnowledgeBaseArticleSelect<ExtArgs extends runtime.Types.Extensions.
   status?: boolean
   title?: boolean
   context?: boolean
+  productId?: boolean
   userId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  product?: boolean | Prisma.KnowledgeBaseArticle$productArgs<ExtArgs>
 }, ExtArgs["result"]["knowledgeBaseArticle"]>
 
 export type KnowledgeBaseArticleSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -584,10 +757,12 @@ export type KnowledgeBaseArticleSelectCreateManyAndReturn<ExtArgs extends runtim
   status?: boolean
   title?: boolean
   context?: boolean
+  productId?: boolean
   userId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  product?: boolean | Prisma.KnowledgeBaseArticle$productArgs<ExtArgs>
 }, ExtArgs["result"]["knowledgeBaseArticle"]>
 
 export type KnowledgeBaseArticleSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -597,10 +772,12 @@ export type KnowledgeBaseArticleSelectUpdateManyAndReturn<ExtArgs extends runtim
   status?: boolean
   title?: boolean
   context?: boolean
+  productId?: boolean
   userId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  product?: boolean | Prisma.KnowledgeBaseArticle$productArgs<ExtArgs>
 }, ExtArgs["result"]["knowledgeBaseArticle"]>
 
 export type KnowledgeBaseArticleSelectScalar = {
@@ -610,26 +787,31 @@ export type KnowledgeBaseArticleSelectScalar = {
   status?: boolean
   title?: boolean
   context?: boolean
+  productId?: boolean
   userId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type KnowledgeBaseArticleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "scope" | "categoryTag" | "status" | "title" | "context" | "userId" | "createdAt" | "updatedAt", ExtArgs["result"]["knowledgeBaseArticle"]>
+export type KnowledgeBaseArticleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "scope" | "categoryTag" | "status" | "title" | "context" | "productId" | "userId" | "createdAt" | "updatedAt", ExtArgs["result"]["knowledgeBaseArticle"]>
 export type KnowledgeBaseArticleInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  product?: boolean | Prisma.KnowledgeBaseArticle$productArgs<ExtArgs>
 }
 export type KnowledgeBaseArticleIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  product?: boolean | Prisma.KnowledgeBaseArticle$productArgs<ExtArgs>
 }
 export type KnowledgeBaseArticleIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  product?: boolean | Prisma.KnowledgeBaseArticle$productArgs<ExtArgs>
 }
 
 export type $KnowledgeBaseArticlePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "KnowledgeBaseArticle"
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
+    product: Prisma.$ProductPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -638,6 +820,7 @@ export type $KnowledgeBaseArticlePayload<ExtArgs extends runtime.Types.Extension
     status: $Enums.ProductStatus
     title: string
     context: string
+    productId: string | null
     userId: string
     createdAt: Date
     updatedAt: Date
@@ -1036,6 +1219,7 @@ readonly fields: KnowledgeBaseArticleFieldRefs;
 export interface Prisma__KnowledgeBaseArticleClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  product<T extends Prisma.KnowledgeBaseArticle$productArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.KnowledgeBaseArticle$productArgs<ExtArgs>>): Prisma.Prisma__ProductClient<runtime.Types.Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1071,6 +1255,7 @@ export interface KnowledgeBaseArticleFieldRefs {
   readonly status: Prisma.FieldRef<"KnowledgeBaseArticle", 'ProductStatus'>
   readonly title: Prisma.FieldRef<"KnowledgeBaseArticle", 'String'>
   readonly context: Prisma.FieldRef<"KnowledgeBaseArticle", 'String'>
+  readonly productId: Prisma.FieldRef<"KnowledgeBaseArticle", 'String'>
   readonly userId: Prisma.FieldRef<"KnowledgeBaseArticle", 'String'>
   readonly createdAt: Prisma.FieldRef<"KnowledgeBaseArticle", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"KnowledgeBaseArticle", 'DateTime'>
@@ -1472,6 +1657,25 @@ export type KnowledgeBaseArticleDeleteManyArgs<ExtArgs extends runtime.Types.Ext
    * Limit how many KnowledgeBaseArticles to delete.
    */
   limit?: number
+}
+
+/**
+ * KnowledgeBaseArticle.product
+ */
+export type KnowledgeBaseArticle$productArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Product
+   */
+  select?: Prisma.ProductSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Product
+   */
+  omit?: Prisma.ProductOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProductInclude<ExtArgs> | null
+  where?: Prisma.ProductWhereInput
 }
 
 /**

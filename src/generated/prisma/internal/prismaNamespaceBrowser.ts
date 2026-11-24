@@ -149,6 +149,7 @@ export const KnowledgeBaseArticleScalarFieldEnum = {
   status: 'status',
   title: 'title',
   context: 'context',
+  productId: 'productId',
   userId: 'userId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

@@ -11,7 +11,7 @@ import type { KnowledgeBaseArticle } from "@/lib/knowledge-base/types";
 
 interface ArticleCardProps {
   article: KnowledgeBaseArticle;
-  onUnarchive: (articleId: string) => void;
+  onUnarchive: (article: KnowledgeBaseArticle) => void;
   isUnarchiving: boolean;
   onDelete: (article: KnowledgeBaseArticle) => void;
   isDeleting: boolean;
@@ -75,7 +75,7 @@ export function ArticleCard({
             {article.status === "archived" ? (
               <button
                 type="button"
-                onClick={() => onUnarchive(article.id)}
+                onClick={() => onUnarchive(article)}
                 disabled={isUnarchiving}
                 className="inline-flex shrink-0 items-center gap-1.5 rounded-sm text-[11px] font-bold text-primary hover:text-primary-hover hover:underline disabled:opacity-60"
               >

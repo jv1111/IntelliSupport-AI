@@ -47,6 +47,7 @@ export const createKnowledgeBaseArticleSchema = z.object({
   categoryTag: articleCategoryTagSchema,
   title: articleTitleSchema,
   context: articleContextSchema,
+  productId: z.string().trim().min(1, "Product ID is required.").optional(),
   status: articleStatusSchema.default("draft"),
 });
 
@@ -56,6 +57,7 @@ export const updateKnowledgeBaseArticleSchema = z
     categoryTag: articleCategoryTagSchema.optional(),
     title: articleTitleSchema.optional(),
     context: articleContextSchema.optional(),
+    productId: z.string().trim().min(1, "Product ID is required.").optional(),
     status: articleStatusSchema.optional(),
   })
   .refine(

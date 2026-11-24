@@ -188,16 +188,22 @@ export function useKnowledgeBase(initialStatus: KnowledgeBaseStatus) {
   }, []);
 
   const unarchiveArticle = useCallback(
-    async (articleId: string) => {
+    async (article: KnowledgeBaseArticle) => {
       if (unarchivingArticleId) {
         return;
       }
 
-      setUnarchivingArticleId(articleId);
+      setUnarchivingArticleId(article.id);
       setActionError(null);
 
       try {
-        await updateKnowledgeBaseArticle(articleId, { status: "draft" });
+        await updateKnowledgeBaseArticle(article.id, {
+          scope: article.scope,
+          ...(article.scope === "specific" && article.productId
+            ? { productId: article.productId }
+            : {}),
+          status: "draft",
+        });
         setRefreshKey((current) => current + 1);
       } catch (error) {
         setActionError(
