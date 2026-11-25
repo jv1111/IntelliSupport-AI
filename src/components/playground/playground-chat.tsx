@@ -35,6 +35,8 @@ export function PlaygroundChat({
     hasAutoReplies,
     showResolutionPrompt,
     isInputDisabled,
+    isSending,
+    geminiError,
     sendMessage,
     selectReply,
     answerResolution,
@@ -46,8 +48,8 @@ export function PlaygroundChat({
     sendMessage();
   }
 
-  const inputPlaceholder = isInputDisabled
-    ? "Automatic replies are unavailable..."
+  const inputPlaceholder = isSending
+    ? "AI Gemini is thinking..."
     : "Type your question...";
 
   const messagesContainerRef = useAutoScroll<HTMLDivElement>(messages.length);
@@ -130,7 +132,7 @@ export function PlaygroundChat({
 
                   <div className="max-w-[85%] space-y-2">
                     <p className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                      AI Assistant
+                      {message.provider === "gemini" ? "AI Gemini" : "AI Assistant"}
                     </p>
                     <div className="rounded-2xl rounded-tl-sm border border-border bg-surface-muted p-3 text-xs leading-relaxed whitespace-pre-wrap text-foreground">
                       {message.content}
@@ -177,18 +179,38 @@ export function PlaygroundChat({
                 className="ml-12 rounded-xl border border-border bg-surface-muted p-3 text-xs text-muted-foreground"
                 role="status"
               >
-                Automatic replies are disabled in your Bot Settings. Enable them
-                in Bot Manager to test your configured responses.
+                Suggested questions are disabled in your Bot Settings. You can
+                still chat with AI Gemini.
               </div>
             ) : !hasAutoReplies ? (
               <div
                 className="ml-12 rounded-xl border border-border bg-surface-muted p-3 text-xs text-muted-foreground"
                 role="status"
               >
-                No automatic replies have been configured for this product yet.
-                Add questions and answers in Bot Manager to test them here.
+                No suggested questions are configured for this product yet.
+                You can still ask AI Gemini a question.
               </div>
             ) : null}
+
+            {geminiError && (
+              <div
+                className="ml-12 rounded-xl border border-border bg-surface-muted p-3 text-xs text-muted-foreground"
+                role="alert"
+              >
+                {geminiError}
+              </div>
+            )}
+
+            {isSending && (
+              <div className="ml-12 space-y-2" role="status">
+                <p className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
+                  AI Gemini
+                </p>
+                <div className="w-fit rounded-2xl rounded-tl-sm border border-border bg-surface-muted p-3 text-xs text-muted-foreground">
+                  Thinking...
+                </div>
+              </div>
+            )}
 
             {showResolutionPrompt && (
               <div

@@ -7,12 +7,17 @@ import { usePlaygroundProducts } from "@/components/playground/hooks/use-playgro
 import type { AutoReply } from "@/lib/auto-replies/types";
 import type { Product } from "@/lib/products/types";
 
-const { fetchAllProductsMock } = vi.hoisted(() => ({
+const { fetchAllProductsMock, sendGeminiMessageMock } = vi.hoisted(() => ({
   fetchAllProductsMock: vi.fn(),
+  sendGeminiMessageMock: vi.fn(),
 }));
 
 vi.mock("@/lib/products", () => ({
   fetchAllProducts: fetchAllProductsMock,
+}));
+
+vi.mock("@/lib/gemini", () => ({
+  sendGeminiMessage: sendGeminiMessageMock,
 }));
 
 const productA: Product = {
@@ -70,6 +75,11 @@ const autoReplies = [rootReply, secondRootReply, followUpReply];
 
 beforeEach(() => {
   vi.clearAllMocks();
+
+  sendGeminiMessageMock.mockResolvedValue({
+    text: "Gemini response",
+    model: "gemini-3.5-flash-lite",
+  });
 });
 
 describe("Playground Products - Loading", () => {
@@ -209,14 +219,14 @@ describe("Playground Chat - Initial State", () => {
     expect(result.current.isInputDisabled).toBe(false);
   });
 
-  it("reports when automatic replies are unavailable", () => {
+  it("keeps the message input available when automatic replies are unavailable", () => {
     const { result } = renderHook(() =>
       usePlaygroundChat(productA.name, [], true),
     );
 
     expect(result.current.hasAutoReplies).toBe(false);
     expect(result.current.suggestedReplies).toEqual([]);
-    expect(result.current.isInputDisabled).toBe(true);
+    expect(result.current.isInputDisabled).toBe(false);
   });
 });
 
@@ -310,122 +320,146 @@ describe("Playground Chat - Suggested Questions", () => {
 });
 
 describe("Playground Chat - Typed Questions", () => {
-  it("matches questions regardless of letter casing", () => {
+  it("sends typed messages to Gemini and displays its response", async () => {
     const { result } = renderHook(() =>
       usePlaygroundChat(productA.name, autoReplies, true),
     );
 
     act(() => {
-      result.current.setMessageDraft("HOW DO I RESET THE ROUTER?");
+      result.current.setMessageDraft("hello");
     });
 
-    act(() => {
-      result.current.sendMessage();
+    await act(async () => {
+      await result.current.sendMessage();
     });
 
+    expect(sendGeminiMessageMock).toHaveBeenCalledWith({
+      message: "hello",
+    });
+
+    expect(result.current.messages).toHaveLength(3);
     expect(result.current.messages[1]).toMatchObject({
       role: "user",
-      content: "HOW DO I RESET THE ROUTER?",
+      content: "hello",
     });
-
     expect(result.current.messages[2]).toMatchObject({
       role: "assistant",
-      content: rootReply.answer,
+      content: "Gemini response",
+      provider: "gemini",
     });
+    expect(result.current.isSending).toBe(false);
+    expect(result.current.geminiError).toBeNull();
   });
 
-  it("matches questions with different whitespace", () => {
+  it("sends trimmed messages to Gemini", async () => {
     const { result } = renderHook(() =>
       usePlaygroundChat(productA.name, autoReplies, true),
     );
 
     act(() => {
-      result.current.setMessageDraft("  How   do I   reset the router?  ");
+      result.current.setMessageDraft("  hello   Gemini  ");
     });
 
-    act(() => {
-      result.current.sendMessage();
+    await act(async () => {
+      await result.current.sendMessage();
     });
 
-    expect(result.current.messages[2]).toMatchObject({
-      role: "assistant",
-      content: rootReply.answer,
+    expect(sendGeminiMessageMock).toHaveBeenCalledWith({
+      message: "hello   Gemini",
     });
   });
 
-  it("clears the message draft after sending a matched question", () => {
+  it("clears the message draft after sending", async () => {
     const { result } = renderHook(() =>
       usePlaygroundChat(productA.name, autoReplies, true),
     );
 
     act(() => {
-      result.current.setMessageDraft(rootReply.question);
+      result.current.setMessageDraft("hello");
     });
 
-    act(() => {
-      result.current.sendMessage();
+    await act(async () => {
+      await result.current.sendMessage();
     });
 
     expect(result.current.messageDraft).toBe("");
   });
 
-  it("suppresses suggested question buttons after sending a typed message", () => {
+  it("suppresses suggested questions after sending a typed message", async () => {
     const { result } = renderHook(() =>
       usePlaygroundChat(productA.name, autoReplies, true),
     );
 
     act(() => {
-      result.current.setMessageDraft(rootReply.question);
+      result.current.setMessageDraft("hello");
     });
 
-    act(() => {
-      result.current.sendMessage();
+    await act(async () => {
+      await result.current.sendMessage();
     });
 
     expect(result.current.suggestedReplies).toEqual([]);
   });
 
-  it("adds an unmatched message without generating an assistant response", () => {
+  it("uses Gemini for typed messages that match an automatic reply question", async () => {
     const { result } = renderHook(() =>
       usePlaygroundChat(productA.name, autoReplies, true),
     );
 
     act(() => {
-      result.current.setMessageDraft("Where can I buy accessories?");
+      result.current.setMessageDraft(rootReply.question);
     });
 
+    await act(async () => {
+      await result.current.sendMessage();
+    });
+
+    expect(sendGeminiMessageMock).toHaveBeenCalledWith({
+      message: rootReply.question,
+    });
+    expect(result.current.messages[2]).toMatchObject({
+      role: "assistant",
+      provider: "gemini",
+      content: "Gemini response",
+    });
+  });
+
+  it("reports Gemini request errors", async () => {
+    sendGeminiMessageMock.mockRejectedValueOnce(
+      new Error("Gemini request failed."),
+    );
+
+    const { result } = renderHook(() =>
+      usePlaygroundChat(productA.name, autoReplies, true),
+    );
+
     act(() => {
-      result.current.sendMessage();
+      result.current.setMessageDraft("hello");
+    });
+
+    await act(async () => {
+      await result.current.sendMessage();
     });
 
     expect(result.current.messages).toHaveLength(2);
-    expect(result.current.messages[1]).toMatchObject({
-      role: "user",
-      content: "Where can I buy accessories?",
-    });
-    expect(
-      result.current.messages.filter((message) => message.role === "assistant"),
-    ).toHaveLength(1);
-    expect(result.current.messageDraft).toBe("");
+    expect(result.current.geminiError).toBe("Gemini request failed.");
+    expect(result.current.isSending).toBe(false);
   });
 
-  it("does not send an empty message", () => {
+  it("does not send an empty message", async () => {
     const { result } = renderHook(() =>
       usePlaygroundChat(productA.name, autoReplies, true),
     );
 
-    act(() => {
-      result.current.setMessageDraft("");
-    });
-
-    act(() => {
-      result.current.sendMessage();
+    await act(async () => {
+      await result.current.sendMessage();
     });
 
     expect(result.current.messages).toHaveLength(1);
+    expect(sendGeminiMessageMock).not.toHaveBeenCalled();
   });
 
-  it("does not send a whitespace-only message", () => {
+  it("does not send a whitespace-only message", async () => {
     const { result } = renderHook(() =>
       usePlaygroundChat(productA.name, autoReplies, true),
     );
@@ -434,15 +468,15 @@ describe("Playground Chat - Typed Questions", () => {
       result.current.setMessageDraft("   ");
     });
 
-    act(() => {
-      result.current.sendMessage();
+    await act(async () => {
+      await result.current.sendMessage();
     });
 
     expect(result.current.messages).toHaveLength(1);
     expect(result.current.messageDraft).toBe("   ");
+    expect(sendGeminiMessageMock).not.toHaveBeenCalled();
   });
 });
-
 describe("Playground Chat - Automatic Replies Disabled", () => {
   it("hides suggested questions when automatic replies are disabled", () => {
     const { result } = renderHook(() =>
@@ -452,29 +486,35 @@ describe("Playground Chat - Automatic Replies Disabled", () => {
     expect(result.current.suggestedReplies).toEqual([]);
   });
 
-  it("disables the message input when automatic replies are disabled", () => {
+  it("keeps the message input enabled when automatic replies are disabled", () => {
     const { result } = renderHook(() =>
       usePlaygroundChat(productA.name, autoReplies, false),
     );
 
-    expect(result.current.isInputDisabled).toBe(true);
+    expect(result.current.isInputDisabled).toBe(false);
   });
 
-  it("does not send a message when automatic replies are disabled", () => {
+  it("sends typed messages to Gemini when automatic replies are disabled", async () => {
     const { result } = renderHook(() =>
       usePlaygroundChat(productA.name, autoReplies, false),
     );
 
     act(() => {
-      result.current.setMessageDraft("How do I reset the router?");
+      result.current.setMessageDraft("hello");
     });
 
-    act(() => {
-      result.current.sendMessage();
+    await act(async () => {
+      await result.current.sendMessage();
     });
 
-    expect(result.current.messages).toHaveLength(1);
-    expect(result.current.messageDraft).toBe("How do I reset the router?");
+    expect(sendGeminiMessageMock).toHaveBeenCalledWith({
+      message: "hello",
+    });
+    expect(result.current.messages[2]).toMatchObject({
+      role: "assistant",
+      provider: "gemini",
+      content: "Gemini response",
+    });
   });
 
   it("does not select a suggested question when automatic replies are disabled", () => {
@@ -490,25 +530,29 @@ describe("Playground Chat - Automatic Replies Disabled", () => {
     expect(result.current.showResolutionPrompt).toBe(false);
   });
 
-  it("does not send a message when there are no automatic replies", () => {
+  it("allows Gemini messages when no automatic replies are configured", async () => {
     const { result } = renderHook(() =>
       usePlaygroundChat(productA.name, [], true),
     );
 
     act(() => {
-      result.current.setMessageDraft("How do I reset the router?");
+      result.current.setMessageDraft("hello");
     });
 
-    act(() => {
-      result.current.sendMessage();
+    await act(async () => {
+      await result.current.sendMessage();
     });
 
-    expect(result.current.messages).toHaveLength(1);
-    expect(result.current.messageDraft).toBe("How do I reset the router?");
-    expect(result.current.isInputDisabled).toBe(true);
+    expect(result.current.isInputDisabled).toBe(false);
+    expect(sendGeminiMessageMock).toHaveBeenCalledWith({
+      message: "hello",
+    });
+    expect(result.current.messages[2]).toMatchObject({
+      role: "assistant",
+      provider: "gemini",
+    });
   });
 });
-
 describe("Playground Chat - Resolution Feedback", () => {
   it("adds a positive resolution response", () => {
     const { result } = renderHook(() =>
@@ -603,7 +647,7 @@ describe("Playground Chat - Restart Conversation", () => {
     ]);
   });
 
-  it("restores the root suggested questions after restarting", () => {
+  it("restores the root suggested questions after restarting", async () => {
     const { result } = renderHook(() =>
       usePlaygroundChat(productA.name, autoReplies, true),
     );
@@ -612,8 +656,8 @@ describe("Playground Chat - Restart Conversation", () => {
       result.current.setMessageDraft("Unknown question");
     });
 
-    act(() => {
-      result.current.sendMessage();
+    await act(async () => {
+      await result.current.sendMessage();
     });
 
     expect(result.current.suggestedReplies).toEqual([]);

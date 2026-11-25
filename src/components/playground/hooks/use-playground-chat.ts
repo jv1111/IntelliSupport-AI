@@ -1,12 +1,14 @@
 "use client";
 
 import { useCallback, useMemo, useRef, useState } from "react";
+import { sendGeminiMessage } from "@/lib/gemini";
 import type { AutoReply } from "@/lib/auto-replies/types";
 
 export interface PlaygroundChatMessage {
   id: string;
   role: "assistant" | "user";
   content: string;
+  provider?: "gemini";
 }
 
 function normalizeQuestion(question: string): string {
@@ -19,12 +21,15 @@ export function usePlaygroundChat(
   autoRepliesEnabled: boolean,
 ) {
   const messageIdRef = useRef(0);
+  const geminiRequestIdRef = useRef(0);
 
   const [messageDraft, setMessageDraft] = useState("");
   const [activeParentId, setActiveParentId] = useState<string | null>(null);
   const [hasSelectedReply, setHasSelectedReply] = useState(false);
   const [suggestionsSuppressed, setSuggestionsSuppressed] = useState(false);
   const [showResolutionPrompt, setShowResolutionPrompt] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [geminiError, setGeminiError] = useState<string | null>(null);
 
   const createMessageId = useCallback(() => {
     messageIdRef.current += 1;
@@ -89,7 +94,6 @@ export function usePlaygroundChat(
 
       setHasSelectedReply(true);
       setActiveParentId(hasFollowUps ? reply.id : null);
-
       setShowResolutionPrompt(!hasFollowUps);
     },
     [autoReplies, createMessageId],
@@ -109,33 +113,21 @@ export function usePlaygroundChat(
     [appendReply, autoRepliesEnabled, suggestedReplies],
   );
 
-  const sendMessage = useCallback(() => {
+  const sendMessage = useCallback(async () => {
     const customerMessage = messageDraft.trim();
 
-    if (!customerMessage || !autoRepliesEnabled || autoReplies.length === 0) {
+    if (!customerMessage || isSending) {
       return;
     }
 
-    const normalizedMessage = normalizeQuestion(customerMessage);
-
-    const matchedReply = autoReplies.find(
-      (reply) =>
-        reply.parentId === activeParentId &&
-        normalizeQuestion(reply.question) === normalizedMessage,
-    );
+    const requestId = ++geminiRequestIdRef.current;
+    const userMessageId = createMessageId();
 
     setMessageDraft("");
-
     setSuggestionsSuppressed(true);
-
-    if (matchedReply) {
-      appendReply(matchedReply, customerMessage);
-      return;
-    }
-
     setShowResolutionPrompt(false);
-
-    const userMessageId = createMessageId();
+    setGeminiError(null);
+    setIsSending(true);
 
     setMessages((current) => [
       ...current,
@@ -145,14 +137,41 @@ export function usePlaygroundChat(
         content: customerMessage,
       },
     ]);
-  }, [
-    activeParentId,
-    appendReply,
-    autoReplies,
-    autoRepliesEnabled,
-    createMessageId,
-    messageDraft,
-  ]);
+
+    try {
+      const response = await sendGeminiMessage({
+        message: customerMessage,
+      });
+
+      if (geminiRequestIdRef.current !== requestId) {
+        return;
+      }
+
+      setMessages((current) => [
+        ...current,
+        {
+          id: createMessageId(),
+          role: "assistant",
+          content: response.text,
+          provider: "gemini",
+        },
+      ]);
+    } catch (error) {
+      if (geminiRequestIdRef.current !== requestId) {
+        return;
+      }
+
+      setGeminiError(
+        error instanceof Error
+          ? error.message
+          : "Unable to get a response from Gemini. Please try again.",
+      );
+    } finally {
+      if (geminiRequestIdRef.current === requestId) {
+        setIsSending(false);
+      }
+    }
+  }, [createMessageId, isSending, messageDraft]);
 
   const answerResolution = useCallback(
     (resolved: boolean) => {
@@ -185,6 +204,8 @@ export function usePlaygroundChat(
   );
 
   const restart = useCallback(() => {
+    geminiRequestIdRef.current += 1;
+
     setMessages([
       {
         id: "playground-greeting",
@@ -198,6 +219,8 @@ export function usePlaygroundChat(
     setSuggestionsSuppressed(false);
     setShowResolutionPrompt(false);
     setMessageDraft("");
+    setIsSending(false);
+    setGeminiError(null);
   }, [greeting]);
 
   const hasAutoReplies = autoReplies.length > 0;
@@ -209,7 +232,9 @@ export function usePlaygroundChat(
     suggestedReplies,
     hasAutoReplies,
     showResolutionPrompt,
-    isInputDisabled: !autoRepliesEnabled || !hasAutoReplies,
+    isInputDisabled: isSending,
+    isSending,
+    geminiError,
     sendMessage,
     selectReply,
     answerResolution,
