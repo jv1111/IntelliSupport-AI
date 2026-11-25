@@ -7,6 +7,10 @@ import {
 } from "@/server/services/register-user";
 import { LoginError, loginUser } from "@/server/services/login-user";
 import {
+  ForgotPasswordError,
+  sendForgotPasswordVerification,
+} from "@/server/services/forgot-password";
+import {
   ChangePasswordError,
   changePassword as changeUserPassword,
 } from "@/server/services/change-password";
@@ -33,6 +37,9 @@ interface ChangePasswordInput {
 type UserResult = Awaited<ReturnType<typeof registerUser>>;
 type LoginResult = Awaited<ReturnType<typeof loginUser>>;
 type PublicUser = UserResult | LoginResult;
+type ForgotPasswordVerificationResult = Awaited<
+  ReturnType<typeof sendForgotPasswordVerification>
+>;
 
 export const authResolvers = {
   Query: {
@@ -41,6 +48,19 @@ export const authResolvers = {
   },
 
   Mutation: {
+    sendForgotPasswordVerification: async (
+      _parent: unknown,
+      args: { identifier: string },
+    ): Promise<ForgotPasswordVerificationResult> => {
+      try {
+        return await sendForgotPasswordVerification(args.identifier);
+      } catch (error) {
+        throwGraphQLError(error, "Unable to send verification code.", [
+          ForgotPasswordError,
+        ]);
+      }
+    },
+
     register: async (
       _parent: unknown,
       args: { input: RegisterInput },

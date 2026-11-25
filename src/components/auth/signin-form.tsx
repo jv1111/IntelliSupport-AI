@@ -90,6 +90,7 @@ export function SignInForm({ onSignUp }: SignInFormProps) {
                   variant="text"
                   type="button"
                   className="absolute right-0 bottom-[2.2rem]"
+                  onClick={() => router.push("/auth/forgot-pass")}
                 >
                   Forgot?
                 </Button>

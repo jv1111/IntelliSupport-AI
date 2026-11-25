@@ -25,7 +25,13 @@ export const authTypeDefs = `#graphql
     me: User
   }
 
+  type ForgotPasswordVerification {
+    method: String!
+    destination: String!
+  }
+
   type Mutation {
+    sendForgotPasswordVerification(identifier: String!): ForgotPasswordVerification!
     register(input: RegisterInput!): User!
     login(input: LoginInput!): User!
     changePassword(input: ChangePasswordInput!): Boolean!

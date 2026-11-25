@@ -279,9 +279,8 @@ export function VerificationDialog({
 
     if (!onVerify) {
       setError(null);
-      setFeedback(
-        "Code submitted in frontend preview. No verification was performed.",
-      );
+      setFeedback(null);
+      window.alert("Code submitted");
       return;
     }
 

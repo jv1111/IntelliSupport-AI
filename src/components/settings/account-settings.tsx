@@ -21,6 +21,7 @@ import {
   validateChangePassword,
   type ChangePasswordFormValues,
 } from "@/lib/validations/auth";
+import { emailAddressSchema } from "@/lib/validations/email";
 import { phoneNumberSchema } from "@/lib/validations/phone";
 
 const initialPasswordValues: ChangePasswordFormValues = {
@@ -149,8 +150,18 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
   function handleAddEmail(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
 
-    const value = email.trim().toLowerCase();
+    const validationResult = emailAddressSchema.safeParse(email);
+
+    if (!validationResult.success) {
+      setEmailMessage(
+        validationResult.error.issues[0]?.message ??
+          "Enter a valid email address.",
+      );
+      return;
+    }
+
     setEmailMessage("");
+    const value = validationResult.data;
     setShouldSendVerificationOnOpen(true);
     setVerificationTarget({
       method: "email",
@@ -415,7 +426,7 @@ export function AccountSettings({ username, createdAt }: AccountSettingsProps) {
               />
             )}
 
-            <form onSubmit={handleAddEmail} className="space-y-3">
+            <form onSubmit={handleAddEmail} className="space-y-3" noValidate>
               <div>
                 <FieldLabel htmlFor="account-email" required>
                   Add an email address

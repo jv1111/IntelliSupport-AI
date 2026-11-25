@@ -90,7 +90,6 @@ export function usePlaygroundChat(
       setHasSelectedReply(true);
       setActiveParentId(hasFollowUps ? reply.id : null);
 
-      // A reply without follow-up questions completes this question path.
       setShowResolutionPrompt(!hasFollowUps);
     },
     [autoReplies, createMessageId],
@@ -119,9 +118,6 @@ export function usePlaygroundChat(
 
     const normalizedMessage = normalizeQuestion(customerMessage);
 
-    // Match typed messages against the current conversation branch.
-    // At the end of a path, activeParentId is null, so root questions
-    // can be typed to start another question path.
     const matchedReply = autoReplies.find(
       (reply) =>
         reply.parentId === activeParentId &&
@@ -130,8 +126,6 @@ export function usePlaygroundChat(
 
     setMessageDraft("");
 
-    // Hide suggested-question buttons after a typed message is sent.
-    // The customer can continue using the input instead.
     setSuggestionsSuppressed(true);
 
     if (matchedReply) {
@@ -139,7 +133,6 @@ export function usePlaygroundChat(
       return;
     }
 
-    // Keep the customer's message visible without a fallback assistant reply.
     setShowResolutionPrompt(false);
 
     const userMessageId = createMessageId();

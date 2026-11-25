@@ -1,10 +1,13 @@
 import "server-only";
 
-import { createVerificationEmailContent } from "@/server/email/templates/verification-email";
+import {
+  createVerificationCodeEmailContent,
+  type VerificationCodeEmailPurpose,
+} from "@/server/email/templates/verification-code-email";
 
 const BREVO_API_URL = "https://api.brevo.com/v3/smtp/email";
 
-interface SendVerificationEmailInput {
+interface SendEmailInput {
   recipientEmail: string;
   verificationCode: string;
 }
@@ -35,12 +38,16 @@ function getBrevoConfig() {
   };
 }
 
-export async function sendVerificationEmail({
-  recipientEmail,
-  verificationCode,
-}: SendVerificationEmailInput): Promise<void> {
+async function sendEmailWithCode(
+  input: SendEmailInput,
+  purpose: VerificationCodeEmailPurpose,
+): Promise<void> {
   const { apiKey, senderEmail, senderName } = getBrevoConfig();
-  const emailContent = createVerificationEmailContent({ verificationCode });
+
+  const emailContent = createVerificationCodeEmailContent({
+    verificationCode: input.verificationCode,
+    purpose,
+  });
 
   const response = await fetch(BREVO_API_URL, {
     method: "POST",
@@ -54,7 +61,7 @@ export async function sendVerificationEmail({
         name: senderName,
         email: senderEmail,
       },
-      to: [{ email: recipientEmail }],
+      to: [{ email: input.recipientEmail }],
       subject: emailContent.subject,
       textContent: emailContent.textContent,
       htmlContent: emailContent.htmlContent,
@@ -67,4 +74,12 @@ export async function sendVerificationEmail({
       `Brevo email request failed with status ${response.status}.`,
     );
   }
+}
+
+export function sendVerificationEmail(input: SendEmailInput): Promise<void> {
+  return sendEmailWithCode(input, "email-verification");
+}
+
+export function sendPasswordResetEmail(input: SendEmailInput): Promise<void> {
+  return sendEmailWithCode(input, "password-reset");
 }

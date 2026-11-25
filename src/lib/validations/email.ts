@@ -21,3 +21,23 @@ export const verifyEmailSchema = z.object({
 
 export type AddEmailInput = z.infer<typeof addEmailSchema>;
 export type VerifyEmailInput = z.infer<typeof verifyEmailSchema>;
+
+export const forgotPasswordSchema = z.object({
+  email: emailAddressSchema,
+});
+
+export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
+
+export function validateForgotPassword(
+  values: ForgotPasswordFormValues,
+): Partial<Record<keyof ForgotPasswordFormValues, string>> {
+  const result = forgotPasswordSchema.safeParse(values);
+
+  if (result.success) {
+    return {};
+  }
+
+  return {
+    email: result.error.issues[0]?.message,
+  };
+}
