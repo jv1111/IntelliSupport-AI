@@ -21,8 +21,9 @@ export const authTypeDefs = `#graphql
     confirmPassword: String!
   }
 
-  extend type Query {
-    me: User
+  input ResetPasswordInput {
+    newPassword: String!
+    confirmPassword: String!
   }
 
   type ForgotPasswordVerification {
@@ -30,8 +31,18 @@ export const authTypeDefs = `#graphql
     destination: String!
   }
 
+  type ForgotPasswordCodeVerification {
+    resetToken: String!
+  }
+
+  extend type Query {
+    me: User
+  }
+
   type Mutation {
     sendForgotPasswordVerification(identifier: String!): ForgotPasswordVerification!
+    verifyForgotPasswordCode(destination: String!, code: String!): ForgotPasswordCodeVerification!
+    resetPassword(resetToken: String!, input: ResetPasswordInput!): Boolean!
     register(input: RegisterInput!): User!
     login(input: LoginInput!): User!
     changePassword(input: ChangePasswordInput!): Boolean!

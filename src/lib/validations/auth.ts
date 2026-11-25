@@ -1,4 +1,9 @@
 import { z } from "zod";
+import {
+  confirmPasswordSchema,
+  loginPasswordSchema,
+  newPasswordSchema,
+} from "@/lib/validations/password";
 
 const usernameSchema = z
   .string()
@@ -9,27 +14,17 @@ const usernameSchema = z
 
 export const registerCredentialsSchema = z.object({
   username: usernameSchema,
-  password: z
-    .string()
-    .min(8, "Password must be at least 8 characters.")
-    .max(128, "Password cannot exceed 128 characters.")
-    .regex(
-      /^(?=.*[A-Za-z])(?=.*\d)[\s\S]+$/,
-      "Password must contain at least one letter and one number.",
-    ),
+  password: newPasswordSchema,
 });
 
 export const loginCredentialsSchema = z.object({
   username: usernameSchema,
-  password: z
-    .string()
-    .min(1, "Password is required.")
-    .max(128, "Password cannot exceed 128 characters."),
+  password: loginPasswordSchema,
 });
 
 export const signUpSchema = registerCredentialsSchema
   .extend({
-    confirmPassword: z.string().min(1, "Please confirm your password."),
+    confirmPassword: confirmPasswordSchema,
   })
   .refine((values) => values.password === values.confirmPassword, {
     path: ["confirmPassword"],
@@ -67,8 +62,8 @@ export function validateSignUp(
 
 export const changePasswordSchema = z
   .object({
-    currentPassword: loginCredentialsSchema.shape.password,
-    newPassword: registerCredentialsSchema.shape.password,
+    currentPassword: loginPasswordSchema,
+    newPassword: newPasswordSchema,
     confirmPassword: z.string().min(1, "Please confirm your password."),
   })
   .refine((values) => values.newPassword !== values.currentPassword, {

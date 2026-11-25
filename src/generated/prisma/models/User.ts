@@ -189,6 +189,7 @@ export type UserWhereInput = {
   unverifiedEmails?: Prisma.UnverifiedEmailListRelationFilter
   phones?: Prisma.UserPhoneListRelationFilter
   unverifiedPhones?: Prisma.UnverifiedPhoneListRelationFilter
+  passwordResetVerifications?: Prisma.PasswordResetVerificationListRelationFilter
   botSettings?: Prisma.XOR<Prisma.BotSettingsNullableScalarRelationFilter, Prisma.BotSettingsWhereInput> | null
 }
 
@@ -205,6 +206,7 @@ export type UserOrderByWithRelationInput = {
   unverifiedEmails?: Prisma.UnverifiedEmailOrderByRelationAggregateInput
   phones?: Prisma.UserPhoneOrderByRelationAggregateInput
   unverifiedPhones?: Prisma.UnverifiedPhoneOrderByRelationAggregateInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationOrderByRelationAggregateInput
   botSettings?: Prisma.BotSettingsOrderByWithRelationInput
 }
 
@@ -224,6 +226,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   unverifiedEmails?: Prisma.UnverifiedEmailListRelationFilter
   phones?: Prisma.UserPhoneListRelationFilter
   unverifiedPhones?: Prisma.UnverifiedPhoneListRelationFilter
+  passwordResetVerifications?: Prisma.PasswordResetVerificationListRelationFilter
   botSettings?: Prisma.XOR<Prisma.BotSettingsNullableScalarRelationFilter, Prisma.BotSettingsWhereInput> | null
 }, "id" | "username">
 
@@ -262,6 +265,7 @@ export type UserCreateInput = {
   unverifiedEmails?: Prisma.UnverifiedEmailCreateNestedManyWithoutUserInput
   phones?: Prisma.UserPhoneCreateNestedManyWithoutUserInput
   unverifiedPhones?: Prisma.UnverifiedPhoneCreateNestedManyWithoutUserInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationCreateNestedManyWithoutUserInput
   botSettings?: Prisma.BotSettingsCreateNestedOneWithoutUserInput
 }
 
@@ -278,6 +282,7 @@ export type UserUncheckedCreateInput = {
   unverifiedEmails?: Prisma.UnverifiedEmailUncheckedCreateNestedManyWithoutUserInput
   phones?: Prisma.UserPhoneUncheckedCreateNestedManyWithoutUserInput
   unverifiedPhones?: Prisma.UnverifiedPhoneUncheckedCreateNestedManyWithoutUserInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationUncheckedCreateNestedManyWithoutUserInput
   botSettings?: Prisma.BotSettingsUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -294,6 +299,7 @@ export type UserUpdateInput = {
   unverifiedEmails?: Prisma.UnverifiedEmailUpdateManyWithoutUserNestedInput
   phones?: Prisma.UserPhoneUpdateManyWithoutUserNestedInput
   unverifiedPhones?: Prisma.UnverifiedPhoneUpdateManyWithoutUserNestedInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationUpdateManyWithoutUserNestedInput
   botSettings?: Prisma.BotSettingsUpdateOneWithoutUserNestedInput
 }
 
@@ -310,6 +316,7 @@ export type UserUncheckedUpdateInput = {
   unverifiedEmails?: Prisma.UnverifiedEmailUncheckedUpdateManyWithoutUserNestedInput
   phones?: Prisma.UserPhoneUncheckedUpdateManyWithoutUserNestedInput
   unverifiedPhones?: Prisma.UnverifiedPhoneUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationUncheckedUpdateManyWithoutUserNestedInput
   botSettings?: Prisma.BotSettingsUncheckedUpdateOneWithoutUserNestedInput
 }
 
@@ -486,6 +493,20 @@ export type UserUpdateOneRequiredWithoutUnverifiedPhonesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutUnverifiedPhonesInput, Prisma.UserUpdateWithoutUnverifiedPhonesInput>, Prisma.UserUncheckedUpdateWithoutUnverifiedPhonesInput>
 }
 
+export type UserCreateNestedOneWithoutPasswordResetVerificationsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPasswordResetVerificationsInput, Prisma.UserUncheckedCreateWithoutPasswordResetVerificationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPasswordResetVerificationsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutPasswordResetVerificationsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPasswordResetVerificationsInput, Prisma.UserUncheckedCreateWithoutPasswordResetVerificationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPasswordResetVerificationsInput
+  upsert?: Prisma.UserUpsertWithoutPasswordResetVerificationsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPasswordResetVerificationsInput, Prisma.UserUpdateWithoutPasswordResetVerificationsInput>, Prisma.UserUncheckedUpdateWithoutPasswordResetVerificationsInput>
+}
+
 export type UserCreateWithoutSessionsInput = {
   id?: string
   username: string
@@ -498,6 +519,7 @@ export type UserCreateWithoutSessionsInput = {
   unverifiedEmails?: Prisma.UnverifiedEmailCreateNestedManyWithoutUserInput
   phones?: Prisma.UserPhoneCreateNestedManyWithoutUserInput
   unverifiedPhones?: Prisma.UnverifiedPhoneCreateNestedManyWithoutUserInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationCreateNestedManyWithoutUserInput
   botSettings?: Prisma.BotSettingsCreateNestedOneWithoutUserInput
 }
 
@@ -513,6 +535,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   unverifiedEmails?: Prisma.UnverifiedEmailUncheckedCreateNestedManyWithoutUserInput
   phones?: Prisma.UserPhoneUncheckedCreateNestedManyWithoutUserInput
   unverifiedPhones?: Prisma.UnverifiedPhoneUncheckedCreateNestedManyWithoutUserInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationUncheckedCreateNestedManyWithoutUserInput
   botSettings?: Prisma.BotSettingsUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -544,6 +567,7 @@ export type UserUpdateWithoutSessionsInput = {
   unverifiedEmails?: Prisma.UnverifiedEmailUpdateManyWithoutUserNestedInput
   phones?: Prisma.UserPhoneUpdateManyWithoutUserNestedInput
   unverifiedPhones?: Prisma.UnverifiedPhoneUpdateManyWithoutUserNestedInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationUpdateManyWithoutUserNestedInput
   botSettings?: Prisma.BotSettingsUpdateOneWithoutUserNestedInput
 }
 
@@ -559,6 +583,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   unverifiedEmails?: Prisma.UnverifiedEmailUncheckedUpdateManyWithoutUserNestedInput
   phones?: Prisma.UserPhoneUncheckedUpdateManyWithoutUserNestedInput
   unverifiedPhones?: Prisma.UnverifiedPhoneUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationUncheckedUpdateManyWithoutUserNestedInput
   botSettings?: Prisma.BotSettingsUncheckedUpdateOneWithoutUserNestedInput
 }
 
@@ -574,6 +599,7 @@ export type UserCreateWithoutProductsInput = {
   unverifiedEmails?: Prisma.UnverifiedEmailCreateNestedManyWithoutUserInput
   phones?: Prisma.UserPhoneCreateNestedManyWithoutUserInput
   unverifiedPhones?: Prisma.UnverifiedPhoneCreateNestedManyWithoutUserInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationCreateNestedManyWithoutUserInput
   botSettings?: Prisma.BotSettingsCreateNestedOneWithoutUserInput
 }
 
@@ -589,6 +615,7 @@ export type UserUncheckedCreateWithoutProductsInput = {
   unverifiedEmails?: Prisma.UnverifiedEmailUncheckedCreateNestedManyWithoutUserInput
   phones?: Prisma.UserPhoneUncheckedCreateNestedManyWithoutUserInput
   unverifiedPhones?: Prisma.UnverifiedPhoneUncheckedCreateNestedManyWithoutUserInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationUncheckedCreateNestedManyWithoutUserInput
   botSettings?: Prisma.BotSettingsUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -620,6 +647,7 @@ export type UserUpdateWithoutProductsInput = {
   unverifiedEmails?: Prisma.UnverifiedEmailUpdateManyWithoutUserNestedInput
   phones?: Prisma.UserPhoneUpdateManyWithoutUserNestedInput
   unverifiedPhones?: Prisma.UnverifiedPhoneUpdateManyWithoutUserNestedInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationUpdateManyWithoutUserNestedInput
   botSettings?: Prisma.BotSettingsUpdateOneWithoutUserNestedInput
 }
 
@@ -635,6 +663,7 @@ export type UserUncheckedUpdateWithoutProductsInput = {
   unverifiedEmails?: Prisma.UnverifiedEmailUncheckedUpdateManyWithoutUserNestedInput
   phones?: Prisma.UserPhoneUncheckedUpdateManyWithoutUserNestedInput
   unverifiedPhones?: Prisma.UnverifiedPhoneUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationUncheckedUpdateManyWithoutUserNestedInput
   botSettings?: Prisma.BotSettingsUncheckedUpdateOneWithoutUserNestedInput
 }
 
@@ -651,6 +680,7 @@ export type UserCreateWithoutBotSettingsInput = {
   unverifiedEmails?: Prisma.UnverifiedEmailCreateNestedManyWithoutUserInput
   phones?: Prisma.UserPhoneCreateNestedManyWithoutUserInput
   unverifiedPhones?: Prisma.UnverifiedPhoneCreateNestedManyWithoutUserInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBotSettingsInput = {
@@ -666,6 +696,7 @@ export type UserUncheckedCreateWithoutBotSettingsInput = {
   unverifiedEmails?: Prisma.UnverifiedEmailUncheckedCreateNestedManyWithoutUserInput
   phones?: Prisma.UserPhoneUncheckedCreateNestedManyWithoutUserInput
   unverifiedPhones?: Prisma.UnverifiedPhoneUncheckedCreateNestedManyWithoutUserInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBotSettingsInput = {
@@ -697,6 +728,7 @@ export type UserUpdateWithoutBotSettingsInput = {
   unverifiedEmails?: Prisma.UnverifiedEmailUpdateManyWithoutUserNestedInput
   phones?: Prisma.UserPhoneUpdateManyWithoutUserNestedInput
   unverifiedPhones?: Prisma.UnverifiedPhoneUpdateManyWithoutUserNestedInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBotSettingsInput = {
@@ -712,6 +744,7 @@ export type UserUncheckedUpdateWithoutBotSettingsInput = {
   unverifiedEmails?: Prisma.UnverifiedEmailUncheckedUpdateManyWithoutUserNestedInput
   phones?: Prisma.UserPhoneUncheckedUpdateManyWithoutUserNestedInput
   unverifiedPhones?: Prisma.UnverifiedPhoneUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutKnowledgeBaseArticlesInput = {
@@ -726,6 +759,7 @@ export type UserCreateWithoutKnowledgeBaseArticlesInput = {
   unverifiedEmails?: Prisma.UnverifiedEmailCreateNestedManyWithoutUserInput
   phones?: Prisma.UserPhoneCreateNestedManyWithoutUserInput
   unverifiedPhones?: Prisma.UnverifiedPhoneCreateNestedManyWithoutUserInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationCreateNestedManyWithoutUserInput
   botSettings?: Prisma.BotSettingsCreateNestedOneWithoutUserInput
 }
 
@@ -741,6 +775,7 @@ export type UserUncheckedCreateWithoutKnowledgeBaseArticlesInput = {
   unverifiedEmails?: Prisma.UnverifiedEmailUncheckedCreateNestedManyWithoutUserInput
   phones?: Prisma.UserPhoneUncheckedCreateNestedManyWithoutUserInput
   unverifiedPhones?: Prisma.UnverifiedPhoneUncheckedCreateNestedManyWithoutUserInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationUncheckedCreateNestedManyWithoutUserInput
   botSettings?: Prisma.BotSettingsUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -772,6 +807,7 @@ export type UserUpdateWithoutKnowledgeBaseArticlesInput = {
   unverifiedEmails?: Prisma.UnverifiedEmailUpdateManyWithoutUserNestedInput
   phones?: Prisma.UserPhoneUpdateManyWithoutUserNestedInput
   unverifiedPhones?: Prisma.UnverifiedPhoneUpdateManyWithoutUserNestedInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationUpdateManyWithoutUserNestedInput
   botSettings?: Prisma.BotSettingsUpdateOneWithoutUserNestedInput
 }
 
@@ -787,6 +823,7 @@ export type UserUncheckedUpdateWithoutKnowledgeBaseArticlesInput = {
   unverifiedEmails?: Prisma.UnverifiedEmailUncheckedUpdateManyWithoutUserNestedInput
   phones?: Prisma.UserPhoneUncheckedUpdateManyWithoutUserNestedInput
   unverifiedPhones?: Prisma.UnverifiedPhoneUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationUncheckedUpdateManyWithoutUserNestedInput
   botSettings?: Prisma.BotSettingsUncheckedUpdateOneWithoutUserNestedInput
 }
 
@@ -802,6 +839,7 @@ export type UserCreateWithoutEmailsInput = {
   unverifiedEmails?: Prisma.UnverifiedEmailCreateNestedManyWithoutUserInput
   phones?: Prisma.UserPhoneCreateNestedManyWithoutUserInput
   unverifiedPhones?: Prisma.UnverifiedPhoneCreateNestedManyWithoutUserInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationCreateNestedManyWithoutUserInput
   botSettings?: Prisma.BotSettingsCreateNestedOneWithoutUserInput
 }
 
@@ -817,6 +855,7 @@ export type UserUncheckedCreateWithoutEmailsInput = {
   unverifiedEmails?: Prisma.UnverifiedEmailUncheckedCreateNestedManyWithoutUserInput
   phones?: Prisma.UserPhoneUncheckedCreateNestedManyWithoutUserInput
   unverifiedPhones?: Prisma.UnverifiedPhoneUncheckedCreateNestedManyWithoutUserInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationUncheckedCreateNestedManyWithoutUserInput
   botSettings?: Prisma.BotSettingsUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -848,6 +887,7 @@ export type UserUpdateWithoutEmailsInput = {
   unverifiedEmails?: Prisma.UnverifiedEmailUpdateManyWithoutUserNestedInput
   phones?: Prisma.UserPhoneUpdateManyWithoutUserNestedInput
   unverifiedPhones?: Prisma.UnverifiedPhoneUpdateManyWithoutUserNestedInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationUpdateManyWithoutUserNestedInput
   botSettings?: Prisma.BotSettingsUpdateOneWithoutUserNestedInput
 }
 
@@ -863,6 +903,7 @@ export type UserUncheckedUpdateWithoutEmailsInput = {
   unverifiedEmails?: Prisma.UnverifiedEmailUncheckedUpdateManyWithoutUserNestedInput
   phones?: Prisma.UserPhoneUncheckedUpdateManyWithoutUserNestedInput
   unverifiedPhones?: Prisma.UnverifiedPhoneUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationUncheckedUpdateManyWithoutUserNestedInput
   botSettings?: Prisma.BotSettingsUncheckedUpdateOneWithoutUserNestedInput
 }
 
@@ -878,6 +919,7 @@ export type UserCreateWithoutUnverifiedEmailsInput = {
   emails?: Prisma.UserEmailCreateNestedManyWithoutUserInput
   phones?: Prisma.UserPhoneCreateNestedManyWithoutUserInput
   unverifiedPhones?: Prisma.UnverifiedPhoneCreateNestedManyWithoutUserInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationCreateNestedManyWithoutUserInput
   botSettings?: Prisma.BotSettingsCreateNestedOneWithoutUserInput
 }
 
@@ -893,6 +935,7 @@ export type UserUncheckedCreateWithoutUnverifiedEmailsInput = {
   emails?: Prisma.UserEmailUncheckedCreateNestedManyWithoutUserInput
   phones?: Prisma.UserPhoneUncheckedCreateNestedManyWithoutUserInput
   unverifiedPhones?: Prisma.UnverifiedPhoneUncheckedCreateNestedManyWithoutUserInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationUncheckedCreateNestedManyWithoutUserInput
   botSettings?: Prisma.BotSettingsUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -924,6 +967,7 @@ export type UserUpdateWithoutUnverifiedEmailsInput = {
   emails?: Prisma.UserEmailUpdateManyWithoutUserNestedInput
   phones?: Prisma.UserPhoneUpdateManyWithoutUserNestedInput
   unverifiedPhones?: Prisma.UnverifiedPhoneUpdateManyWithoutUserNestedInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationUpdateManyWithoutUserNestedInput
   botSettings?: Prisma.BotSettingsUpdateOneWithoutUserNestedInput
 }
 
@@ -939,6 +983,7 @@ export type UserUncheckedUpdateWithoutUnverifiedEmailsInput = {
   emails?: Prisma.UserEmailUncheckedUpdateManyWithoutUserNestedInput
   phones?: Prisma.UserPhoneUncheckedUpdateManyWithoutUserNestedInput
   unverifiedPhones?: Prisma.UnverifiedPhoneUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationUncheckedUpdateManyWithoutUserNestedInput
   botSettings?: Prisma.BotSettingsUncheckedUpdateOneWithoutUserNestedInput
 }
 
@@ -954,6 +999,7 @@ export type UserCreateWithoutPhonesInput = {
   emails?: Prisma.UserEmailCreateNestedManyWithoutUserInput
   unverifiedEmails?: Prisma.UnverifiedEmailCreateNestedManyWithoutUserInput
   unverifiedPhones?: Prisma.UnverifiedPhoneCreateNestedManyWithoutUserInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationCreateNestedManyWithoutUserInput
   botSettings?: Prisma.BotSettingsCreateNestedOneWithoutUserInput
 }
 
@@ -969,6 +1015,7 @@ export type UserUncheckedCreateWithoutPhonesInput = {
   emails?: Prisma.UserEmailUncheckedCreateNestedManyWithoutUserInput
   unverifiedEmails?: Prisma.UnverifiedEmailUncheckedCreateNestedManyWithoutUserInput
   unverifiedPhones?: Prisma.UnverifiedPhoneUncheckedCreateNestedManyWithoutUserInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationUncheckedCreateNestedManyWithoutUserInput
   botSettings?: Prisma.BotSettingsUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -1000,6 +1047,7 @@ export type UserUpdateWithoutPhonesInput = {
   emails?: Prisma.UserEmailUpdateManyWithoutUserNestedInput
   unverifiedEmails?: Prisma.UnverifiedEmailUpdateManyWithoutUserNestedInput
   unverifiedPhones?: Prisma.UnverifiedPhoneUpdateManyWithoutUserNestedInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationUpdateManyWithoutUserNestedInput
   botSettings?: Prisma.BotSettingsUpdateOneWithoutUserNestedInput
 }
 
@@ -1015,6 +1063,7 @@ export type UserUncheckedUpdateWithoutPhonesInput = {
   emails?: Prisma.UserEmailUncheckedUpdateManyWithoutUserNestedInput
   unverifiedEmails?: Prisma.UnverifiedEmailUncheckedUpdateManyWithoutUserNestedInput
   unverifiedPhones?: Prisma.UnverifiedPhoneUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationUncheckedUpdateManyWithoutUserNestedInput
   botSettings?: Prisma.BotSettingsUncheckedUpdateOneWithoutUserNestedInput
 }
 
@@ -1030,6 +1079,7 @@ export type UserCreateWithoutUnverifiedPhonesInput = {
   emails?: Prisma.UserEmailCreateNestedManyWithoutUserInput
   unverifiedEmails?: Prisma.UnverifiedEmailCreateNestedManyWithoutUserInput
   phones?: Prisma.UserPhoneCreateNestedManyWithoutUserInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationCreateNestedManyWithoutUserInput
   botSettings?: Prisma.BotSettingsCreateNestedOneWithoutUserInput
 }
 
@@ -1045,6 +1095,7 @@ export type UserUncheckedCreateWithoutUnverifiedPhonesInput = {
   emails?: Prisma.UserEmailUncheckedCreateNestedManyWithoutUserInput
   unverifiedEmails?: Prisma.UnverifiedEmailUncheckedCreateNestedManyWithoutUserInput
   phones?: Prisma.UserPhoneUncheckedCreateNestedManyWithoutUserInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationUncheckedCreateNestedManyWithoutUserInput
   botSettings?: Prisma.BotSettingsUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -1076,6 +1127,7 @@ export type UserUpdateWithoutUnverifiedPhonesInput = {
   emails?: Prisma.UserEmailUpdateManyWithoutUserNestedInput
   unverifiedEmails?: Prisma.UnverifiedEmailUpdateManyWithoutUserNestedInput
   phones?: Prisma.UserPhoneUpdateManyWithoutUserNestedInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationUpdateManyWithoutUserNestedInput
   botSettings?: Prisma.BotSettingsUpdateOneWithoutUserNestedInput
 }
 
@@ -1091,6 +1143,87 @@ export type UserUncheckedUpdateWithoutUnverifiedPhonesInput = {
   emails?: Prisma.UserEmailUncheckedUpdateManyWithoutUserNestedInput
   unverifiedEmails?: Prisma.UnverifiedEmailUncheckedUpdateManyWithoutUserNestedInput
   phones?: Prisma.UserPhoneUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetVerifications?: Prisma.PasswordResetVerificationUncheckedUpdateManyWithoutUserNestedInput
+  botSettings?: Prisma.BotSettingsUncheckedUpdateOneWithoutUserNestedInput
+}
+
+export type UserCreateWithoutPasswordResetVerificationsInput = {
+  id?: string
+  username: string
+  passwordHash: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  products?: Prisma.ProductCreateNestedManyWithoutUserInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleCreateNestedManyWithoutUserInput
+  emails?: Prisma.UserEmailCreateNestedManyWithoutUserInput
+  unverifiedEmails?: Prisma.UnverifiedEmailCreateNestedManyWithoutUserInput
+  phones?: Prisma.UserPhoneCreateNestedManyWithoutUserInput
+  unverifiedPhones?: Prisma.UnverifiedPhoneCreateNestedManyWithoutUserInput
+  botSettings?: Prisma.BotSettingsCreateNestedOneWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutPasswordResetVerificationsInput = {
+  id?: string
+  username: string
+  passwordHash: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutUserInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUncheckedCreateNestedManyWithoutUserInput
+  emails?: Prisma.UserEmailUncheckedCreateNestedManyWithoutUserInput
+  unverifiedEmails?: Prisma.UnverifiedEmailUncheckedCreateNestedManyWithoutUserInput
+  phones?: Prisma.UserPhoneUncheckedCreateNestedManyWithoutUserInput
+  unverifiedPhones?: Prisma.UnverifiedPhoneUncheckedCreateNestedManyWithoutUserInput
+  botSettings?: Prisma.BotSettingsUncheckedCreateNestedOneWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutPasswordResetVerificationsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutPasswordResetVerificationsInput, Prisma.UserUncheckedCreateWithoutPasswordResetVerificationsInput>
+}
+
+export type UserUpsertWithoutPasswordResetVerificationsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutPasswordResetVerificationsInput, Prisma.UserUncheckedUpdateWithoutPasswordResetVerificationsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPasswordResetVerificationsInput, Prisma.UserUncheckedCreateWithoutPasswordResetVerificationsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutPasswordResetVerificationsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutPasswordResetVerificationsInput, Prisma.UserUncheckedUpdateWithoutPasswordResetVerificationsInput>
+}
+
+export type UserUpdateWithoutPasswordResetVerificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  products?: Prisma.ProductUpdateManyWithoutUserNestedInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUpdateManyWithoutUserNestedInput
+  emails?: Prisma.UserEmailUpdateManyWithoutUserNestedInput
+  unverifiedEmails?: Prisma.UnverifiedEmailUpdateManyWithoutUserNestedInput
+  phones?: Prisma.UserPhoneUpdateManyWithoutUserNestedInput
+  unverifiedPhones?: Prisma.UnverifiedPhoneUpdateManyWithoutUserNestedInput
+  botSettings?: Prisma.BotSettingsUpdateOneWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutPasswordResetVerificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutUserNestedInput
+  knowledgeBaseArticles?: Prisma.KnowledgeBaseArticleUncheckedUpdateManyWithoutUserNestedInput
+  emails?: Prisma.UserEmailUncheckedUpdateManyWithoutUserNestedInput
+  unverifiedEmails?: Prisma.UnverifiedEmailUncheckedUpdateManyWithoutUserNestedInput
+  phones?: Prisma.UserPhoneUncheckedUpdateManyWithoutUserNestedInput
+  unverifiedPhones?: Prisma.UnverifiedPhoneUncheckedUpdateManyWithoutUserNestedInput
   botSettings?: Prisma.BotSettingsUncheckedUpdateOneWithoutUserNestedInput
 }
 
@@ -1107,6 +1240,7 @@ export type UserCountOutputType = {
   unverifiedEmails: number
   phones: number
   unverifiedPhones: number
+  passwordResetVerifications: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1117,6 +1251,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   unverifiedEmails?: boolean | UserCountOutputTypeCountUnverifiedEmailsArgs
   phones?: boolean | UserCountOutputTypeCountPhonesArgs
   unverifiedPhones?: boolean | UserCountOutputTypeCountUnverifiedPhonesArgs
+  passwordResetVerifications?: boolean | UserCountOutputTypeCountPasswordResetVerificationsArgs
 }
 
 /**
@@ -1178,6 +1313,13 @@ export type UserCountOutputTypeCountUnverifiedPhonesArgs<ExtArgs extends runtime
   where?: Prisma.UnverifiedPhoneWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountPasswordResetVerificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PasswordResetVerificationWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1192,6 +1334,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   unverifiedEmails?: boolean | Prisma.User$unverifiedEmailsArgs<ExtArgs>
   phones?: boolean | Prisma.User$phonesArgs<ExtArgs>
   unverifiedPhones?: boolean | Prisma.User$unverifiedPhonesArgs<ExtArgs>
+  passwordResetVerifications?: boolean | Prisma.User$passwordResetVerificationsArgs<ExtArgs>
   botSettings?: boolean | Prisma.User$botSettingsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
@@ -1229,6 +1372,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   unverifiedEmails?: boolean | Prisma.User$unverifiedEmailsArgs<ExtArgs>
   phones?: boolean | Prisma.User$phonesArgs<ExtArgs>
   unverifiedPhones?: boolean | Prisma.User$unverifiedPhonesArgs<ExtArgs>
+  passwordResetVerifications?: boolean | Prisma.User$passwordResetVerificationsArgs<ExtArgs>
   botSettings?: boolean | Prisma.User$botSettingsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -1245,6 +1389,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     unverifiedEmails: Prisma.$UnverifiedEmailPayload<ExtArgs>[]
     phones: Prisma.$UserPhonePayload<ExtArgs>[]
     unverifiedPhones: Prisma.$UnverifiedPhonePayload<ExtArgs>[]
+    passwordResetVerifications: Prisma.$PasswordResetVerificationPayload<ExtArgs>[]
     botSettings: Prisma.$BotSettingsPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1654,6 +1799,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   unverifiedEmails<T extends Prisma.User$unverifiedEmailsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$unverifiedEmailsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UnverifiedEmailPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   phones<T extends Prisma.User$phonesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$phonesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPhonePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   unverifiedPhones<T extends Prisma.User$unverifiedPhonesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$unverifiedPhonesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UnverifiedPhonePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  passwordResetVerifications<T extends Prisma.User$passwordResetVerificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$passwordResetVerificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PasswordResetVerificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   botSettings<T extends Prisma.User$botSettingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$botSettingsArgs<ExtArgs>>): Prisma.Prisma__BotSettingsClient<runtime.Types.Result.GetResult<Prisma.$BotSettingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2247,6 +2393,30 @@ export type User$unverifiedPhonesArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.UnverifiedPhoneScalarFieldEnum | Prisma.UnverifiedPhoneScalarFieldEnum[]
+}
+
+/**
+ * User.passwordResetVerifications
+ */
+export type User$passwordResetVerificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PasswordResetVerification
+   */
+  select?: Prisma.PasswordResetVerificationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PasswordResetVerification
+   */
+  omit?: Prisma.PasswordResetVerificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PasswordResetVerificationInclude<ExtArgs> | null
+  where?: Prisma.PasswordResetVerificationWhereInput
+  orderBy?: Prisma.PasswordResetVerificationOrderByWithRelationInput | Prisma.PasswordResetVerificationOrderByWithRelationInput[]
+  cursor?: Prisma.PasswordResetVerificationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PasswordResetVerificationScalarFieldEnum | Prisma.PasswordResetVerificationScalarFieldEnum[]
 }
 
 /**

@@ -9,6 +9,8 @@ import { LoginError, loginUser } from "@/server/services/login-user";
 import {
   ForgotPasswordError,
   sendForgotPasswordVerification,
+  verifyForgotPasswordCode as verifyPasswordResetCode,
+  resetPassword as resetUserPassword,
 } from "@/server/services/forgot-password";
 import {
   ChangePasswordError,
@@ -34,11 +36,19 @@ interface ChangePasswordInput {
   confirmPassword: string;
 }
 
+interface ResetPasswordInput {
+  newPassword: string;
+  confirmPassword: string;
+}
+
 type UserResult = Awaited<ReturnType<typeof registerUser>>;
 type LoginResult = Awaited<ReturnType<typeof loginUser>>;
 type PublicUser = UserResult | LoginResult;
 type ForgotPasswordVerificationResult = Awaited<
   ReturnType<typeof sendForgotPasswordVerification>
+>;
+type ForgotPasswordCodeVerificationResult = Awaited<
+  ReturnType<typeof verifyPasswordResetCode>
 >;
 
 export const authResolvers = {
@@ -55,7 +65,35 @@ export const authResolvers = {
       try {
         return await sendForgotPasswordVerification(args.identifier);
       } catch (error) {
+        console.error("[auth] sendForgotPasswordVerification failed:", error);
         throwGraphQLError(error, "Unable to send verification code.", [
+          ForgotPasswordError,
+        ]);
+      }
+    },
+
+    verifyForgotPasswordCode: async (
+      _parent: unknown,
+      args: { destination: string; code: string },
+    ): Promise<ForgotPasswordCodeVerificationResult> => {
+      try {
+        return await verifyPasswordResetCode(args.destination, args.code);
+      } catch (error) {
+        throwGraphQLError(error, "Unable to verify password reset code.", [
+          ForgotPasswordError,
+        ]);
+      }
+    },
+
+    resetPassword: async (
+      _parent: unknown,
+      args: { resetToken: string; input: ResetPasswordInput },
+    ): Promise<boolean> => {
+      try {
+        await resetUserPassword(args.resetToken, args.input);
+        return true;
+      } catch (error) {
+        throwGraphQLError(error, "Unable to reset password.", [
           ForgotPasswordError,
         ]);
       }

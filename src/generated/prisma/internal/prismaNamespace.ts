@@ -406,7 +406,8 @@ export const ModelName = {
   UserEmail: 'UserEmail',
   UnverifiedEmail: 'UnverifiedEmail',
   UserPhone: 'UserPhone',
-  UnverifiedPhone: 'UnverifiedPhone'
+  UnverifiedPhone: 'UnverifiedPhone',
+  PasswordResetVerification: 'PasswordResetVerification'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -422,7 +423,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "product" | "botSettings" | "autoReply" | "knowledgeBaseArticle" | "userEmail" | "unverifiedEmail" | "userPhone" | "unverifiedPhone"
+    modelProps: "user" | "session" | "product" | "botSettings" | "autoReply" | "knowledgeBaseArticle" | "userEmail" | "unverifiedEmail" | "userPhone" | "unverifiedPhone" | "passwordResetVerification"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1166,6 +1167,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PasswordResetVerification: {
+      payload: Prisma.$PasswordResetVerificationPayload<ExtArgs>
+      fields: Prisma.PasswordResetVerificationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PasswordResetVerificationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetVerificationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PasswordResetVerificationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetVerificationPayload>
+        }
+        findFirst: {
+          args: Prisma.PasswordResetVerificationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetVerificationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PasswordResetVerificationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetVerificationPayload>
+        }
+        findMany: {
+          args: Prisma.PasswordResetVerificationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetVerificationPayload>[]
+        }
+        create: {
+          args: Prisma.PasswordResetVerificationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetVerificationPayload>
+        }
+        createMany: {
+          args: Prisma.PasswordResetVerificationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PasswordResetVerificationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetVerificationPayload>[]
+        }
+        delete: {
+          args: Prisma.PasswordResetVerificationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetVerificationPayload>
+        }
+        update: {
+          args: Prisma.PasswordResetVerificationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetVerificationPayload>
+        }
+        deleteMany: {
+          args: Prisma.PasswordResetVerificationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PasswordResetVerificationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PasswordResetVerificationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetVerificationPayload>[]
+        }
+        upsert: {
+          args: Prisma.PasswordResetVerificationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetVerificationPayload>
+        }
+        aggregate: {
+          args: Prisma.PasswordResetVerificationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePasswordResetVerification>
+        }
+        groupBy: {
+          args: Prisma.PasswordResetVerificationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PasswordResetVerificationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PasswordResetVerificationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PasswordResetVerificationCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1326,6 +1401,23 @@ export const UnverifiedPhoneScalarFieldEnum = {
 } as const
 
 export type UnverifiedPhoneScalarFieldEnum = (typeof UnverifiedPhoneScalarFieldEnum)[keyof typeof UnverifiedPhoneScalarFieldEnum]
+
+
+export const PasswordResetVerificationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  method: 'method',
+  destination: 'destination',
+  verificationCodeHash: 'verificationCodeHash',
+  expiresAt: 'expiresAt',
+  verifiedAt: 'verifiedAt',
+  resetTokenHash: 'resetTokenHash',
+  resetTokenExpiresAt: 'resetTokenExpiresAt',
+  consumedAt: 'consumedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type PasswordResetVerificationScalarFieldEnum = (typeof PasswordResetVerificationScalarFieldEnum)[keyof typeof PasswordResetVerificationScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1623,6 +1715,7 @@ export type GlobalOmitConfig = {
   unverifiedEmail?: Prisma.UnverifiedEmailOmit
   userPhone?: Prisma.UserPhoneOmit
   unverifiedPhone?: Prisma.UnverifiedPhoneOmit
+  passwordResetVerification?: Prisma.PasswordResetVerificationOmit
 }
 
 /* Types for Logging */

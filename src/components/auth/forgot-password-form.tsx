@@ -10,6 +10,7 @@ import { FormikInput } from "@/components/ui/formik-input";
 import { VerificationDialog } from "@/components/ui/verification-dialog";
 import {
   sendForgotPasswordVerification,
+  verifyForgotPasswordCode,
   type ForgotPasswordVerification,
 } from "@/lib/auth/forgot-password";
 import {
@@ -37,6 +38,22 @@ export function ForgotPasswordForm() {
 
     await sendForgotPasswordVerification(verificationTarget.destination);
   }, [verificationTarget]);
+
+  const handleVerifyCode = useCallback(
+    async (code: string) => {
+      if (!verificationTarget) {
+        return;
+      }
+
+      const result = await verifyForgotPasswordCode(
+        verificationTarget.destination,
+        code,
+      );
+
+      router.replace(`/auth/${result.resetToken}/reset`);
+    },
+    [router, verificationTarget],
+  );
 
   async function handleSubmit(
     values: ForgotPasswordFormValues,
@@ -84,7 +101,7 @@ export function ForgotPasswordForm() {
                 label="Email or phone number"
                 type="text"
                 autoComplete="username"
-                placeholder="name@example.com or +639171234567"
+                placeholder="name@example.com or +639123456789"
                 leadingIcon={Mail}
               />
 
@@ -115,6 +132,7 @@ export function ForgotPasswordForm() {
         method={verificationTarget?.method ?? "email"}
         destination={verificationTarget?.destination ?? ""}
         onClose={handleCloseVerificationDialog}
+        onVerify={handleVerifyCode}
         onResend={handleResendVerification}
       />
     </>

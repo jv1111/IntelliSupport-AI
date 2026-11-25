@@ -60,7 +60,8 @@ export const ModelName = {
   UserEmail: 'UserEmail',
   UnverifiedEmail: 'UnverifiedEmail',
   UserPhone: 'UserPhone',
-  UnverifiedPhone: 'UnverifiedPhone'
+  UnverifiedPhone: 'UnverifiedPhone',
+  PasswordResetVerification: 'PasswordResetVerification'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -200,6 +201,23 @@ export const UnverifiedPhoneScalarFieldEnum = {
 } as const
 
 export type UnverifiedPhoneScalarFieldEnum = (typeof UnverifiedPhoneScalarFieldEnum)[keyof typeof UnverifiedPhoneScalarFieldEnum]
+
+
+export const PasswordResetVerificationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  method: 'method',
+  destination: 'destination',
+  verificationCodeHash: 'verificationCodeHash',
+  expiresAt: 'expiresAt',
+  verifiedAt: 'verifiedAt',
+  resetTokenHash: 'resetTokenHash',
+  resetTokenExpiresAt: 'resetTokenExpiresAt',
+  consumedAt: 'consumedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type PasswordResetVerificationScalarFieldEnum = (typeof PasswordResetVerificationScalarFieldEnum)[keyof typeof PasswordResetVerificationScalarFieldEnum]
 
 
 export const SortOrder = {

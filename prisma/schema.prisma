@@ -25,19 +25,20 @@ enum ArticleCategoryTag {
 }
 
 model User {
-  id                    String                 @id @default(cuid())
-  username              String                 @unique @db.VarChar(50)
-  passwordHash          String                 @db.VarChar(255)
-  createdAt             DateTime               @default(now())
-  updatedAt             DateTime               @updatedAt
-  sessions              Session[]
-  products              Product[]
-  knowledgeBaseArticles KnowledgeBaseArticle[]
-  emails                UserEmail[]
-  unverifiedEmails      UnverifiedEmail[]
-  phones                UserPhone[]
-  unverifiedPhones      UnverifiedPhone[]
-  botSettings           BotSettings?
+  id                         String                      @id @default(cuid())
+  username                   String                      @unique @db.VarChar(50)
+  passwordHash               String                      @db.VarChar(255)
+  createdAt                  DateTime                    @default(now())
+  updatedAt                  DateTime                    @updatedAt
+  sessions                   Session[]
+  products                   Product[]
+  knowledgeBaseArticles      KnowledgeBaseArticle[]
+  emails                     UserEmail[]
+  unverifiedEmails           UnverifiedEmail[]
+  phones                     UserPhone[]
+  unverifiedPhones           UnverifiedPhone[]
+  passwordResetVerifications PasswordResetVerification[]
+  botSettings                BotSettings?
 
   @@map("users")
 }
@@ -172,4 +173,25 @@ model UnverifiedPhone {
   @@index([userId, phone])
   @@index([expiresAt])
   @@map("unverified_phones")
+}
+
+model PasswordResetVerification {
+  id                   String    @id @default(cuid())
+  userId               String
+  method               String    @db.VarChar(16)
+  destination          String    @db.VarChar(254)
+  verificationCodeHash String    @db.VarChar(255)
+  expiresAt            DateTime
+  verifiedAt           DateTime?
+  resetTokenHash       String?   @unique @db.VarChar(64)
+  resetTokenExpiresAt  DateTime?
+  consumedAt           DateTime?
+  createdAt            DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, method, destination])
+  @@index([expiresAt])
+  @@index([resetTokenExpiresAt])
+  @@map("password_reset_verifications")
 }

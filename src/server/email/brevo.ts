@@ -70,8 +70,12 @@ async function sendEmailWithCode(
   });
 
   if (!response.ok) {
+    const responseBody = await response.text();
+
     throw new Error(
-      `Brevo email request failed with status ${response.status}.`,
+      `Brevo email request failed with status ${response.status}: ${
+        responseBody || response.statusText || "No response body returned."
+      }`,
     );
   }
 }

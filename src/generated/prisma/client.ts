@@ -91,3 +91,8 @@ export type UserPhone = Prisma.UserPhoneModel
  * 
  */
 export type UnverifiedPhone = Prisma.UnverifiedPhoneModel
+/**
+ * Model PasswordResetVerification
+ * 
+ */
+export type PasswordResetVerification = Prisma.PasswordResetVerificationModel
