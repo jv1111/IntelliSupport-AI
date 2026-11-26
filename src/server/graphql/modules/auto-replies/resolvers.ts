@@ -15,12 +15,12 @@ import type { GraphQLContext } from "@/server/graphql/context";
 interface CreateAutoReplyInput {
   productId: string;
   parentId?: string | null;
-  question: string;
+  message: string;
   answer: string;
 }
 
 interface UpdateAutoReplyInput {
-  question: string;
+  message: string;
   answer: string;
 }
 

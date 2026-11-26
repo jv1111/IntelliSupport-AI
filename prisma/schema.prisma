@@ -91,7 +91,7 @@ model AutoReply {
   id        String   @id @default(cuid())
   productId String
   parentId  String?
-  question  String
+  message   String
   answer    String
   position  Int      @default(0)
   createdAt DateTime @default(now())

@@ -6,6 +6,7 @@ export const geminiTypeDefs = `#graphql
 
   input SendGeminiMessageInput {
     message: String!
+    productId: String!
   }
 
   extend type Mutation {

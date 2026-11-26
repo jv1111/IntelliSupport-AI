@@ -53,14 +53,14 @@ export function BotManager() {
 
   const query = searchQuery.trim().toLowerCase();
   const filteredProducts = products.flatMap((product) => {
-    const questionCount = autoReplies.filter(
+    const messageCount = autoReplies.filter(
       (item) => item.productId === product.id && item.parentId === null,
     ).length;
     const matchesSearch =
       !query || `${product.name} ${product.sku}`.toLowerCase().includes(query);
 
-    return questionCount > 0 && matchesSearch
-      ? [{ product, questionCount }]
+    return messageCount > 0 && matchesSearch
+      ? [{ product, messageCount }]
       : [];
   });
 
@@ -142,8 +142,8 @@ export function BotManager() {
               Automatic Chat Replies
             </h2>
             <p className="mt-1 max-w-3xl text-xs leading-relaxed text-muted-foreground">
-              Set instant static answers for common questions. When a
-              customer&apos;s message matches a question, the answer is sent
+              Set instant static answers for common messages. When a
+              customer&apos;s message matches a message, the answer is sent
               right away.
             </p>
           </div>
@@ -192,11 +192,11 @@ export function BotManager() {
                 id="product-catalog-heading"
                 className="text-sm font-bold text-foreground"
               >
-                Products with Questions & Answers
+                Products with Messages & Answers
               </h2>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                Select a product to manage its saved questions and answers,
-                update replies, and organize follow-up questions.
+                Select a product to manage its saved messages and answers,
+                update replies, and organize follow-up messages.
               </p>
             </div>
 
@@ -236,7 +236,7 @@ export function BotManager() {
                   autoRepliesEnabled ? "" : "opacity-50"
                 }`}
               >
-                {filteredProducts.map(({ product, questionCount }) => (
+                {filteredProducts.map(({ product, messageCount }) => (
                   <li key={product.id} className="py-3 first:pt-0 last:pb-0">
                     <Link
                       href={`/bot-manager/${product.id}/question-editor`}
@@ -268,8 +268,8 @@ export function BotManager() {
                       />
 
                       <span className="shrink-0 rounded-full border border-primary/15 bg-primary/5 px-2.5 py-1 text-[10px] font-bold text-primary">
-                        {questionCount}{" "}
-                        {questionCount === 1 ? "question" : "questions"}
+                        {messageCount}{" "}
+                        {messageCount === 1 ? "message" : "messages"}
                       </span>
                     </Link>
                   </li>
@@ -280,7 +280,7 @@ export function BotManager() {
                 role="status"
                 className="flex min-h-0 flex-1 items-center justify-center py-10 text-center text-xs font-medium text-muted-foreground"
               >
-                No products with saved questions and answers found.
+                No products with saved messages and answers found.
               </p>
             )}
           </Card>

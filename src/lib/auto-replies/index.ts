@@ -10,7 +10,7 @@ const autoReplyFields = `
   id
   productId
   parentId
-  question
+  message
   answer
   position
   createdAt

@@ -76,7 +76,7 @@ export function useBotManagerAutoReplies(productId?: string, enabled = true) {
       try {
         const savedAutoReply = autoReplyId
           ? await updateAutoReplyRequest(autoReplyId, {
-              question: input.question,
+              message: input.message,
               answer: input.answer,
             })
           : await createAutoReplyRequest(input);
@@ -234,7 +234,7 @@ export function useBotManagerAutoReplies(productId?: string, enabled = true) {
         setReorderError(
           error instanceof Error
             ? error.message
-            : "Unable to reorder questions. Please try again.",
+            : "Unable to reorder messages. Please try again.",
         );
 
         return false;

@@ -41,7 +41,7 @@ const pageHeaders: Record<string, PageHeaderContent> = {
   },
   "/playground/chat": {
     title: "Playground Chat",
-    description: "Test your bot's responses to customer questions.",
+    description: "Test your bot's responses to customer messages.",
   },
   "/billing": {
     title: "Billing",

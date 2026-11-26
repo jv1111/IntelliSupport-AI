@@ -38,7 +38,7 @@ export type AutoReplyMinAggregateOutputType = {
   id: string | null
   productId: string | null
   parentId: string | null
-  question: string | null
+  message: string | null
   answer: string | null
   position: number | null
   createdAt: Date | null
@@ -49,7 +49,7 @@ export type AutoReplyMaxAggregateOutputType = {
   id: string | null
   productId: string | null
   parentId: string | null
-  question: string | null
+  message: string | null
   answer: string | null
   position: number | null
   createdAt: Date | null
@@ -60,7 +60,7 @@ export type AutoReplyCountAggregateOutputType = {
   id: number
   productId: number
   parentId: number
-  question: number
+  message: number
   answer: number
   position: number
   createdAt: number
@@ -81,7 +81,7 @@ export type AutoReplyMinAggregateInputType = {
   id?: true
   productId?: true
   parentId?: true
-  question?: true
+  message?: true
   answer?: true
   position?: true
   createdAt?: true
@@ -92,7 +92,7 @@ export type AutoReplyMaxAggregateInputType = {
   id?: true
   productId?: true
   parentId?: true
-  question?: true
+  message?: true
   answer?: true
   position?: true
   createdAt?: true
@@ -103,7 +103,7 @@ export type AutoReplyCountAggregateInputType = {
   id?: true
   productId?: true
   parentId?: true
-  question?: true
+  message?: true
   answer?: true
   position?: true
   createdAt?: true
@@ -201,7 +201,7 @@ export type AutoReplyGroupByOutputType = {
   id: string
   productId: string
   parentId: string | null
-  question: string
+  message: string
   answer: string
   position: number
   createdAt: Date
@@ -235,7 +235,7 @@ export type AutoReplyWhereInput = {
   id?: Prisma.StringFilter<"AutoReply"> | string
   productId?: Prisma.StringFilter<"AutoReply"> | string
   parentId?: Prisma.StringNullableFilter<"AutoReply"> | string | null
-  question?: Prisma.StringFilter<"AutoReply"> | string
+  message?: Prisma.StringFilter<"AutoReply"> | string
   answer?: Prisma.StringFilter<"AutoReply"> | string
   position?: Prisma.IntFilter<"AutoReply"> | number
   createdAt?: Prisma.DateTimeFilter<"AutoReply"> | Date | string
@@ -249,7 +249,7 @@ export type AutoReplyOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   parentId?: Prisma.SortOrderInput | Prisma.SortOrder
-  question?: Prisma.SortOrder
+  message?: Prisma.SortOrder
   answer?: Prisma.SortOrder
   position?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -267,7 +267,7 @@ export type AutoReplyWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.AutoReplyWhereInput | Prisma.AutoReplyWhereInput[]
   productId?: Prisma.StringFilter<"AutoReply"> | string
   parentId?: Prisma.StringNullableFilter<"AutoReply"> | string | null
-  question?: Prisma.StringFilter<"AutoReply"> | string
+  message?: Prisma.StringFilter<"AutoReply"> | string
   answer?: Prisma.StringFilter<"AutoReply"> | string
   position?: Prisma.IntFilter<"AutoReply"> | number
   createdAt?: Prisma.DateTimeFilter<"AutoReply"> | Date | string
@@ -281,7 +281,7 @@ export type AutoReplyOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   parentId?: Prisma.SortOrderInput | Prisma.SortOrder
-  question?: Prisma.SortOrder
+  message?: Prisma.SortOrder
   answer?: Prisma.SortOrder
   position?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -300,7 +300,7 @@ export type AutoReplyScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"AutoReply"> | string
   productId?: Prisma.StringWithAggregatesFilter<"AutoReply"> | string
   parentId?: Prisma.StringNullableWithAggregatesFilter<"AutoReply"> | string | null
-  question?: Prisma.StringWithAggregatesFilter<"AutoReply"> | string
+  message?: Prisma.StringWithAggregatesFilter<"AutoReply"> | string
   answer?: Prisma.StringWithAggregatesFilter<"AutoReply"> | string
   position?: Prisma.IntWithAggregatesFilter<"AutoReply"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"AutoReply"> | Date | string
@@ -309,7 +309,7 @@ export type AutoReplyScalarWhereWithAggregatesInput = {
 
 export type AutoReplyCreateInput = {
   id?: string
-  question: string
+  message: string
   answer: string
   position?: number
   createdAt?: Date | string
@@ -323,7 +323,7 @@ export type AutoReplyUncheckedCreateInput = {
   id?: string
   productId: string
   parentId?: string | null
-  question: string
+  message: string
   answer: string
   position?: number
   createdAt?: Date | string
@@ -333,7 +333,7 @@ export type AutoReplyUncheckedCreateInput = {
 
 export type AutoReplyUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  question?: Prisma.StringFieldUpdateOperationsInput | string
+  message?: Prisma.StringFieldUpdateOperationsInput | string
   answer?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -347,7 +347,7 @@ export type AutoReplyUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  question?: Prisma.StringFieldUpdateOperationsInput | string
+  message?: Prisma.StringFieldUpdateOperationsInput | string
   answer?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -359,7 +359,7 @@ export type AutoReplyCreateManyInput = {
   id?: string
   productId: string
   parentId?: string | null
-  question: string
+  message: string
   answer: string
   position?: number
   createdAt?: Date | string
@@ -368,7 +368,7 @@ export type AutoReplyCreateManyInput = {
 
 export type AutoReplyUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  question?: Prisma.StringFieldUpdateOperationsInput | string
+  message?: Prisma.StringFieldUpdateOperationsInput | string
   answer?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -379,7 +379,7 @@ export type AutoReplyUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  question?: Prisma.StringFieldUpdateOperationsInput | string
+  message?: Prisma.StringFieldUpdateOperationsInput | string
   answer?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -410,7 +410,7 @@ export type AutoReplyCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   parentId?: Prisma.SortOrder
-  question?: Prisma.SortOrder
+  message?: Prisma.SortOrder
   answer?: Prisma.SortOrder
   position?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -425,7 +425,7 @@ export type AutoReplyMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   parentId?: Prisma.SortOrder
-  question?: Prisma.SortOrder
+  message?: Prisma.SortOrder
   answer?: Prisma.SortOrder
   position?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -436,7 +436,7 @@ export type AutoReplyMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   parentId?: Prisma.SortOrder
-  question?: Prisma.SortOrder
+  message?: Prisma.SortOrder
   answer?: Prisma.SortOrder
   position?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -557,7 +557,7 @@ export type AutoReplyUncheckedUpdateManyWithoutParentNestedInput = {
 
 export type AutoReplyCreateWithoutProductInput = {
   id?: string
-  question: string
+  message: string
   answer: string
   position?: number
   createdAt?: Date | string
@@ -569,7 +569,7 @@ export type AutoReplyCreateWithoutProductInput = {
 export type AutoReplyUncheckedCreateWithoutProductInput = {
   id?: string
   parentId?: string | null
-  question: string
+  message: string
   answer: string
   position?: number
   createdAt?: Date | string
@@ -610,7 +610,7 @@ export type AutoReplyScalarWhereInput = {
   id?: Prisma.StringFilter<"AutoReply"> | string
   productId?: Prisma.StringFilter<"AutoReply"> | string
   parentId?: Prisma.StringNullableFilter<"AutoReply"> | string | null
-  question?: Prisma.StringFilter<"AutoReply"> | string
+  message?: Prisma.StringFilter<"AutoReply"> | string
   answer?: Prisma.StringFilter<"AutoReply"> | string
   position?: Prisma.IntFilter<"AutoReply"> | number
   createdAt?: Prisma.DateTimeFilter<"AutoReply"> | Date | string
@@ -619,7 +619,7 @@ export type AutoReplyScalarWhereInput = {
 
 export type AutoReplyCreateWithoutFollowUpsInput = {
   id?: string
-  question: string
+  message: string
   answer: string
   position?: number
   createdAt?: Date | string
@@ -632,7 +632,7 @@ export type AutoReplyUncheckedCreateWithoutFollowUpsInput = {
   id?: string
   productId: string
   parentId?: string | null
-  question: string
+  message: string
   answer: string
   position?: number
   createdAt?: Date | string
@@ -646,7 +646,7 @@ export type AutoReplyCreateOrConnectWithoutFollowUpsInput = {
 
 export type AutoReplyCreateWithoutParentInput = {
   id?: string
-  question: string
+  message: string
   answer: string
   position?: number
   createdAt?: Date | string
@@ -657,7 +657,7 @@ export type AutoReplyCreateWithoutParentInput = {
 
 export type AutoReplyUncheckedCreateWithoutParentInput = {
   id?: string
-  question: string
+  message: string
   answer: string
   position?: number
   createdAt?: Date | string
@@ -688,7 +688,7 @@ export type AutoReplyUpdateToOneWithWhereWithoutFollowUpsInput = {
 
 export type AutoReplyUpdateWithoutFollowUpsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  question?: Prisma.StringFieldUpdateOperationsInput | string
+  message?: Prisma.StringFieldUpdateOperationsInput | string
   answer?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -701,7 +701,7 @@ export type AutoReplyUncheckedUpdateWithoutFollowUpsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  question?: Prisma.StringFieldUpdateOperationsInput | string
+  message?: Prisma.StringFieldUpdateOperationsInput | string
   answer?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -727,7 +727,7 @@ export type AutoReplyUpdateManyWithWhereWithoutParentInput = {
 export type AutoReplyCreateManyProductInput = {
   id?: string
   parentId?: string | null
-  question: string
+  message: string
   answer: string
   position?: number
   createdAt?: Date | string
@@ -736,7 +736,7 @@ export type AutoReplyCreateManyProductInput = {
 
 export type AutoReplyUpdateWithoutProductInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  question?: Prisma.StringFieldUpdateOperationsInput | string
+  message?: Prisma.StringFieldUpdateOperationsInput | string
   answer?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -748,7 +748,7 @@ export type AutoReplyUpdateWithoutProductInput = {
 export type AutoReplyUncheckedUpdateWithoutProductInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  question?: Prisma.StringFieldUpdateOperationsInput | string
+  message?: Prisma.StringFieldUpdateOperationsInput | string
   answer?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -759,7 +759,7 @@ export type AutoReplyUncheckedUpdateWithoutProductInput = {
 export type AutoReplyUncheckedUpdateManyWithoutProductInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  question?: Prisma.StringFieldUpdateOperationsInput | string
+  message?: Prisma.StringFieldUpdateOperationsInput | string
   answer?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -768,7 +768,7 @@ export type AutoReplyUncheckedUpdateManyWithoutProductInput = {
 
 export type AutoReplyCreateManyParentInput = {
   id?: string
-  question: string
+  message: string
   answer: string
   position?: number
   createdAt?: Date | string
@@ -777,7 +777,7 @@ export type AutoReplyCreateManyParentInput = {
 
 export type AutoReplyUpdateWithoutParentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  question?: Prisma.StringFieldUpdateOperationsInput | string
+  message?: Prisma.StringFieldUpdateOperationsInput | string
   answer?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -788,7 +788,7 @@ export type AutoReplyUpdateWithoutParentInput = {
 
 export type AutoReplyUncheckedUpdateWithoutParentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  question?: Prisma.StringFieldUpdateOperationsInput | string
+  message?: Prisma.StringFieldUpdateOperationsInput | string
   answer?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -798,7 +798,7 @@ export type AutoReplyUncheckedUpdateWithoutParentInput = {
 
 export type AutoReplyUncheckedUpdateManyWithoutParentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  question?: Prisma.StringFieldUpdateOperationsInput | string
+  message?: Prisma.StringFieldUpdateOperationsInput | string
   answer?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -840,7 +840,7 @@ export type AutoReplySelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   id?: boolean
   productId?: boolean
   parentId?: boolean
-  question?: boolean
+  message?: boolean
   answer?: boolean
   position?: boolean
   createdAt?: boolean
@@ -855,7 +855,7 @@ export type AutoReplySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   id?: boolean
   productId?: boolean
   parentId?: boolean
-  question?: boolean
+  message?: boolean
   answer?: boolean
   position?: boolean
   createdAt?: boolean
@@ -868,7 +868,7 @@ export type AutoReplySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   id?: boolean
   productId?: boolean
   parentId?: boolean
-  question?: boolean
+  message?: boolean
   answer?: boolean
   position?: boolean
   createdAt?: boolean
@@ -881,14 +881,14 @@ export type AutoReplySelectScalar = {
   id?: boolean
   productId?: boolean
   parentId?: boolean
-  question?: boolean
+  message?: boolean
   answer?: boolean
   position?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type AutoReplyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "productId" | "parentId" | "question" | "answer" | "position" | "createdAt" | "updatedAt", ExtArgs["result"]["autoReply"]>
+export type AutoReplyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "productId" | "parentId" | "message" | "answer" | "position" | "createdAt" | "updatedAt", ExtArgs["result"]["autoReply"]>
 export type AutoReplyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
   parent?: boolean | Prisma.AutoReply$parentArgs<ExtArgs>
@@ -915,7 +915,7 @@ export type $AutoReplyPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     id: string
     productId: string
     parentId: string | null
-    question: string
+    message: string
     answer: string
     position: number
     createdAt: Date
@@ -1349,7 +1349,7 @@ export interface AutoReplyFieldRefs {
   readonly id: Prisma.FieldRef<"AutoReply", 'String'>
   readonly productId: Prisma.FieldRef<"AutoReply", 'String'>
   readonly parentId: Prisma.FieldRef<"AutoReply", 'String'>
-  readonly question: Prisma.FieldRef<"AutoReply", 'String'>
+  readonly message: Prisma.FieldRef<"AutoReply", 'String'>
   readonly answer: Prisma.FieldRef<"AutoReply", 'String'>
   readonly position: Prisma.FieldRef<"AutoReply", 'Int'>
   readonly createdAt: Prisma.FieldRef<"AutoReply", 'DateTime'>

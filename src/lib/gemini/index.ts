@@ -2,6 +2,7 @@ import { graphqlRequest } from "@/lib/graphql/client";
 
 interface SendGeminiMessageInput {
   message: string;
+  productId: string;
 }
 
 export interface GeminiResponse {

@@ -3,7 +3,7 @@ export const autoReplyTypeDefs = `#graphql
     id: ID!
     productId: ID!
     parentId: ID
-    question: String!
+    message: String!
     answer: String!
     position: Int!
     createdAt: String!
@@ -13,12 +13,12 @@ export const autoReplyTypeDefs = `#graphql
   input CreateAutoReplyInput {
     productId: ID!
     parentId: ID
-    question: String!
+    message: String!
     answer: String!
   }
 
   input UpdateAutoReplyInput {
-    question: String!
+    message: String!
     answer: String!
   }
 

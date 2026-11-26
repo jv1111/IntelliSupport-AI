@@ -42,7 +42,7 @@ const rootReply: AutoReply = {
   id: "reply-root",
   productId: productA.id,
   parentId: null,
-  question: "How do I reset the router?",
+  message: "How do I reset the router?",
   answer: "Hold the reset button for 10 seconds.",
   position: 1,
   createdAt: "2026-01-01T00:00:00.000Z",
@@ -53,7 +53,7 @@ const secondRootReply: AutoReply = {
   id: "reply-root-2",
   productId: productA.id,
   parentId: null,
-  question: "What is the Wi-Fi coverage range?",
+  message: "What is the Wi-Fi coverage range?",
   answer: "The router covers up to 2500 square feet.",
   position: 0,
   createdAt: "2026-01-01T00:00:00.000Z",
@@ -64,7 +64,7 @@ const followUpReply: AutoReply = {
   id: "reply-follow-up",
   productId: productA.id,
   parentId: rootReply.id,
-  question: "What if the router does not restart?",
+  message: "What if the router does not restart?",
   answer: "Disconnect the power adapter and reconnect it after 30 seconds.",
   position: 0,
   createdAt: "2026-01-01T00:00:00.000Z",
@@ -186,7 +186,7 @@ describe("Playground Products - Loading", () => {
 describe("Playground Chat - Initial State", () => {
   it("displays a product-specific greeting", () => {
     const { result } = renderHook(() =>
-      usePlaygroundChat(productA.name, autoReplies, true),
+      usePlaygroundChat(productA.id, productA.name, autoReplies, true),
     );
 
     expect(result.current.messages).toEqual([
@@ -201,7 +201,7 @@ describe("Playground Chat - Initial State", () => {
 
   it("displays root suggestions ordered by position", () => {
     const { result } = renderHook(() =>
-      usePlaygroundChat(productA.name, autoReplies, true),
+      usePlaygroundChat(productA.id, productA.name, autoReplies, true),
     );
 
     expect(result.current.suggestedReplies).toEqual([
@@ -212,7 +212,7 @@ describe("Playground Chat - Initial State", () => {
 
   it("reports when automatic replies are available", () => {
     const { result } = renderHook(() =>
-      usePlaygroundChat(productA.name, autoReplies, true),
+      usePlaygroundChat(productA.id, productA.name, autoReplies, true),
     );
 
     expect(result.current.hasAutoReplies).toBe(true);
@@ -221,7 +221,7 @@ describe("Playground Chat - Initial State", () => {
 
   it("keeps the message input available when automatic replies are unavailable", () => {
     const { result } = renderHook(() =>
-      usePlaygroundChat(productA.name, [], true),
+      usePlaygroundChat(productA.id, productA.name, [], true),
     );
 
     expect(result.current.hasAutoReplies).toBe(false);
@@ -230,10 +230,10 @@ describe("Playground Chat - Initial State", () => {
   });
 });
 
-describe("Playground Chat - Suggested Questions", () => {
-  it("adds user and assistant messages when selecting a suggested question", () => {
+describe("Playground Chat - Suggested Messages", () => {
+  it("adds user and assistant messages when selecting a suggested message", () => {
     const { result } = renderHook(() =>
-      usePlaygroundChat(productA.name, autoReplies, true),
+      usePlaygroundChat(productA.id, productA.name, autoReplies, true),
     );
 
     act(() => {
@@ -243,7 +243,7 @@ describe("Playground Chat - Suggested Questions", () => {
     expect(result.current.messages).toHaveLength(3);
     expect(result.current.messages[1]).toMatchObject({
       role: "user",
-      content: rootReply.question,
+      content: rootReply.message,
     });
     expect(result.current.messages[2]).toMatchObject({
       role: "assistant",
@@ -251,9 +251,9 @@ describe("Playground Chat - Suggested Questions", () => {
     });
   });
 
-  it("displays follow-up suggestions after selecting a parent question", () => {
+  it("displays follow-up suggestions after selecting a parent message", () => {
     const { result } = renderHook(() =>
-      usePlaygroundChat(productA.name, autoReplies, true),
+      usePlaygroundChat(productA.id, productA.name, autoReplies, true),
     );
 
     act(() => {
@@ -264,9 +264,9 @@ describe("Playground Chat - Suggested Questions", () => {
     expect(result.current.showResolutionPrompt).toBe(false);
   });
 
-  it("displays the resolution prompt after selecting a question without follow-ups", () => {
+  it("displays the resolution prompt after selecting a message without follow-ups", () => {
     const { result } = renderHook(() =>
-      usePlaygroundChat(productA.name, autoReplies, true),
+      usePlaygroundChat(productA.id, productA.name, autoReplies, true),
     );
 
     act(() => {
@@ -277,9 +277,9 @@ describe("Playground Chat - Suggested Questions", () => {
     expect(result.current.showResolutionPrompt).toBe(true);
   });
 
-  it("ignores a question that is not currently suggested", () => {
+  it("ignores a message that is not currently suggested", () => {
     const { result } = renderHook(() =>
-      usePlaygroundChat(productA.name, autoReplies, true),
+      usePlaygroundChat(productA.id, productA.name, autoReplies, true),
     );
 
     act(() => {
@@ -290,9 +290,9 @@ describe("Playground Chat - Suggested Questions", () => {
     expect(result.current.suggestedReplies).toHaveLength(2);
   });
 
-  it("completes a nested conversation through follow-up questions", () => {
+  it("completes a nested conversation through follow-up messages", () => {
     const { result } = renderHook(() =>
-      usePlaygroundChat(productA.name, autoReplies, true),
+      usePlaygroundChat(productA.id, productA.name, autoReplies, true),
     );
 
     act(() => {
@@ -308,7 +308,7 @@ describe("Playground Chat - Suggested Questions", () => {
     expect(result.current.messages).toHaveLength(5);
     expect(result.current.messages[3]).toMatchObject({
       role: "user",
-      content: followUpReply.question,
+      content: followUpReply.message,
     });
     expect(result.current.messages[4]).toMatchObject({
       role: "assistant",
@@ -319,10 +319,10 @@ describe("Playground Chat - Suggested Questions", () => {
   });
 });
 
-describe("Playground Chat - Typed Questions", () => {
+describe("Playground Chat - Typed Messages", () => {
   it("sends typed messages to Gemini and displays its response", async () => {
     const { result } = renderHook(() =>
-      usePlaygroundChat(productA.name, autoReplies, true),
+      usePlaygroundChat(productA.id, productA.name, autoReplies, true),
     );
 
     act(() => {
@@ -335,6 +335,7 @@ describe("Playground Chat - Typed Questions", () => {
 
     expect(sendGeminiMessageMock).toHaveBeenCalledWith({
       message: "hello",
+      productId: productA.id,
     });
 
     expect(result.current.messages).toHaveLength(3);
@@ -353,7 +354,7 @@ describe("Playground Chat - Typed Questions", () => {
 
   it("sends trimmed messages to Gemini", async () => {
     const { result } = renderHook(() =>
-      usePlaygroundChat(productA.name, autoReplies, true),
+      usePlaygroundChat(productA.id, productA.name, autoReplies, true),
     );
 
     act(() => {
@@ -366,12 +367,13 @@ describe("Playground Chat - Typed Questions", () => {
 
     expect(sendGeminiMessageMock).toHaveBeenCalledWith({
       message: "hello   Gemini",
+      productId: productA.id,
     });
   });
 
   it("clears the message draft after sending", async () => {
     const { result } = renderHook(() =>
-      usePlaygroundChat(productA.name, autoReplies, true),
+      usePlaygroundChat(productA.id, productA.name, autoReplies, true),
     );
 
     act(() => {
@@ -385,9 +387,9 @@ describe("Playground Chat - Typed Questions", () => {
     expect(result.current.messageDraft).toBe("");
   });
 
-  it("suppresses suggested questions after sending a typed message", async () => {
+  it("suppresses suggested messages after sending a typed message", async () => {
     const { result } = renderHook(() =>
-      usePlaygroundChat(productA.name, autoReplies, true),
+      usePlaygroundChat(productA.id, productA.name, autoReplies, true),
     );
 
     act(() => {
@@ -401,13 +403,13 @@ describe("Playground Chat - Typed Questions", () => {
     expect(result.current.suggestedReplies).toEqual([]);
   });
 
-  it("uses Gemini for typed messages that match an automatic reply question", async () => {
+  it("uses Gemini for typed messages that match an automatic reply message", async () => {
     const { result } = renderHook(() =>
-      usePlaygroundChat(productA.name, autoReplies, true),
+      usePlaygroundChat(productA.id, productA.name, autoReplies, true),
     );
 
     act(() => {
-      result.current.setMessageDraft(rootReply.question);
+      result.current.setMessageDraft(rootReply.message);
     });
 
     await act(async () => {
@@ -415,7 +417,8 @@ describe("Playground Chat - Typed Questions", () => {
     });
 
     expect(sendGeminiMessageMock).toHaveBeenCalledWith({
-      message: rootReply.question,
+      message: rootReply.message,
+      productId: productA.id,
     });
     expect(result.current.messages[2]).toMatchObject({
       role: "assistant",
@@ -430,7 +433,7 @@ describe("Playground Chat - Typed Questions", () => {
     );
 
     const { result } = renderHook(() =>
-      usePlaygroundChat(productA.name, autoReplies, true),
+      usePlaygroundChat(productA.id, productA.name, autoReplies, true),
     );
 
     act(() => {
@@ -448,7 +451,7 @@ describe("Playground Chat - Typed Questions", () => {
 
   it("does not send an empty message", async () => {
     const { result } = renderHook(() =>
-      usePlaygroundChat(productA.name, autoReplies, true),
+      usePlaygroundChat(productA.id, productA.name, autoReplies, true),
     );
 
     await act(async () => {
@@ -461,7 +464,7 @@ describe("Playground Chat - Typed Questions", () => {
 
   it("does not send a whitespace-only message", async () => {
     const { result } = renderHook(() =>
-      usePlaygroundChat(productA.name, autoReplies, true),
+      usePlaygroundChat(productA.id, productA.name, autoReplies, true),
     );
 
     act(() => {
@@ -478,9 +481,9 @@ describe("Playground Chat - Typed Questions", () => {
   });
 });
 describe("Playground Chat - Automatic Replies Disabled", () => {
-  it("hides suggested questions when automatic replies are disabled", () => {
+  it("hides suggested messages when automatic replies are disabled", () => {
     const { result } = renderHook(() =>
-      usePlaygroundChat(productA.name, autoReplies, false),
+      usePlaygroundChat(productA.id, productA.name, autoReplies, false),
     );
 
     expect(result.current.suggestedReplies).toEqual([]);
@@ -488,7 +491,7 @@ describe("Playground Chat - Automatic Replies Disabled", () => {
 
   it("keeps the message input enabled when automatic replies are disabled", () => {
     const { result } = renderHook(() =>
-      usePlaygroundChat(productA.name, autoReplies, false),
+      usePlaygroundChat(productA.id, productA.name, autoReplies, false),
     );
 
     expect(result.current.isInputDisabled).toBe(false);
@@ -496,7 +499,7 @@ describe("Playground Chat - Automatic Replies Disabled", () => {
 
   it("sends typed messages to Gemini when automatic replies are disabled", async () => {
     const { result } = renderHook(() =>
-      usePlaygroundChat(productA.name, autoReplies, false),
+      usePlaygroundChat(productA.id, productA.name, autoReplies, false),
     );
 
     act(() => {
@@ -509,6 +512,7 @@ describe("Playground Chat - Automatic Replies Disabled", () => {
 
     expect(sendGeminiMessageMock).toHaveBeenCalledWith({
       message: "hello",
+      productId: productA.id,
     });
     expect(result.current.messages[2]).toMatchObject({
       role: "assistant",
@@ -517,9 +521,9 @@ describe("Playground Chat - Automatic Replies Disabled", () => {
     });
   });
 
-  it("does not select a suggested question when automatic replies are disabled", () => {
+  it("does not select a suggested message when automatic replies are disabled", () => {
     const { result } = renderHook(() =>
-      usePlaygroundChat(productA.name, autoReplies, false),
+      usePlaygroundChat(productA.id, productA.name, autoReplies, false),
     );
 
     act(() => {
@@ -532,7 +536,7 @@ describe("Playground Chat - Automatic Replies Disabled", () => {
 
   it("allows Gemini messages when no automatic replies are configured", async () => {
     const { result } = renderHook(() =>
-      usePlaygroundChat(productA.name, [], true),
+      usePlaygroundChat(productA.id, productA.name, [], true),
     );
 
     act(() => {
@@ -546,6 +550,7 @@ describe("Playground Chat - Automatic Replies Disabled", () => {
     expect(result.current.isInputDisabled).toBe(false);
     expect(sendGeminiMessageMock).toHaveBeenCalledWith({
       message: "hello",
+      productId: productA.id,
     });
     expect(result.current.messages[2]).toMatchObject({
       role: "assistant",
@@ -556,7 +561,7 @@ describe("Playground Chat - Automatic Replies Disabled", () => {
 describe("Playground Chat - Resolution Feedback", () => {
   it("adds a positive resolution response", () => {
     const { result } = renderHook(() =>
-      usePlaygroundChat(productA.name, autoReplies, true),
+      usePlaygroundChat(productA.id, productA.name, autoReplies, true),
     );
 
     act(() => {
@@ -575,7 +580,7 @@ describe("Playground Chat - Resolution Feedback", () => {
       expect.objectContaining({
         role: "assistant",
         content:
-          "I'm glad I could help! You can still type another question anytime.",
+          "I'm glad I could help! You can still type another message anytime.",
       }),
     ]);
 
@@ -584,7 +589,7 @@ describe("Playground Chat - Resolution Feedback", () => {
 
   it("adds a negative resolution response", () => {
     const { result } = renderHook(() =>
-      usePlaygroundChat(productA.name, autoReplies, true),
+      usePlaygroundChat(productA.id, productA.name, autoReplies, true),
     );
 
     act(() => {
@@ -612,7 +617,7 @@ describe("Playground Chat - Resolution Feedback", () => {
 
   it("ignores resolution feedback when the prompt is not visible", () => {
     const { result } = renderHook(() =>
-      usePlaygroundChat(productA.name, autoReplies, true),
+      usePlaygroundChat(productA.id, productA.name, autoReplies, true),
     );
 
     act(() => {
@@ -626,7 +631,7 @@ describe("Playground Chat - Resolution Feedback", () => {
 describe("Playground Chat - Restart Conversation", () => {
   it("resets messages and restores the initial greeting", () => {
     const { result } = renderHook(() =>
-      usePlaygroundChat(productA.name, autoReplies, true),
+      usePlaygroundChat(productA.id, productA.name, autoReplies, true),
     );
 
     act(() => {
@@ -647,13 +652,13 @@ describe("Playground Chat - Restart Conversation", () => {
     ]);
   });
 
-  it("restores the root suggested questions after restarting", async () => {
+  it("restores the root suggested messages after restarting", async () => {
     const { result } = renderHook(() =>
-      usePlaygroundChat(productA.name, autoReplies, true),
+      usePlaygroundChat(productA.id, productA.name, autoReplies, true),
     );
 
     act(() => {
-      result.current.setMessageDraft("Unknown question");
+      result.current.setMessageDraft("Unknown message");
     });
 
     await act(async () => {
@@ -674,7 +679,7 @@ describe("Playground Chat - Restart Conversation", () => {
 
   it("clears the message draft after restarting", () => {
     const { result } = renderHook(() =>
-      usePlaygroundChat(productA.name, autoReplies, true),
+      usePlaygroundChat(productA.id, productA.name, autoReplies, true),
     );
 
     act(() => {
@@ -690,7 +695,7 @@ describe("Playground Chat - Restart Conversation", () => {
 
   it("clears the resolution prompt after restarting", () => {
     const { result } = renderHook(() =>
-      usePlaygroundChat(productA.name, autoReplies, true),
+      usePlaygroundChat(productA.id, productA.name, autoReplies, true),
     );
 
     act(() => {

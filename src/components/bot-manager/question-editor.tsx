@@ -25,15 +25,15 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
   const isProductSelectionMode = productId === undefined;
   const router = useRouter();
   const [selectedProductId, setSelectedProductId] = useState(productId ?? "");
-  const [isAddingQuestion, setIsAddingQuestion] = useState(false);
-  const [editingQuestionId, setEditingQuestionId] = useState<string | null>(
+  const [isAddingMessage, setIsAddingMessage] = useState(false);
+  const [editingAutoReplyId, setEditingAutoReplyId] = useState<string | null>(
     null,
   );
-  const [questionPendingDeletion, setQuestionPendingDeletion] = useState<{
+  const [autoReplyPendingDeletion, setAutoReplyPendingDeletion] = useState<{
     id: string;
-    question: string;
+    message: string;
   } | null>(null);
-  const [questionDraft, setQuestionDraft] = useState("");
+  const [messageDraft, setMessageDraft] = useState("");
   const [answerDraft, setAnswerDraft] = useState("");
 
   const {
@@ -72,7 +72,7 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
     Boolean(activeProductId),
   );
 
-  const questions = autoReplies
+  const messages = autoReplies
     .filter((item) => item.parentId === null)
     .sort((a, b) => a.position - b.position || a.id.localeCompare(b.id));
 
@@ -80,50 +80,50 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
     router.push("/bot-manager");
   }
 
-  function handleAddQuestion() {
+  function handleAddMessage() {
     if (
       !activeProductId ||
-      questions.length >= MAX_AUTO_REPLIES_PER_LEVEL ||
+      messages.length >= MAX_AUTO_REPLIES_PER_LEVEL ||
       isSaving ||
       isReordering
     ) {
       return;
     }
 
-    setEditingQuestionId(null);
-    setQuestionDraft("");
+    setEditingAutoReplyId(null);
+    setMessageDraft("");
     setAnswerDraft("");
-    setIsAddingQuestion(true);
+    setIsAddingMessage(true);
   }
 
-  function handleEditQuestion(
-    questionId: string,
-    question: string,
+  function handleEditMessage(
+    autoReplyId: string,
+    message: string,
     answer: string,
   ) {
-    if (isAddingQuestion || isSaving || isReordering) {
+    if (isAddingMessage || isSaving || isReordering) {
       return;
     }
 
-    setEditingQuestionId(questionId);
-    setQuestionDraft(question);
+    setEditingAutoReplyId(autoReplyId);
+    setMessageDraft(message);
     setAnswerDraft(answer);
-    setIsAddingQuestion(true);
+    setIsAddingMessage(true);
   }
 
-  function handleCancelAddQuestion() {
+  function handleCancelAddMessage() {
     if (isSaving) {
       return;
     }
 
-    setIsAddingQuestion(false);
-    setEditingQuestionId(null);
-    setQuestionDraft("");
+    setIsAddingMessage(false);
+    setEditingAutoReplyId(null);
+    setMessageDraft("");
     setAnswerDraft("");
   }
 
-  function handleOpenDeleteConfirmation(questionId: string, question: string) {
-    setQuestionPendingDeletion({ id: questionId, question });
+  function handleOpenDeleteConfirmation(autoReplyId: string, message: string) {
+    setAutoReplyPendingDeletion({ id: autoReplyId, message });
   }
 
   function handleCloseDeleteConfirmation() {
@@ -131,41 +131,41 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
       return;
     }
 
-    setQuestionPendingDeletion(null);
+    setAutoReplyPendingDeletion(null);
   }
 
-  async function handleConfirmDeleteQuestion() {
-    if (!questionPendingDeletion || isDeleting) {
+  async function handleConfirmDeleteMessage() {
+    if (!autoReplyPendingDeletion || isDeleting) {
       return;
     }
 
-    const deleted = await deleteAutoReply(questionPendingDeletion.id);
+    const deleted = await deleteAutoReply(autoReplyPendingDeletion.id);
 
     if (deleted) {
-      setQuestionPendingDeletion(null);
+      setAutoReplyPendingDeletion(null);
     }
   }
 
-  async function handleSaveQuestion(event: FormEvent<HTMLFormElement>) {
+  async function handleSaveMessage(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!activeProductId || !questionDraft.trim() || !answerDraft.trim()) {
+    if (!activeProductId || !messageDraft.trim() || !answerDraft.trim()) {
       return;
     }
 
     const savedAutoReply = await saveAutoReply(
       {
         productId: activeProductId,
-        question: questionDraft.trim(),
+        message: messageDraft.trim(),
         answer: answerDraft.trim(),
       },
-      editingQuestionId ?? undefined,
+      editingAutoReplyId ?? undefined,
     );
 
     if (savedAutoReply) {
-      setIsAddingQuestion(false);
-      setEditingQuestionId(null);
-      setQuestionDraft("");
+      setIsAddingMessage(false);
+      setEditingAutoReplyId(null);
+      setMessageDraft("");
       setAnswerDraft("");
     }
   }
@@ -182,7 +182,7 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
                 Add Auto Reply
               </h1>
               <p className="mt-1 text-xs text-muted-foreground">
-                Select a product to add automatic reply questions and answers.
+                Select a product to add automatic reply messages and answers.
               </p>
             </div>
           ) : product ? (
@@ -230,7 +230,7 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
               required
               value={selectedProductId}
               disabled={
-                isAddingQuestion ||
+                isAddingMessage ||
                 isLoadingProducts ||
                 availableProducts.length === 0
               }
@@ -264,20 +264,20 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
 
             <div className="shrink-0 space-y-1">
               <h2 className="text-sm font-bold text-foreground">
-                Automatic Reply Questions
+                Automatic Reply Messages
               </h2>
               <p className="max-w-3xl text-xs leading-relaxed text-muted-foreground">
-                Add questions and answers for common customer inquiries.
+                Add messages and answers for common customer inquiries.
               </p>
             </div>
 
             <Card className="flex min-h-0 w-full max-w-5xl flex-1 flex-col gap-4 p-4 sm:p-5">
               <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-border/70 pb-3">
-                <h3 className="text-sm font-bold text-foreground">Questions</h3>
+                <h3 className="text-sm font-bold text-foreground">Messages</h3>
 
                 <div className="flex items-center gap-2">
                   <span className="rounded-full border border-primary/15 bg-primary/5 px-2.5 py-1 text-[10px] font-bold text-primary">
-                    {questions.length}/{MAX_AUTO_REPLIES_PER_LEVEL} questions
+                    {messages.length}/{MAX_AUTO_REPLIES_PER_LEVEL} messages
                   </span>
 
                   <Button
@@ -285,15 +285,15 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
                     fullWidth={false}
                     type="button"
                     disabled={
-                      questions.length >= MAX_AUTO_REPLIES_PER_LEVEL ||
-                      isAddingQuestion ||
+                      messages.length >= MAX_AUTO_REPLIES_PER_LEVEL ||
+                      isAddingMessage ||
                       isSaving ||
                       isLoadingAutoReplies
                     }
                     size="small"
-                    onClick={handleAddQuestion}
+                    onClick={handleAddMessage}
                   >
-                    Add Question
+                    Add Message
                   </Button>
                 </div>
               </div>
@@ -328,25 +328,25 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
                       </p>
                     </li>
                   )}
-                  {questions.length === 0 && !isAddingQuestion && (
+                  {messages.length === 0 && !isAddingMessage && (
                     <li className="flex min-h-0 flex-1 items-center justify-center py-10 text-center text-xs font-medium text-muted-foreground">
-                      No questions have been added for this product yet.
+                      No messages have been added for this product yet.
                     </li>
                   )}
-                  {questions.map((question, index) => (
-                    <li key={question.id} className="py-4 first:pt-0 last:pb-0">
+                  {messages.map((message, index) => (
+                    <li key={message.id} className="py-4 first:pt-0 last:pb-0">
                       <AutoReplyItem
-                        reply={question}
+                        reply={message}
                         index={index}
                         followUpCount={
                           autoReplies.filter(
-                            (item) => item.parentId === question.id,
+                            (item) => item.parentId === message.id,
                           ).length
                         }
                         isFirst={index === 0}
-                        isLast={index === questions.length - 1}
+                        isLast={index === messages.length - 1}
                         isDisabled={
-                          isAddingQuestion ||
+                          isAddingMessage ||
                           isSaving ||
                           isDeleting ||
                           isReordering
@@ -355,14 +355,14 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
                           void moveAutoReply(id, direction)
                         }
                         onEdit={(reply) =>
-                          handleEditQuestion(
+                          handleEditMessage(
                             reply.id,
-                            reply.question,
+                            reply.message,
                             reply.answer,
                           )
                         }
                         onDelete={(reply) =>
-                          handleOpenDeleteConfirmation(reply.id, reply.question)
+                          handleOpenDeleteConfirmation(reply.id, reply.message)
                         }
                         onOpenFollowUps={(id) =>
                           router.push(`/bot-manager/${id}/follow-ups`)
@@ -371,23 +371,23 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
                     </li>
                   ))}
 
-                  {isAddingQuestion && (
+                  {isAddingMessage && (
                     <li className="py-4">
-                      <form onSubmit={handleSaveQuestion} className="space-y-3">
+                      <form onSubmit={handleSaveMessage} className="space-y-3">
                         <h3 className="text-sm font-bold text-foreground">
-                          {editingQuestionId ? "Edit Question" : "New Question"}
+                          {editingAutoReplyId ? "Edit Message" : "New Message"}
                         </h3>
                         <div className="space-y-2">
                           <Input
                             autoFocus
                             required
                             maxLength={500}
-                            value={questionDraft}
+                            value={messageDraft}
                             onChange={(event) =>
-                              setQuestionDraft(event.target.value)
+                              setMessageDraft(event.target.value)
                             }
-                            placeholder="Enter a question..."
-                            aria-label="New auto reply question"
+                            placeholder="Enter a message..."
+                            aria-label="New auto reply message"
                             disabled={isSaving}
                           />
 
@@ -417,7 +417,7 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
                             fullWidth={false}
                             type="button"
                             size="small"
-                            onClick={handleCancelAddQuestion}
+                            onClick={handleCancelAddMessage}
                             disabled={isSaving}
                           >
                             Cancel
@@ -430,13 +430,13 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
                             size="small"
                             disabled={
                               isSaving ||
-                              !questionDraft.trim() ||
+                              !messageDraft.trim() ||
                               !answerDraft.trim()
                             }
                           >
                             {isSaving
                               ? "Saving..."
-                              : editingQuestionId
+                              : editingAutoReplyId
                                 ? "Save Changes"
                                 : "Save"}
                           </Button>
@@ -447,9 +447,9 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
                 </ol>
               )}
 
-              {questions.length >= MAX_AUTO_REPLIES_PER_LEVEL && (
+              {messages.length >= MAX_AUTO_REPLIES_PER_LEVEL && (
                 <p className="shrink-0 border-t border-border/70 pt-3 text-[10px] text-muted-foreground">
-                  Maximum of {MAX_AUTO_REPLIES_PER_LEVEL} questions reached.
+                  Maximum of {MAX_AUTO_REPLIES_PER_LEVEL} messages reached.
                 </p>
               )}
             </Card>
@@ -457,27 +457,27 @@ export function QuestionEditor({ productId }: QuestionEditorProps) {
         ) : isProductSelectionMode ? (
           <Card className="flex min-h-0 w-full max-w-5xl flex-1 items-center justify-center py-10 text-center">
             <p className="text-xs font-medium text-muted-foreground">
-              Select a product to view and manage its automatic reply questions.
+              Select a product to view and manage its automatic reply messages.
             </p>
           </Card>
         ) : null}
       </section>
 
       <ConfirmationDialog
-        open={Boolean(questionPendingDeletion)}
-        title="Delete question?"
+        open={Boolean(autoReplyPendingDeletion)}
+        title="Delete message?"
         description={
-          questionPendingDeletion
-            ? `Deleting "${questionPendingDeletion.question}" will also permanently delete all of its follow-up questions.`
+          autoReplyPendingDeletion
+            ? `Deleting "${autoReplyPendingDeletion.message}" will also permanently delete all of its follow-up messages.`
             : ""
         }
-        confirmLabel="Delete Question"
+        confirmLabel="Delete Message"
         pendingLabel="Deleting..."
         variant="danger"
         icon={Trash2}
         isPending={isDeleting}
         error={deletionError}
-        onConfirm={handleConfirmDeleteQuestion}
+        onConfirm={handleConfirmDeleteMessage}
         onCancel={handleCloseDeleteConfirmation}
       />
     </main>

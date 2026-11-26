@@ -1,10 +1,10 @@
 import {
-  botManagerQuestions,
-  findBotManagerQuestion,
-  type BotManagerQuestion,
+  botManagerMessages,
+  findBotManagerMessage,
+  type BotManagerMessage,
 } from "@/components/bot-manager/question-editor-data";
 
-type QuestionDirection = "up" | "down";
+type MessageDirection = "up" | "down";
 
 const listeners = new Set<() => void>();
 
@@ -12,34 +12,34 @@ let version = 0;
 
 let snapshot = {
   version,
-  questions: botManagerQuestions,
+  messages: botManagerMessages,
 };
 
 function notifyListeners() {
   version += 1;
   snapshot = {
     version,
-    questions: botManagerQuestions,
+    messages: botManagerMessages,
   };
   listeners.forEach((listener) => listener());
 }
 
-function createQuestionId(prefix: string) {
+function createAutoReplyId(prefix: string) {
   return `${prefix}-${crypto.randomUUID()}`;
 }
 
-function findQuestionList(
-  questions: BotManagerQuestion[],
-  questionId: string,
-): { items: BotManagerQuestion[]; index: number } | null {
-  for (let index = 0; index < questions.length; index += 1) {
-    const question = questions[index];
+function findMessageList(
+  messages: BotManagerMessage[],
+  autoReplyId: string,
+): { items: BotManagerMessage[]; index: number } | null {
+  for (let index = 0; index < messages.length; index += 1) {
+    const message = messages[index];
 
-    if (question.id === questionId) {
-      return { items: questions, index };
+    if (message.id === autoReplyId) {
+      return { items: messages, index };
     }
 
-    const match = findQuestionList(question.followUps ?? [], questionId);
+    const match = findMessageList(message.followUps ?? [], autoReplyId);
 
     if (match) {
       return match;
@@ -49,7 +49,7 @@ function findQuestionList(
   return null;
 }
 
-export function subscribeToBotManagerQuestions(listener: () => void) {
+export function subscribeToBotManagerMessages(listener: () => void) {
   listeners.add(listener);
 
   return () => {
@@ -57,68 +57,68 @@ export function subscribeToBotManagerQuestions(listener: () => void) {
   };
 }
 
-export function getBotManagerQuestionsSnapshot() {
+export function getBotManagerMessagesSnapshot() {
   return snapshot;
 }
 
-export function addBotManagerQuestion(productId: string) {
-  const questions = (botManagerQuestions[productId] ??= []);
+export function addBotManagerMessage(productId: string) {
+  const messages = (botManagerMessages[productId] ??= []);
 
-  const question: BotManagerQuestion = {
-    id: createQuestionId("Q"),
-    question: "",
+  const message: BotManagerMessage = {
+    id: createAutoReplyId("Q"),
+    message: "",
     answer: "",
     followUps: [],
   };
 
-  questions.push(question);
+  messages.push(message);
   notifyListeners();
 
-  return question;
+  return message;
 }
 
-export function addBotManagerFollowUp(parentQuestionId: string) {
-  const match = findBotManagerQuestion(parentQuestionId);
+export function addBotManagerFollowUp(parentAutoReplyId: string) {
+  const match = findBotManagerMessage(parentAutoReplyId);
 
   if (!match) {
     return null;
   }
 
-  const question: BotManagerQuestion = {
-    id: createQuestionId("FQ"),
-    question: "",
+  const message: BotManagerMessage = {
+    id: createAutoReplyId("FQ"),
+    message: "",
     answer: "",
     followUps: [],
   };
 
-  match.question.followUps ??= [];
-  match.question.followUps.push(question);
+  match.message.followUps ??= [];
+  match.message.followUps.push(message);
   notifyListeners();
 
-  return question;
+  return message;
 }
 
-export function updateBotManagerQuestion(
-  questionId: string,
-  question: string,
+export function updateBotManagerMessage(
+  autoReplyId: string,
+  message: string,
   answer: string,
 ) {
-  const match = findBotManagerQuestion(questionId);
+  const match = findBotManagerMessage(autoReplyId);
 
   if (!match) {
     return false;
   }
 
-  match.question.question = question;
-  match.question.answer = answer;
+  match.message.message = message;
+  match.message.answer = answer;
   notifyListeners();
 
   return true;
 }
 
-export function removeBotManagerQuestion(questionId: string) {
-  for (const questions of Object.values(botManagerQuestions)) {
-    const match = findQuestionList(questions, questionId);
+export function removeBotManagerMessage(autoReplyId: string) {
+  for (const messages of Object.values(botManagerMessages)) {
+    const match = findMessageList(messages, autoReplyId);
 
     if (match) {
       match.items.splice(match.index, 1);
@@ -130,12 +130,12 @@ export function removeBotManagerQuestion(questionId: string) {
   return false;
 }
 
-export function moveBotManagerQuestion(
-  questionId: string,
-  direction: QuestionDirection,
+export function moveBotManagerMessage(
+  autoReplyId: string,
+  direction: MessageDirection,
 ) {
-  for (const questions of Object.values(botManagerQuestions)) {
-    const match = findQuestionList(questions, questionId);
+  for (const messages of Object.values(botManagerMessages)) {
+    const match = findMessageList(messages, autoReplyId);
 
     if (!match) {
       continue;

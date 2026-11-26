@@ -11,11 +11,8 @@ export interface PlaygroundChatMessage {
   provider?: "gemini";
 }
 
-function normalizeQuestion(question: string): string {
-  return question.trim().replace(/\s+/g, " ").toLowerCase();
-}
-
 export function usePlaygroundChat(
+  productId: string,
   productName: string,
   autoReplies: AutoReply[],
   autoRepliesEnabled: boolean,
@@ -108,7 +105,7 @@ export function usePlaygroundChat(
         return;
       }
 
-      appendReply(reply, reply.question);
+      appendReply(reply, reply.message);
     },
     [appendReply, autoRepliesEnabled, suggestedReplies],
   );
@@ -141,6 +138,7 @@ export function usePlaygroundChat(
     try {
       const response = await sendGeminiMessage({
         message: customerMessage,
+        productId,
       });
 
       if (geminiRequestIdRef.current !== requestId) {
@@ -171,7 +169,7 @@ export function usePlaygroundChat(
         setIsSending(false);
       }
     }
-  }, [createMessageId, isSending, messageDraft]);
+  }, [createMessageId, isSending, messageDraft, productId]);
 
   const answerResolution = useCallback(
     (resolved: boolean) => {
@@ -193,7 +191,7 @@ export function usePlaygroundChat(
           id: assistantMessageId,
           role: "assistant",
           content: resolved
-            ? "I'm glad I could help! You can still type another question anytime."
+            ? "I'm glad I could help! You can still type another message anytime."
             : "Thank you for letting us know. A support agent will review your concern and respond as soon as possible.",
         },
       ]);

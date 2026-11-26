@@ -19,7 +19,7 @@ const autoReplySelect = {
   id: true,
   productId: true,
   parentId: true,
-  question: true,
+  message: true,
   answer: true,
   position: true,
   createdAt: true,
@@ -99,7 +99,7 @@ export async function createAutoReply(userId: string, input: unknown) {
     );
   }
 
-  const { productId, parentId, question, answer } = validationResult.data;
+  const { productId, parentId, message, answer } = validationResult.data;
 
   const product = await prisma.product.findFirst({
     where: {
@@ -154,7 +154,7 @@ export async function createAutoReply(userId: string, input: unknown) {
   if (siblingCount >= MAX_AUTO_REPLIES_PER_LEVEL) {
     throw new AutoReplyError(
       "LIMIT_REACHED",
-      `A maximum of ${MAX_AUTO_REPLIES_PER_LEVEL} questions is allowed at each level.`,
+      `A maximum of ${MAX_AUTO_REPLIES_PER_LEVEL} messages is allowed at each level.`,
     );
   }
 
@@ -162,7 +162,7 @@ export async function createAutoReply(userId: string, input: unknown) {
     data: {
       productId,
       parentId,
-      question,
+      message,
       answer,
       position: (lastSibling?.position ?? -1) + 1,
     },

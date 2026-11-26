@@ -77,7 +77,7 @@ const autoReplyA = {
   id: "auto-reply-a-id",
   productId: productAId,
   parentId: null,
-  question: "How do I reset the router?",
+  message: "How do I reset the router?",
   answer: "Hold the reset button for 10 seconds.",
   position: 0,
   createdAt: new Date("2026-01-01T00:00:00.000Z"),
@@ -87,13 +87,13 @@ const autoReplyA = {
 const autoReplyB = {
   ...autoReplyA,
   id: "auto-reply-b-id",
-  question: "How do I connect to Wi-Fi?",
+  message: "How do I connect to Wi-Fi?",
   position: 1,
 };
 
 const createInput = {
   productId: productAId,
-  question: "How do I reset the router?",
+  message: "How do I reset the router?",
   answer: "Hold the reset button for 10 seconds.",
 };
 
@@ -287,7 +287,7 @@ describe("Bot Manager - Create Auto Reply", () => {
         data: {
           productId: productAId,
           parentId: null,
-          question: createInput.question,
+          message: createInput.message,
           answer: createInput.answer,
           position: 0,
         },
@@ -295,6 +295,37 @@ describe("Bot Manager - Create Auto Reply", () => {
     );
 
     expect(result).toEqual(autoReplyA);
+  });
+
+  it("accepts a customer message that is not phrased as a question", async () => {
+    const message = "I see color red";
+
+    productFindFirstMock.mockResolvedValue({
+      id: productAId,
+    });
+
+    autoReplyCountMock.mockResolvedValue(0);
+    autoReplyFindFirstMock.mockResolvedValue(null);
+    autoReplyCreateMock.mockResolvedValue({
+      ...autoReplyA,
+      message,
+    });
+
+    const result = await createAutoReply(userAId, {
+      ...createInput,
+      message,
+    });
+
+    expect(autoReplyCreateMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          message,
+          answer: createInput.answer,
+        }),
+      }),
+    );
+
+    expect(result.message).toBe(message);
   });
 
   it("creates a follow-up under an existing automatic reply", async () => {
@@ -361,12 +392,12 @@ describe("Bot Manager - Create Auto Reply", () => {
     );
   });
 
-  it("rejects an empty question", async () => {
+  it("rejects an empty message", async () => {
     await expectInvalidInput(
       () =>
         createAutoReply(userAId, {
           ...createInput,
-          question: "",
+          message: "",
         }),
       [
         productFindFirstMock,
@@ -446,7 +477,7 @@ describe("Bot Manager - Update Auto Reply", () => {
   it("updates an automatic reply belonging to the authenticated user", async () => {
     const updatedReply = {
       ...autoReplyA,
-      question: "Updated question",
+      message: "Updated message",
       answer: "Updated answer",
     };
 
@@ -457,7 +488,7 @@ describe("Bot Manager - Update Auto Reply", () => {
     autoReplyUpdateMock.mockResolvedValue(updatedReply);
 
     const result = await updateAutoReply(userAId, autoReplyA.id, {
-      question: "Updated question",
+      message: "Updated message",
       answer: "Updated answer",
     });
 
@@ -480,7 +511,7 @@ describe("Bot Manager - Update Auto Reply", () => {
           id: autoReplyA.id,
         },
         data: {
-          question: "Updated question",
+          message: "Updated message",
           answer: "Updated answer",
         },
       }),
@@ -492,7 +523,7 @@ describe("Bot Manager - Update Auto Reply", () => {
   it("rejects an empty automatic reply ID", async () => {
     await expect(
       updateAutoReply(userAId, "", {
-        question: "Updated question",
+        message: "Updated message",
         answer: "Updated answer",
       }),
     ).rejects.toMatchObject({
@@ -503,10 +534,10 @@ describe("Bot Manager - Update Auto Reply", () => {
     expect(autoReplyUpdateMock).not.toHaveBeenCalled();
   });
 
-  it("rejects an empty updated question", async () => {
+  it("rejects an empty updated message", async () => {
     await expect(
       updateAutoReply(userAId, autoReplyA.id, {
-        question: "",
+        message: "",
         answer: "Updated answer",
       }),
     ).rejects.toMatchObject({
@@ -520,7 +551,7 @@ describe("Bot Manager - Update Auto Reply", () => {
   it("rejects an empty updated answer", async () => {
     await expect(
       updateAutoReply(userAId, autoReplyA.id, {
-        question: "Updated question",
+        message: "Updated message",
         answer: "",
       }),
     ).rejects.toMatchObject({
@@ -536,7 +567,7 @@ describe("Bot Manager - Update Auto Reply", () => {
 
     await expect(
       updateAutoReply(userAId, autoReplyB.id, {
-        question: "Unauthorized Update",
+        message: "Unauthorized Update",
         answer: "Unauthorized Answer",
       }),
     ).rejects.toMatchObject({
@@ -894,7 +925,7 @@ describe("Bot Manager Resolvers - Unauthenticated User", () => {
         {
           id: autoReplyA.id,
           input: {
-            question: "Updated question",
+            message: "Updated message",
             answer: "Updated answer",
           },
         },

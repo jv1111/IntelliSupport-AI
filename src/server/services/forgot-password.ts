@@ -324,7 +324,6 @@ export async function hasValidPasswordResetToken(
   );
 }
 
-
 export async function resetPassword(
   resetTokenInput: unknown,
   input: unknown,
@@ -361,8 +360,8 @@ export async function resetPassword(
   const now = new Date();
 
   await prisma.$transaction(async (transaction) => {
-    const verification =
-      await transaction.passwordResetVerification.findUnique({
+    const verification = await transaction.passwordResetVerification.findUnique(
+      {
         where: { resetTokenHash },
         select: {
           id: true,
@@ -371,7 +370,8 @@ export async function resetPassword(
           resetTokenExpiresAt: true,
           consumedAt: true,
         },
-      });
+      },
+    );
 
     if (
       !verification ||

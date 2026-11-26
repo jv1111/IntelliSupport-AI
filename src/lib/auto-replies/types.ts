@@ -4,7 +4,7 @@ export interface AutoReply {
   id: string;
   productId: string;
   parentId: string | null;
-  question: string;
+  message: string;
   answer: string;
   position: number;
   createdAt: string;
@@ -14,11 +14,11 @@ export interface AutoReply {
 export interface CreateAutoReplyInput {
   productId: string;
   parentId?: string | null;
-  question: string;
+  message: string;
   answer: string;
 }
 
 export interface UpdateAutoReplyInput {
-  question: string;
+  message: string;
   answer: string;
 }

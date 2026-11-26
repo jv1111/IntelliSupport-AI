@@ -15,10 +15,10 @@ import { fieldControlStyles } from "@/components/ui/field";
 import { MAX_AUTO_REPLIES_PER_LEVEL } from "@/lib/auto-replies/constants";
 
 interface FollowUpsEditorProps {
-  questionId: string;
+  autoReplyId: string;
 }
 
-export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
+export function FollowUpsEditor({ autoReplyId }: FollowUpsEditorProps) {
   const router = useRouter();
 
   const [isAddingFollowUp, setIsAddingFollowUp] = useState(false);
@@ -29,7 +29,7 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
   );
   const [followUpPendingDeletion, setFollowUpPendingDeletion] = useState<{
     id: string;
-    question: string;
+    message: string;
   } | null>(null);
 
   const {
@@ -48,7 +48,7 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
     retry: retryAutoReplies,
   } = useBotManagerAutoReplies();
 
-  const parentReply = autoReplies.find((item) => item.id === questionId);
+  const parentReply = autoReplies.find((item) => item.id === autoReplyId);
 
   const {
     product,
@@ -57,7 +57,7 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
   } = useBotManagerProduct(parentReply?.productId);
 
   const followUps = autoReplies
-    .filter((item) => item.parentId === questionId)
+    .filter((item) => item.parentId === autoReplyId)
     .sort((a, b) => a.position - b.position || a.id.localeCompare(b.id));
 
   function handleBack() {
@@ -92,7 +92,7 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
 
   function handleEditFollowUp(
     followUpId: string,
-    question: string,
+    message: string,
     answer: string,
   ) {
     if (isAddingFollowUp || isSaving || isDeleting || isReordering) {
@@ -100,7 +100,7 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
     }
 
     setEditingFollowUpId(followUpId);
-    setFollowUpDraft(question);
+    setFollowUpDraft(message);
     setAnswerDraft(answer);
     setIsAddingFollowUp(true);
   }
@@ -116,8 +116,8 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
     setAnswerDraft("");
   }
 
-  function handleOpenDeleteConfirmation(followUpId: string, question: string) {
-    setFollowUpPendingDeletion({ id: followUpId, question });
+  function handleOpenDeleteConfirmation(followUpId: string, message: string) {
+    setFollowUpPendingDeletion({ id: followUpId, message });
   }
 
   function handleCloseDeleteConfirmation() {
@@ -151,7 +151,7 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
       {
         productId: parentReply.productId,
         parentId: parentReply.id,
-        question: followUpDraft.trim(),
+        message: followUpDraft.trim(),
         answer: answerDraft.trim(),
       },
       editingFollowUpId ?? undefined,
@@ -171,7 +171,7 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
         <section className="space-y-6">
           <BackButton
             onClick={handleBack}
-            ariaLabel="Back to previous questions"
+            ariaLabel="Back to previous messages"
           />
           <p role="status" className="text-xs text-muted-foreground">
             Loading automatic replies...
@@ -187,7 +187,7 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
         <section className="space-y-4">
           <BackButton
             onClick={handleBack}
-            ariaLabel="Back to previous questions"
+            ariaLabel="Back to previous messages"
           />
           <p role="alert" className="text-xs text-danger">
             {autoRepliesError}
@@ -211,7 +211,7 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
         <section className="space-y-6">
           <BackButton onClick={handleBack} ariaLabel="Back to Bot Manager" />
           <h1 className="text-sm font-bold text-foreground">
-            Follow-up question not found
+            Follow-up message not found
           </h1>
         </section>
       </main>
@@ -224,7 +224,7 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
         <section className="space-y-6">
           <BackButton
             onClick={handleBack}
-            ariaLabel="Back to previous questions"
+            ariaLabel="Back to previous messages"
           />
           <p role="status" className="text-xs text-muted-foreground">
             Loading product...
@@ -240,7 +240,7 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
         <section className="space-y-6">
           <BackButton
             onClick={handleBack}
-            ariaLabel="Back to previous questions"
+            ariaLabel="Back to previous messages"
           />
           <h1 role="alert" className="text-sm font-bold text-danger">
             {productError ?? "Unable to load product."}
@@ -256,7 +256,7 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
         <div className="flex shrink-0 items-center gap-3">
           <BackButton
             onClick={handleBack}
-            ariaLabel="Back to previous questions"
+            ariaLabel="Back to previous messages"
           />
 
           <div className="min-w-0 space-y-1">
@@ -264,7 +264,7 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
               {product.name}
             </p>
             <h1 className="text-sm font-bold text-foreground">
-              Follow-ups for {parentReply.question}
+              Follow-ups for {parentReply.message}
             </h1>
           </div>
         </div>
@@ -286,7 +286,7 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
           <div className="flex shrink-0 flex-wrap items-start justify-between gap-3">
             <p className="flex-1 text-xs leading-relaxed text-muted-foreground">
               After this answer, customers can pick one of these follow-up
-              questions ({followUps.length}/{MAX_AUTO_REPLIES_PER_LEVEL}).
+              messages ({followUps.length}/{MAX_AUTO_REPLIES_PER_LEVEL}).
             </p>
 
             <Button
@@ -341,12 +341,12 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
                         onEdit={(reply) =>
                           handleEditFollowUp(
                             reply.id,
-                            reply.question,
+                            reply.message,
                             reply.answer,
                           )
                         }
                         onDelete={(reply) =>
-                          handleOpenDeleteConfirmation(reply.id, reply.question)
+                          handleOpenDeleteConfirmation(reply.id, reply.message)
                         }
                         onOpenFollowUps={(id) =>
                           router.push(`/bot-manager/${id}/follow-ups`)
@@ -373,8 +373,8 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
                         onChange={(event) =>
                           setFollowUpDraft(event.target.value)
                         }
-                        placeholder="Enter a follow-up question..."
-                        aria-label="New follow-up question"
+                        placeholder="Enter a follow-up message..."
+                        aria-label="New follow-up message"
                         disabled={isSaving}
                       />
 
@@ -433,14 +433,14 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
           ) : (
             <Card className="flex min-h-0 flex-1 items-center justify-center py-10 text-center">
               <p className="text-xs font-medium text-muted-foreground">
-                No follow-up questions have been added yet.
+                No follow-up messages have been added yet.
               </p>
             </Card>
           )}
 
           {followUps.length >= MAX_AUTO_REPLIES_PER_LEVEL && (
             <p className="shrink-0 border-t border-border/70 pt-3 text-[10px] text-muted-foreground">
-              Maximum of {MAX_AUTO_REPLIES_PER_LEVEL} follow-up questions
+              Maximum of {MAX_AUTO_REPLIES_PER_LEVEL} follow-up messages
               reached.
             </p>
           )}
@@ -449,10 +449,10 @@ export function FollowUpsEditor({ questionId }: FollowUpsEditorProps) {
 
       <ConfirmationDialog
         open={Boolean(followUpPendingDeletion)}
-        title="Delete follow-up question?"
+        title="Delete follow-up message?"
         description={
           followUpPendingDeletion
-            ? `Deleting "${followUpPendingDeletion.question}" will also permanently delete all of its nested follow-up questions.`
+            ? `Deleting "${followUpPendingDeletion.message}" will also permanently delete all of its nested follow-up messages.`
             : ""
         }
         confirmLabel="Delete Follow-up"

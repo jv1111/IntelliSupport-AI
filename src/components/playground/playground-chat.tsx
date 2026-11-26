@@ -41,7 +41,12 @@ export function PlaygroundChat({
     selectReply,
     answerResolution,
     restart,
-  } = usePlaygroundChat(product.name, autoReplies, autoRepliesEnabled);
+  } = usePlaygroundChat(
+    product.id,
+    product.name,
+    autoReplies,
+    autoRepliesEnabled,
+  );
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -50,7 +55,7 @@ export function PlaygroundChat({
 
   const inputPlaceholder = isSending
     ? "AI Gemini is thinking..."
-    : "Type your question...";
+    : "Type your message...";
 
   const messagesContainerRef = useAutoScroll<HTMLDivElement>(messages.length);
 
@@ -68,8 +73,8 @@ export function PlaygroundChat({
               Test your product assistant
             </h1>
             <p className="mt-1 text-xs text-muted-foreground">
-              Preview how your assistant responds to customer questions about
-              the selected product.
+              Preview how your assistant responds to customer messages about the
+              selected product.
             </p>
           </div>
         </div>
@@ -132,7 +137,9 @@ export function PlaygroundChat({
 
                   <div className="max-w-[85%] space-y-2">
                     <p className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                      {message.provider === "gemini" ? "AI Gemini" : "AI Assistant"}
+                      {message.provider === "gemini"
+                        ? "AI Gemini"
+                        : "AI Assistant"}
                     </p>
                     <div className="rounded-2xl rounded-tl-sm border border-border bg-surface-muted p-3 text-xs leading-relaxed whitespace-pre-wrap text-foreground">
                       {message.content}
@@ -156,7 +163,7 @@ export function PlaygroundChat({
             {suggestedReplies.length > 0 && (
               <div className="ml-12 space-y-2">
                 <p className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                  Suggested Questions
+                  Suggested Messages
                 </p>
 
                 <div className="flex flex-col items-start gap-1.5">
@@ -167,7 +174,7 @@ export function PlaygroundChat({
                       className="inline-flex min-h-11 w-fit max-w-full items-center rounded-2xl rounded-bl-sm border border-primary/15 bg-primary/5 px-3 py-2 text-left text-xs leading-relaxed font-medium text-primary transition-colors hover:border-primary/30 hover:bg-primary/10 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
                       onClick={() => selectReply(reply)}
                     >
-                      <span className="min-w-0">{reply.question}</span>
+                      <span className="min-w-0">{reply.message}</span>
                     </button>
                   ))}
                 </div>
@@ -179,7 +186,7 @@ export function PlaygroundChat({
                 className="ml-12 rounded-xl border border-border bg-surface-muted p-3 text-xs text-muted-foreground"
                 role="status"
               >
-                Suggested questions are disabled in your Bot Settings. You can
+                Suggested messages are disabled in your Bot Settings. You can
                 still chat with AI Gemini.
               </div>
             ) : !hasAutoReplies ? (
@@ -187,8 +194,8 @@ export function PlaygroundChat({
                 className="ml-12 rounded-xl border border-border bg-surface-muted p-3 text-xs text-muted-foreground"
                 role="status"
               >
-                No suggested questions are configured for this product yet.
-                You can still ask AI Gemini a question.
+                No suggested messages are configured for this product yet. You
+                can still ask AI Gemini a message.
               </div>
             ) : null}
 

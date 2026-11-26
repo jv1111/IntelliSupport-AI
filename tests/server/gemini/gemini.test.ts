@@ -20,6 +20,7 @@ describe("Gemini Service - Live Sending", () => {
         result = await sendGeminiMessage({
           message:
             "Reply with exactly this text and nothing else: GEMINI_CONNECTION_OK",
+          systemInstruction: "Return the requested test token exactly.",
         });
       } catch (error) {
         if (error instanceof GeminiError && error.code === "RATE_LIMITED") {

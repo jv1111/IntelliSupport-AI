@@ -42,14 +42,14 @@ export function AutoReplyItem({
       <div className="min-w-0 flex-1 space-y-3">
         <div className="flex items-start justify-between gap-3">
           <p className="min-w-0 text-sm font-bold text-foreground">
-            {reply.question}
+            {reply.message}
           </p>
 
           <div className="flex shrink-0 items-center gap-2">
             <Button
               variant="icon"
               type="button"
-              aria-label={`Move ${reply.question} up`}
+              aria-label={`Move ${reply.message} up`}
               title="Move up"
               className="text-muted-foreground! hover:text-primary!"
               disabled={isFirst || isDisabled}
@@ -61,7 +61,7 @@ export function AutoReplyItem({
             <Button
               variant="icon"
               type="button"
-              aria-label={`Move ${reply.question} down`}
+              aria-label={`Move ${reply.message} down`}
               title="Move down"
               className="text-muted-foreground! hover:text-primary!"
               disabled={isLast || isDisabled}
@@ -73,8 +73,8 @@ export function AutoReplyItem({
             <Button
               variant="icon"
               type="button"
-              aria-label={`Edit ${reply.question}`}
-              title="Edit question"
+              aria-label={`Edit ${reply.message}`}
+              title="Edit message"
               className="text-primary! hover:text-primary-hover!"
               disabled={isDisabled}
               onClick={() => onEdit(reply)}
@@ -85,8 +85,8 @@ export function AutoReplyItem({
             <Button
               variant="icon"
               type="button"
-              aria-label={`Delete ${reply.question}`}
-              title="Delete question"
+              aria-label={`Delete ${reply.message}`}
+              title="Delete message"
               className="text-danger! hover:text-danger/80!"
               disabled={isDisabled}
               onClick={() => onDelete(reply)}

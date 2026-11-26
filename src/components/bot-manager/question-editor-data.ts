@@ -1,27 +1,27 @@
-export interface BotManagerQuestion {
+export interface BotManagerMessage {
   id: string;
-  question: string;
+  message: string;
   answer: string;
-  followUps?: BotManagerQuestion[];
+  followUps?: BotManagerMessage[];
 }
 
-export const botManagerQuestions: Record<string, BotManagerQuestion[]> = {
+export const botManagerMessages: Record<string, BotManagerMessage[]> = {
   "PROD-101": [
     {
       id: "Q-101",
-      question: "How do I reset the router?",
+      message: "How do I reset the router?",
       answer:
         "Hold the reset button for 10 seconds until the LED blinks white, then wait 2 minutes for it to restart.",
       followUps: [
         {
           id: "FQ-101",
-          question: "What if the router does not restart after resetting?",
+          message: "What if the router does not restart after resetting?",
           answer:
             "Disconnect the power adapter, wait 30 seconds, reconnect it, and allow the router to boot completely.",
           followUps: [
             {
               id: "FQ-101-A",
-              question: "How long should I wait for the router to boot?",
+              message: "How long should I wait for the router to boot?",
               answer:
                 "Allow approximately 2 minutes for the router to complete its startup process.",
             },
@@ -29,7 +29,7 @@ export const botManagerQuestions: Record<string, BotManagerQuestion[]> = {
         },
         {
           id: "FQ-102",
-          question: "Will resetting erase my Wi-Fi settings?",
+          message: "Will resetting erase my Wi-Fi settings?",
           answer:
             "Yes. A factory reset restores the default network name and password printed on the router label.",
         },
@@ -37,7 +37,7 @@ export const botManagerQuestions: Record<string, BotManagerQuestion[]> = {
     },
     {
       id: "Q-102",
-      question: "What is the Wi-Fi coverage range?",
+      message: "What is the Wi-Fi coverage range?",
       answer: "The X200 covers up to 2500 sq ft with mesh coverage.",
       followUps: [],
     },
@@ -45,7 +45,7 @@ export const botManagerQuestions: Record<string, BotManagerQuestion[]> = {
   "PROD-102": [
     {
       id: "Q-103",
-      question: "Is the camera waterproof?",
+      message: "Is the camera waterproof?",
       answer: "Yes, it is IP66 weatherproof and safe for outdoor use.",
       followUps: [],
     },
@@ -53,28 +53,28 @@ export const botManagerQuestions: Record<string, BotManagerQuestion[]> = {
   "PROD-103": [],
 };
 
-export interface BotManagerQuestionMatch {
+export interface BotManagerMessageMatch {
   productId: string;
-  question: BotManagerQuestion;
+  message: BotManagerMessage;
   parentId: string | null;
 }
 
-function findQuestionInTree(
-  questions: BotManagerQuestion[],
-  questionId: string,
+function findMessageInTree(
+  messages: BotManagerMessage[],
+  autoReplyId: string,
   productId: string,
   parentId: string | null = null,
-): BotManagerQuestionMatch | null {
-  for (const question of questions) {
-    if (question.id === questionId) {
-      return { productId, question, parentId };
+): BotManagerMessageMatch | null {
+  for (const message of messages) {
+    if (message.id === autoReplyId) {
+      return { productId, message, parentId };
     }
 
-    const match = findQuestionInTree(
-      question.followUps ?? [],
-      questionId,
+    const match = findMessageInTree(
+      message.followUps ?? [],
+      autoReplyId,
       productId,
-      question.id,
+      message.id,
     );
 
     if (match) {
@@ -85,15 +85,15 @@ function findQuestionInTree(
   return null;
 }
 
-export function findBotManagerQuestion(
-  questionId: string,
+export function findBotManagerMessage(
+  autoReplyId: string,
   questionsByProduct: Record<
     string,
-    BotManagerQuestion[]
-  > = botManagerQuestions,
-): BotManagerQuestionMatch | null {
-  for (const [productId, questions] of Object.entries(questionsByProduct)) {
-    const match = findQuestionInTree(questions, questionId, productId);
+    BotManagerMessage[]
+  > = botManagerMessages,
+): BotManagerMessageMatch | null {
+  for (const [productId, messages] of Object.entries(questionsByProduct)) {
+    const match = findMessageInTree(messages, autoReplyId, productId);
 
     if (match) {
       return match;

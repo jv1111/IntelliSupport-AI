@@ -11,12 +11,12 @@ export const createAutoReplySchema = z.object({
     .nullable()
     .optional()
     .transform((value) => value ?? null),
-  question: z.string().trim().min(1, "Question is required."),
+  message: z.string().trim().min(1, "Message is required."),
   answer: z.string().trim().min(1, "Answer is required."),
 });
 
 export const updateAutoReplySchema = z.object({
-  question: z.string().trim().min(1, "Question is required."),
+  message: z.string().trim().min(1, "Message is required."),
   answer: z.string().trim().min(1, "Answer is required."),
 });
 

@@ -4,7 +4,6 @@ import { ResetPasswordForm } from "@/components/auth/reset-password-form";
 import { AppFooter } from "@/components/layout/app-footer";
 import { hasValidPasswordResetToken } from "@/server/services/forgot-password";
 
-
 interface ResetPasswordPageProps {
   params: Promise<{ token: string }>;
 }

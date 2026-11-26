@@ -7,9 +7,9 @@ interface FollowUpsPageProps {
 }
 
 async function FollowUpsContent({ params }: FollowUpsPageProps) {
-  const { productId: questionId } = await params;
+  const { productId: autoReplyId } = await params;
 
-  return <FollowUpsEditor questionId={questionId} />;
+  return <FollowUpsEditor autoReplyId={autoReplyId} />;
 }
 
 export default function FollowUpsPage({ params }: FollowUpsPageProps) {

@@ -135,6 +135,25 @@ export async function getKnowledgeBaseArticles(userId: string, input: unknown) {
   };
 }
 
+export async function getKnowledgeBaseArticlesForProduct(
+  userId: string,
+  productId: string,
+) {
+  const id = validateKnowledgeBaseProductId(productId);
+
+  return prisma.knowledgeBaseArticle.findMany({
+    where: {
+      userId,
+      OR: [
+        { productId: id },
+        { scope: "generic", productId: null },
+      ],
+    },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    select: knowledgeBaseArticleSelect,
+  });
+}
+
 export async function getKnowledgeBaseArticle(
   userId: string,
   articleId: string,

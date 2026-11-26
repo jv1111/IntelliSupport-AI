@@ -10,6 +10,10 @@ const sendGeminiMessageSchema = z.object({
     .trim()
     .min(1, "Message is required.")
     .max(10000, "Message must not exceed 10000 characters."),
+  systemInstruction: z
+    .string()
+    .trim()
+    .min(1, "System instruction is required."),
 });
 
 export class GeminiError extends Error {
@@ -54,6 +58,7 @@ export async function sendGeminiMessage(input: unknown) {
     const interaction = await ai.interactions.create({
       model,
       input: validationResult.data.message,
+      system_instruction: validationResult.data.systemInstruction,
     });
 
     const text = interaction.output_text?.trim();

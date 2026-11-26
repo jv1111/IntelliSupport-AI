@@ -1333,7 +1333,7 @@ export const AutoReplyScalarFieldEnum = {
   id: 'id',
   productId: 'productId',
   parentId: 'parentId',
-  question: 'question',
+  message: 'message',
   answer: 'answer',
   position: 'position',
   createdAt: 'createdAt',
